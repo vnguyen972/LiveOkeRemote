@@ -20,8 +20,8 @@
             android:layout_height="match_parent"
             android:gravity="bottom"
             sothree:panelHeight="68dp"
-            sothree:shadowHeight="4dp">
-
+            sothree:shadowHeight="4dp"
+        >
             <RelativeLayout android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -31,14 +31,9 @@
                     android:gravity="center"
                     android:text="Main Content"
                     android:textSize="16sp" />
-                <include layout="@layout/main_fab"></include>
+                <include layout="@layout/main_fab"/>
             </RelativeLayout>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center|top"
-                android:text="The Awesome Sliding Up Panel"
-                android:textSize="16sp" />
+            <include layout="@layout/panel_hdr"/>
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>
     </LinearLayout>
     <!-- The navigation drawer -->

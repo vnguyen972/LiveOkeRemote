@@ -5,15 +5,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    public SlidingUpPanelLayout slidingPanel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle("Closed");
+                getSupportActionBar().setTitle("");
                 invalidateOptionsMenu();
             }
 
@@ -53,20 +59,10 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
 
-//        findViewById(R.id.pink_icon).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(MainActivity.this, "Clicked pink Floating Action Button", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.setter);
-//        button.setSize(FloatingActionButton.SIZE_MINI);
-//        button.setColorNormalResId(R.color.pink);
-//        button.setColorPressedResId(R.color.pink_pressed);
-//        button.setIcon(R.drawable.ic_fab_star);
-
-        //button.setVisibility(View.INVISIBLE);
+        slidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        slidingPanel.setEnabled(false);
+        displayNowPlaying("Xin Loi Tinh Yeu");
+        updateRsvpCount(7);
     }
 
 
@@ -90,6 +86,35 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateRsvpCount(int count) {
+        ColorGenerator generator = ColorGenerator.DEFAULT;
+        // generate color based on a key (same key returns the same color), useful for list/grid views
+        int color = generator.getColor(count+"");
+        TextDrawable drawable = TextDrawable.builder().
+                beginConfig()
+                .withBorder(4) /* thickness in px */
+                .endConfig()
+                .buildRoundRect(count+"", color, 5);
+        ImageView imageView = (ImageView) findViewById(R.id.now_playing_image_view);
+        imageView.setImageDrawable(drawable);
+        imageView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (slidingPanel.isPanelExpanded()) {
+                    slidingPanel.collapsePanel();
+                } else {
+                    slidingPanel.expandPanel();
+                }
+            }
+        });
+    }
+
+    public void displayNowPlaying(String title) {
+        TextView tv = (TextView) findViewById(R.id.now_playing_text_view);
+        tv.setText(Html.fromHtml("Now Playing: <br><b>"+title+"</b>"));
     }
 
 }

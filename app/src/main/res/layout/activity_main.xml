@@ -5,6 +5,7 @@
     android:id="@+id/main_content"
     android:orientation="vertical"
     tools:context=".MainActivity">
-    <include layout="@layout/main_toolbar"></include>
-    <include layout="@layout/main_drawer"></include>
+    <!--include layout="@layout/panel_hdr"/-->
+    <include layout="@layout/main_toolbar"/>
+    <include layout="@layout/main_drawer"/>
 </LinearLayout>
