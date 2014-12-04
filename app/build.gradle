@@ -24,4 +24,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:21.0.+"
     compile 'com.getbase:floatingactionbutton:1.2.0'
     compile 'com.sothree.slidinguppanel:library:+'
+    compile 'com.github.theDazzler:droidicon:0.1.4@aar'
+
 }
