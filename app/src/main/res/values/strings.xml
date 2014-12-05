@@ -7,4 +7,7 @@
     <string name="open">Nav Drawer Opens</string>
     <string name="close">Nav Drawer Close</string>
     <string name="now_playing">Now Playing:</string>
+
+    <string name="rsvp_title">RESERVED LIST</string>
+    <string name="rsvp_header">SONGS RESERVED</string>
 </resources>

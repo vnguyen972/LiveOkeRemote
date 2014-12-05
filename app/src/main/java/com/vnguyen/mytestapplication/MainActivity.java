@@ -6,8 +6,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -22,28 +25,57 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public class MainActivity extends ActionBarActivity {
 
-    public SlidingUpPanelLayout slidingPanel;
+    public String TAG = "-MainActivity-";
+    public SlidingUpPanelLayout mSlidingPanel;
+    public ImageView mReservedCountImgView;
+    public TextView mNowPlayingTxtView;
+    public OrientationEventListener myOrientationEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // setup toolbar as actionbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
 
+        // setup sliding Navigation panel (hidden from left)
         setupSlidingNav(toolbar);
 
+        // setup floating action button(s)
         setupActionButtons();
 
-        slidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        slidingPanel.setEnabled(false);
+        // setup sliding up panel layout
+        mSlidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        mSlidingPanel.setEnabled(false); // disable swiping to slide
 
+        setupReservedPanel(); // setup reserved list panel
 
-        displayNowPlaying("Xin Loi Tinh Yeu");
-        updateRsvpCount(7);
+        final FloatingActionsMenu fam = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
+        fam.setTag("VERTICAL_DIRECTION");
+
+        // FUTURE FEATURE
+        // See if we could detect orientation change to expand the floating button accordingly
+        myOrientationEventListener = new OrientationEventListener(getApplicationContext()) {
+            @Override
+            public void onOrientationChanged(int orientation) {
+                if (fam.getTag().equals("VERTICAL_DIRECTION")) {
+                    fam.setTag("HORIZONTAL_DIRECTION");
+                } else if (fam.getTag().equals("HORIZONTAL_DIRECTION")) {
+                    fam.setTag("VERTICAL_DIRECTION");
+                }
+                Log.v(TAG, fam.getTag()+"");
+            }
+        };
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -96,9 +128,11 @@ public class MainActivity extends ActionBarActivity {
                 if (playButton.getTag().equals("PLAY")) {
                     playButton.setImageDrawable(pauseBtnIcon);
                     playButton.setTag("PAUSE");
+                    updateNowPlaying("Now Playing:<br><b>Xin Loi Tinh Yeu</b>");
                 } else if (playButton.getTag().equals("PAUSE")) {
                     playButton.setImageDrawable(playBtnIcon);
                     playButton.setTag("PLAY");
+                    updateNowPlaying("<b>PAUSE<br>Press PLAY to resume</b>");
                 }
             }
         });
@@ -157,35 +191,43 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
     }
-    public void updateRsvpCount(int count) {
+
+    public void setupReservedPanel() {
+        mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
+
+        mReservedCountImgView = (ImageView) findViewById(R.id.now_playing_image_view);
+        mReservedCountImgView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mSlidingPanel.isPanelExpanded()) {
+                    mSlidingPanel.collapsePanel();
+                    getSupportActionBar().setTitle("");
+                    updateRsvpCount(mNowPlayingTxtView.getText().charAt(0) + "");
+                } else {
+                    mSlidingPanel.expandPanel();
+                    getSupportActionBar().setTitle(R.string.rsvp_title);
+                    updateRsvpCount("V");
+                }
+            }
+        });
+        updateRsvpCount("W");
+        updateNowPlaying("<b>Welcome<br>Reserve a song and start singing</b>");
+    }
+
+    public void updateRsvpCount(String value) {
         ColorGenerator generator = ColorGenerator.DEFAULT;
-        // generate color based on a key (same key returns the same color), useful for list/grid views
-        int color = generator.getColor(count+"");
+        int color = generator.getColor(value);
         TextDrawable drawable = TextDrawable.builder().
                 beginConfig()
                 .withBorder(4) /* thickness in px */
                 .endConfig()
-                .buildRoundRect(count+"", color, 5);
-        ImageView imageView = (ImageView) findViewById(R.id.now_playing_image_view);
-        imageView.setImageDrawable(drawable);
-        imageView.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (slidingPanel.isPanelExpanded()) {
-                    slidingPanel.collapsePanel();
-                    getSupportActionBar().setTitle("");
-                } else {
-                    slidingPanel.expandPanel();
-                    getSupportActionBar().setTitle("Reserved List");
-                }
-            }
-        });
+                .buildRoundRect(value, color, 5);
+        mReservedCountImgView.setImageDrawable(drawable);
     }
 
-    public void displayNowPlaying(String title) {
-        TextView tv = (TextView) findViewById(R.id.now_playing_text_view);
-        tv.setText(Html.fromHtml("Now Playing: <br><b>"+title+"</b>"));
+    public void updateNowPlaying(String title) {
+        mNowPlayingTxtView.setText(Html.fromHtml(title));
     }
 
 }
