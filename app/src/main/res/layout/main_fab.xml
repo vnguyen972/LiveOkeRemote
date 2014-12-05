@@ -14,19 +14,47 @@
         fab:fab_addButtonPlusIconColor="@android:color/white"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp">
+        android:layout_marginEnd="16dp"
+        >
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/switchAudioTrackBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_colorNormal="@color/white"
-            fab:fab_colorPressed="@color/white_pressed"/>
+            fab:fab_colorNormal="@color/orange_200"
+            fab:fab_colorPressed="@color/orange_300"
+            fab:fab_addButtonColorNormal="@color/orange_700"
+            fab:fab_addButtonColorPressed="@color/orange_600"
+            />
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/skipPreviousBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/orange_200"
+            fab:fab_colorPressed="@color/orange_300"
+            fab:fab_addButtonColorNormal="@color/orange_700"
+            fab:fab_addButtonColorPressed="@color/orange_600"
+        />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/playBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_colorNormal="@color/white"
-            fab:fab_colorPressed="@color/white_pressed"/>
+            fab:fab_colorNormal="@color/orange_200"
+            fab:fab_colorPressed="@color/orange_300"
+            fab:fab_addButtonColorNormal="@color/orange_700"
+            fab:fab_addButtonColorPressed="@color/orange_600"
+            />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/skipNextBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/orange_200"
+            fab:fab_colorPressed="@color/orange_300"
+            fab:fab_addButtonColorNormal="@color/orange_700"
+            fab:fab_addButtonColorPressed="@color/orange_600"
+            />
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

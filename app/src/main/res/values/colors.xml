@@ -14,4 +14,11 @@
     <color name="white_pressed">#f1f1f1</color>
     <color name="orange_900">#e65100</color>
     <color name="orange_800">#ef6c00</color>
+    <color name="orange_700">#f57c00</color>
+    <color name="orange_600">#fb8c00</color>
+    <color name="orange_500">#ff9800</color>
+    <color name="orange_400">#ffa726</color>
+    <color name="orange_300">#ffb74d</color>
+    <color name="orange_200">#ffcc80</color>
+
 </resources>
