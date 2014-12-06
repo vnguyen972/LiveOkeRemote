@@ -20,5 +20,8 @@
     <color name="orange_400">#ffa726</color>
     <color name="orange_300">#ffb74d</color>
     <color name="orange_200">#ffcc80</color>
+    <color name="light_green_A400">#76ff03</color>
+    <color name="light_blue_400">#29b6f6</color>
+    <color name="deep_orange_500">#ff5722</color>
 
 </resources>

@@ -30,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
     public ImageView mReservedCountImgView;
     public TextView mNowPlayingTxtView;
     public OrientationEventListener myOrientationEventListener;
+    public MenuItem onOffSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,9 @@ public class MainActivity extends ActionBarActivity {
         // setup toolbar as actionbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        getSupportActionBar().setTitle("Tool-Bar");
+        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM);
+
 
         // setup sliding Navigation panel (hidden from left)
         setupSlidingNav(toolbar);
@@ -81,6 +84,8 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        onOffSwitch = menu.findItem(R.id.on_off_switch);
+        onOffSwitch.setActionView(R.layout.on_off_switch);
         return true;
     }
 
@@ -92,7 +97,7 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.on_off_switch) {
             return true;
         }
 
@@ -156,7 +161,6 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
-
     }
 
     public void setupSlidingNav(Toolbar toolbar) {
