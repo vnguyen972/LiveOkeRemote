@@ -175,14 +175,14 @@ public class MainActivity extends ActionBarActivity {
             public void onDrawerOpened(View view) {
                 super.onDrawerOpened(view);
                 getSupportActionBar().setTitle("Opened");
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 getSupportActionBar().setTitle("");
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
             }
 
             @Override
