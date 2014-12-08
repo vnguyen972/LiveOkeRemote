@@ -20,8 +20,8 @@
             android:layout_height="match_parent">
             <ImageView
                 android:layout_width="fill_parent"
-                android:layout_height="150dp"
-                android:src="@drawable/karaoke_banner"
+                android:layout_height="35dp"
+                android:src="@drawable/karaoke_banner_land"
                 android:scaleType="fitXY"
                 android:id="@+id/imageView" />
             <LinearLayout
@@ -52,9 +52,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Navigation Menu"
-                android:layout_margin="10dp"
-                android:textSize="16sp" />
+                android:text="MENU"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </LinearLayout>
@@ -64,8 +63,7 @@
         android:layout_height="wrap_content"
         android:background="#ffffff"
         android:choiceMode="singleChoice"
-        android:dividerHeight="1dp"
-        />
+        android:dividerHeight="1dp"/>
     <!--LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"

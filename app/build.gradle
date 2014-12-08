@@ -15,6 +15,7 @@ android {
         maven {
             url 'http://dl.bintray.com/amulyakhare/maven'
         }
+        mavenCentral()
     }
     buildTypes {
         release {
@@ -27,9 +28,11 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:appcompat-v7:21.0.+"
+    compile 'com.android.support:recyclerview-v7:21.+'
     compile 'com.getbase:floatingactionbutton:1.2.1'
     compile 'com.sothree.slidinguppanel:library:+'
     compile 'com.joanzapata.android:android-iconify:1.0.8'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.0'
     compile 'com.malinskiy:materialicons:1.0.0'
+    compile 'com.github.theDazzler:droidicon:0.1.4@aar'
 }

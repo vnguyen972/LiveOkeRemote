@@ -1,9 +1,17 @@
 package com.vnguyen.mytestapplication;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
@@ -11,7 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -21,6 +31,8 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -32,6 +44,8 @@ public class MainActivity extends ActionBarActivity {
     public OrientationEventListener myOrientationEventListener;
     public MenuItem onOffSwitch;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +55,8 @@ public class MainActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tool-Bar");
-        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM);
+
 
 
         // setup sliding Navigation panel (hidden from left)
@@ -72,6 +87,31 @@ public class MainActivity extends ActionBarActivity {
                 Log.v(TAG, fam.getTag()+"");
             }
         };
+
+        // Setup Nav Menu
+        String[] navMenuTitles = getResources().getStringArray(R.array.nav_menu_items);
+        ListView mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+
+        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        Bitmap vnIcon = BitmapFactory.decodeResource(getResources(),R.drawable.vn);
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], new BitmapDrawable(getResources(),vnIcon),true,"200"));
+
+        Bitmap usIcon = BitmapFactory.decodeResource(getResources(),R.drawable.us);
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], new BitmapDrawable(getResources(),usIcon),true,"100"));
+
+        Bitmap cnIcon = BitmapFactory.decodeResource(getResources(), R.drawable.cn);
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], new BitmapDrawable(getResources(),cnIcon), true,"100"));
+
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+            }
+        });
+        NavDrawerListAdapter adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
+        mDrawerList.setAdapter(adapter);
     }
 
 
@@ -86,6 +126,39 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
+
+        IconDrawable searchIcon = new IconDrawable(getApplicationContext(), Iconify.IconValue.md_search);
+        searchIcon.sizeDp(30);
+        searchIcon.colorRes(R.color.white);
+        MenuItem search = menu.findItem(R.id.menu_search);
+        //search.setIcon(searchIcon);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        //searchView.setMaxWidth(800);
+        Log.v(TAG, searchView + "");
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(true);
+            SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener()
+            {
+                public boolean onQueryTextChange(String newText)
+                {
+                    // this is your adapter that will be filtered
+                    //adapter.getFilter().filter(newText);
+                    return true;
+                }
+
+                public boolean onQueryTextSubmit(String query)
+                {
+                    // this is your adapter that will be filtered
+                    //adapter.getFilter().filter(query);
+                    return true;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
+        }
+
+
         return true;
     }
 
@@ -174,14 +247,12 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onDrawerOpened(View view) {
                 super.onDrawerOpened(view);
-                getSupportActionBar().setTitle("Opened");
                 //invalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle("");
                 //invalidateOptionsMenu();
             }
 
@@ -211,7 +282,6 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     mSlidingPanel.expandPanel();
                     getSupportActionBar().setTitle(R.string.rsvp_title);
-                    updateRsvpCount("V");
                 }
             }
         });

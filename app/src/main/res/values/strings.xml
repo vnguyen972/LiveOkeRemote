@@ -11,4 +11,14 @@
 
     <string name="rsvp_title">RESERVED LIST</string>
     <string name="rsvp_header">SONGS RESERVED</string>
+
+    <string-array name="nav_menu_items">
+        <item>Vietnamese Songs</item>
+        <item>English Songs</item>
+        <item>Chinese Songs</item>
+    </string-array>
+
+    <string name="search_hint">Search Songs</string>
+    <string name="search_label">Search</string>
+    <string name="search_global_description">Search Global</string>
 </resources>
