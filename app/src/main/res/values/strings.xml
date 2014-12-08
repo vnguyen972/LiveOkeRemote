@@ -13,12 +13,21 @@
     <string name="rsvp_header">SONGS RESERVED</string>
 
     <string-array name="nav_menu_items">
+        <item>Home</item>
+        <item>Songs List</item>
         <item>Vietnamese Songs</item>
         <item>English Songs</item>
         <item>Chinese Songs</item>
+        <item>Settings</item>
+        <item>IP Address</item>
+        <item>Friends List</item>
+        <item>Comment to Screen</item>
+        <item>Help</item>
     </string-array>
 
     <string name="search_hint">Search Songs</string>
     <string name="search_label">Search</string>
     <string name="search_global_description">Search Global</string>
+
+    <string name="nav_home_title">Home</string>
 </resources>

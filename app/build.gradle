@@ -31,8 +31,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.+'
     compile 'com.getbase:floatingactionbutton:1.2.1'
     compile 'com.sothree.slidinguppanel:library:+'
-    compile 'com.joanzapata.android:android-iconify:1.0.8'
-    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.0'
-    compile 'com.malinskiy:materialicons:1.0.0'
-    compile 'com.github.theDazzler:droidicon:0.1.4@aar'
+    compile 'com.joanzapata.android:android-iconify:1.0.8'// this library only creates icon from Font Awesome icon suite.
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.0'// this library only create icons for Text values
+    compile 'com.malinskiy:materialicons:1.0.0'// this library only create icons from Google Material Designs
+    compile 'com.github.theDazzler:droidicon:0.1.4@aar'// this library will create icons drawable from 5 different icon suites (yes!)
 }

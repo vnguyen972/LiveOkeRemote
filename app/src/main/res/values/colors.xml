@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#009688</color>
-    <color name="textPrimary">#ffffff</color>
+    <color name="textPrimary">#000000</color>
     <color name="accent">#64FFDA</color>
     <color name="action_mode_bg">#E0F2F1</color>
     <color name="pink">#ff69b4</color>

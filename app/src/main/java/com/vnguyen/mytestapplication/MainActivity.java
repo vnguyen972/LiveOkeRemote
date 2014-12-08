@@ -4,7 +4,10 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -31,6 +34,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.thedazzler.droidicon.IconicFontDrawable;
 
 import java.util.ArrayList;
 
@@ -88,30 +92,6 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
-        // Setup Nav Menu
-        String[] navMenuTitles = getResources().getStringArray(R.array.nav_menu_items);
-        ListView mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
-
-        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
-
-        Bitmap vnIcon = BitmapFactory.decodeResource(getResources(),R.drawable.vn);
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], new BitmapDrawable(getResources(),vnIcon),true,"200"));
-
-        Bitmap usIcon = BitmapFactory.decodeResource(getResources(),R.drawable.us);
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], new BitmapDrawable(getResources(),usIcon),true,"100"));
-
-        Bitmap cnIcon = BitmapFactory.decodeResource(getResources(), R.drawable.cn);
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], new BitmapDrawable(getResources(),cnIcon), true,"100"));
-
-
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                view.setSelected(true);
-            }
-        });
-        NavDrawerListAdapter adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
-        mDrawerList.setAdapter(adapter);
     }
 
 
@@ -131,7 +111,7 @@ public class MainActivity extends ActionBarActivity {
         searchIcon.sizeDp(30);
         searchIcon.colorRes(R.color.white);
         MenuItem search = menu.findItem(R.id.menu_search);
-        //search.setIcon(searchIcon);
+        search.setIcon(searchIcon);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         //searchView.setMaxWidth(800);
@@ -265,6 +245,89 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
+
+        // Setup Nav menu
+
+
+        String[] navMenuTitles = getResources().getStringArray(R.array.nav_menu_items);
+        ListView mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+
+        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        Drawable iconDrawable = null;
+        boolean showCounter = false;
+        String navCounter = "0";
+        for (int i = 0; i < navMenuTitles.length;i++) {
+            switch (i) {
+                case 0:
+                    // Home
+//                    iconDrawable = new IconDrawable(getApplicationContext(), Iconify.IconValue.md_home).
+//                            colorRes(R.color.primary).sizeDp(100);
+                    IconicFontDrawable iconicFontDrawable = new IconicFontDrawable(getApplicationContext());
+                    iconicFontDrawable.setIcon("gmd-home");
+                    iconicFontDrawable.setIconColor(getResources().getColor(R.color.primary));
+                    iconDrawable = iconicFontDrawable;
+                    showCounter = false;
+                    break;
+                case 1:
+                    // header
+                    iconDrawable = null;
+                    showCounter = false;
+                    break;
+                case 2:
+                    Bitmap vnIcon = BitmapFactory.decodeResource(getResources(),R.drawable.vn);
+                    iconDrawable = new BitmapDrawable(getResources(), vnIcon);
+                    showCounter = true;
+                    navCounter = "2000";
+                    break;
+                case 3:
+                    Bitmap usIcon = BitmapFactory.decodeResource(getResources(),R.drawable.us);
+                    iconDrawable = new BitmapDrawable(getResources(), usIcon);
+                    showCounter = true;
+                    navCounter = "1000";
+                    break;
+                case 4:
+                    Bitmap cnIcon = BitmapFactory.decodeResource(getResources(),R.drawable.cn);
+                    iconDrawable = new BitmapDrawable(getResources(), cnIcon);
+                    showCounter = true;
+                    navCounter = "1000";
+                    break;
+                case 5:
+                    //header
+                    iconDrawable = null;
+                    showCounter = false;
+                    break;
+                case 6:
+                    iconDrawable = new com.joanzapata.android.iconify.IconDrawable(getApplicationContext(),
+                            com.joanzapata.android.iconify.Iconify.IconValue.fa_plug).colorRes(R.color.primary);
+                    showCounter = false;
+                    break;
+                case 7:
+                    IconicFontDrawable peopleIcon = new IconicFontDrawable(getApplicationContext());
+                    peopleIcon.setIcon("gmd-people");
+                    peopleIcon.setIconColor(getResources().getColor(R.color.primary));
+                    iconDrawable = peopleIcon;
+                    showCounter = false;
+                    break;
+                default:
+                    continue;
+            }
+            navDrawerItems.add(new NavDrawerItem(navMenuTitles[i], iconDrawable, showCounter, navCounter));
+        }
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+            }
+        });
+
+        NavDrawerListAdapter navAdapter = new NavDrawerListAdapter(getApplicationContext());
+        for (int i = 0; i < navDrawerItems.size();i++) {
+            navAdapter.addItem(navDrawerItems.get(i));
+        }
+        mDrawerList.setAdapter(navAdapter);
+
     }
 
     public void setupReservedPanel() {
@@ -286,7 +349,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         updateRsvpCount("W");
-        updateNowPlaying("<b>Welcome<br>Reserve a song and start singing</b>");
+        updateNowPlaying("Welcome<br>Reserve a song and start singing");
     }
 
     public void updateRsvpCount(String value) {
