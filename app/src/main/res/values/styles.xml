@@ -33,4 +33,13 @@
         <item name="color">@android:color/white</item>
     </style>
 
+    <style name="AlertDialogCustom" parent="@style/Theme.AppCompat.Light">
+        <item name="android:background">#ffffff</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:editTextBackground">@color/light_blue_400</item>
+    </style>
+
 </resources>

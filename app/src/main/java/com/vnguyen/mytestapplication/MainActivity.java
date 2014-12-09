@@ -309,6 +309,13 @@ public class MainActivity extends ActionBarActivity {
                     iconDrawable = peopleIcon;
                     showCounter = false;
                     break;
+                case 8:
+                    IconicFontDrawable send2ScreenIcon = new IconicFontDrawable(getApplicationContext());
+                    send2ScreenIcon.setIcon("gmd-open-in-browser");
+                    send2ScreenIcon.setIconColor(getResources().getColor(R.color.primary));
+                    iconDrawable = send2ScreenIcon;
+                    showCounter = false;
+                    break;
                 default:
                     continue;
             }
@@ -319,6 +326,14 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 view.setSelected(true);
+                Log.v(TAG,"Position = " + position);
+                //NavDrawerListAdapter.NavViewHolder holder = (NavDrawerListAdapter.NavViewHolder) view.getTag();
+                switch (position) {
+                    case 6:
+                        // IP Address
+                        (new AlertDialogHelper()).popupDialog(MainActivity.this,"Karaoke4Pro IP Address","Enter IP Address");
+                        break;
+                }
             }
         });
 

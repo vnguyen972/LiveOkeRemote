@@ -2,7 +2,7 @@
 <resources>
     <color name="primary">#009688</color>
     <color name="textPrimary">#000000</color>
-    <color name="accent">#64FFDA</color>
+    <color name="accent">@color/orange_900</color>
     <color name="action_mode_bg">#E0F2F1</color>
     <color name="pink">#ff69b4</color>
     <color name="pink_pressed">#ec407a</color>

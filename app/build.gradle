@@ -35,4 +35,5 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.0'// this library only create icons for Text values
     compile 'com.malinskiy:materialicons:1.0.0'// this library only create icons from Google Material Designs
     compile 'com.github.theDazzler:droidicon:0.1.4@aar'// this library will create icons drawable from 5 different icon suites (yes!)
+    compile 'com.afollestad:material-dialogs:0.4.3'
 }

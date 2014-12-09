@@ -2,6 +2,7 @@ package com.vnguyen.mytestapplication;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,7 +102,12 @@ public class NavDrawerListAdapter extends BaseAdapter {
         }
 
         if (holder.imgIcon != null) {
-            holder.imgIcon.setBackground(navDrawerItems.get(position).getIcon());
+            int currentVersion = Build.VERSION.SDK_INT;
+            if (currentVersion >= 16) {
+                holder.imgIcon.setBackground(navDrawerItems.get(position).getIcon());
+            } else {
+                holder.imgIcon.setBackgroundDrawable(navDrawerItems.get(position).getIcon());
+            }
         }
         holder.txtTitle.setText(navDrawerItems.get(position).getTitle());
 
