@@ -1,5 +1,6 @@
 package com.vnguyen.mytestapplication;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
@@ -75,6 +76,8 @@ public class NavDrawerListAdapter extends BaseAdapter {
         return navDrawerItems.get(position);
     }
 
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         NavViewHolder holder = null;
