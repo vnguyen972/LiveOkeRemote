@@ -29,5 +29,7 @@
     <string name="search_label">Search</string>
     <string name="search_global_description">Search Global</string>
 
-    <string name="nav_home_title">Home</string>
+    <!-- Preferences -->
+    <string name="ip_adress">ipAddress</string>
+
 </resources>
