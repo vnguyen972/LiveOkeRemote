@@ -117,8 +117,7 @@ public class NavigationDrawerHelper {
                     ipAddrIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = ipAddrIcon;
                     showCounter = false;
-                    String ip = PreferencesHelper.getInstance(context).getPreferences().getString(
-                            context.getResources().getString(R.string.ip_adress),"");
+                    String ip = PreferencesHelper.getInstance(context).getPreference(context.getResources().getString(R.string.ip_adress));
                     if (ip != null && !ip.equals("")) {
                         title = navMenuTitles[i] + " (" + ip  + ")";
                     }

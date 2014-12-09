@@ -22,8 +22,12 @@ public class PreferencesHelper {
         return prefHelper;
     }
 
-    public void loadPreferences() {
-        context.ipAddress = getPreferences().getString(context.getResources().getString(R.string.ip_adress),"");
+    public String getPreference(String key) {
+        return getPreferences().getString(key,"");
+    }
+
+    public void setStringPreference(String key, String value) {
+        preferences.edit().putString(key, value).apply();
     }
 
     public SharedPreferences getPreferences() {

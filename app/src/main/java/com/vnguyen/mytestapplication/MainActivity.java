@@ -31,9 +31,6 @@ public class MainActivity extends ActionBarActivity {
 
     public String TAG = "-MainActivity-";
 
-    // Shared Preference
-    PreferencesHelper prefHelper;
-
     // Variables to hold values from POPUP dialogs in SETTINGS
     public String ipAddress;
     public String comment2Send2Screen;
@@ -52,10 +49,8 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         // Load Shared Preference
-        prefHelper = PreferencesHelper.getInstance(MainActivity.this);
-        prefHelper.loadPreferences();
-
-
+        ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                getResources().getString(R.string.ip_adress));
 
         // setup toolbar as actionbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);

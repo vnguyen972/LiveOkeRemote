@@ -1,11 +1,13 @@
 package com.vnguyen.mytestapplication;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.thedazzler.droidicon.IconicFontDrawable;
 
 public class AlertDialogHelper {
 
@@ -20,7 +22,6 @@ public class AlertDialogHelper {
         if (context.ipAddress != null && !context.ipAddress.equals("")) {
             input.setText(context.ipAddress);
         }
-
         new MaterialDialog.Builder(context)
                 .title(title)
                 .content(dialogMsg)
@@ -40,11 +41,10 @@ public class AlertDialogHelper {
                         if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
                             String value = input.getEditableText().toString().trim();
                             // store into Preference
-                            context.prefHelper.getPreferences().edit()
-                                    .putString(context.getResources().getString(R.string.ip_adress),value)
-                                    .apply();
+                            PreferencesHelper.getInstance(context).setStringPreference(
+                                    context.getResources().getString(R.string.ip_adress), value);
                             context.ipAddress = value;
-                            Toast.makeText(context, value, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "IP Address Set To: "+ value, Toast.LENGTH_LONG).show();
                             // Change the list item by appending the IP to it
                             if (item.getTitle().contains("(")) {
                                 String hdr = item.getTitle().substring(0, item.getTitle().indexOf(" ("));
