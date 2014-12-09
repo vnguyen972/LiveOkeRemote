@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
@@ -16,8 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
@@ -31,11 +35,15 @@ public class MainActivity extends ActionBarActivity {
 
     public String TAG = "-MainActivity-";
 
+    public Animation slide_in_left, slide_out_right;
+    public ViewFlipper viewFlipper;
+
     // Variables to hold values from POPUP dialogs in SETTINGS
     public String ipAddress;
     public String comment2Send2Screen;
 
     // GUI Components
+    public DrawerLayout mDrawerLayout;
     public SlidingUpPanelLayout mSlidingPanel;
     public ImageView mReservedCountImgView;
     public TextView mNowPlayingTxtView;
@@ -52,6 +60,14 @@ public class MainActivity extends ActionBarActivity {
         ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                 getResources().getString(R.string.ip_adress));
 
+        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        slide_in_left = AnimationUtils.loadAnimation(this,
+                android.R.anim.slide_in_left);
+        slide_out_right = AnimationUtils.loadAnimation(this,
+                android.R.anim.slide_out_right);
+        viewFlipper.setInAnimation(slide_in_left);
+        viewFlipper.setOutAnimation(slide_out_right);
+
         // setup toolbar as actionbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
@@ -59,6 +75,7 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM);
 
         // setup sliding Navigation panel (hidden from left)
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         new NavigationDrawerHelper(MainActivity.this).setupSlidingNav(toolbar);
 
         // setup floating action button(s)

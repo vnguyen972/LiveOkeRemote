@@ -26,8 +26,8 @@ public class NavigationDrawerHelper {
     }
 
     public void setupSlidingNav(Toolbar toolbar) {
-        DrawerLayout mDrawerLayout = (DrawerLayout) context.findViewById(R.id.drawer);
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(context, mDrawerLayout, toolbar, R.string.open, R.string.close){
+
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(context, context.mDrawerLayout, toolbar, R.string.open, R.string.close){
             @Override
             public void onDrawerSlide(View view, float v) {
                 super.onDrawerSlide(view,v);
@@ -50,7 +50,7 @@ public class NavigationDrawerHelper {
                 super.onDrawerStateChanged(i);
             }
         };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        context.mDrawerLayout.setDrawerListener(mDrawerToggle);
         context.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         context.getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
@@ -165,6 +165,11 @@ public class NavigationDrawerHelper {
                         (new AlertDialogHelper(context)).
                                 popupIPAddressDialog("Karaoke4Pro IP Address", "Enter IP Address",
                                         adapter.getItem(position),adapter);
+                        break;
+                    case 7:
+                        // Friends List
+                        context.mDrawerLayout.closeDrawers();
+                        context.viewFlipper.showNext();
                         break;
                 }
             }

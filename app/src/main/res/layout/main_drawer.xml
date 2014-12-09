@@ -4,9 +4,6 @@
     android:background="#ffffff"
     android:id="@+id/drawer"
     >
-
-    <!-- Framelayout to display Fragments -->
-
     <LinearLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
@@ -22,21 +19,39 @@
             sothree:panelHeight="68dp"
             sothree:shadowHeight="4dp"
             >
-            <RelativeLayout android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
+            <ViewFlipper
+                android:id="@+id/view_flipper"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="Main Content"
-                    android:textSize="16sp" />
-                <include layout="@layout/main_fab"/>
-            </RelativeLayout>
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="Main Content"
+                        android:textSize="16sp"
+                        android:textColor="@color/half_black" />
+                    <include layout="@layout/main_fab"/>
+                </RelativeLayout>
+                <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <ListView
+                        android:id="@+id/list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#ffffff"
+                        android:choiceMode="singleChoice"
+                        android:dividerHeight="1dp"
+                    />
+                    <include layout="@layout/friend_list_fab"/>
+                </RelativeLayout>
+            </ViewFlipper>
             <include layout="@layout/panel_hdr"/>
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>
     </LinearLayout>
     <!-- Listview to display slider menu -->
-
     <include layout="@layout/navigation_panel"/>
 </android.support.v4.widget.DrawerLayout>
