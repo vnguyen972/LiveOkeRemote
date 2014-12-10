@@ -22,8 +22,9 @@ public class ReservedListItem {
                     beginConfig()
                     .withBorder(4) /* thickness in px */
                     .width(5)
+                    .textColor(R.color.white)
                     .endConfig()
-                    .buildRound(title.charAt(0)+"", color);
+                    .round().build("S", color);
             this.icon = iconDrawable;
         }
     }

@@ -14,7 +14,13 @@
             android:layout_height="60dp"
             android:id="@+id/now_playing_image_view"
             android:gravity="start"
-            android:layout_margin="6dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+
             />
         <LinearLayout
             android:layout_width="fill_parent"
@@ -42,16 +48,19 @@
             android:layout_height="wrap_content"
             android:text="@string/rsvp_header"
             android:gravity="center|top"
+            android:textStyle="bold"
             android:textColor="@color/primary"
+            android:layout_margin="5dp"
         />
         <ListView
-            android:id="@+id/left_drawer"
+            android:id="@+id/rsvp_drawer"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:choiceMode="singleChoice"
-            android:divider="@android:color/holo_blue_dark"
-            android:dividerHeight="0dp"
+            android:divider="@color/primary_material_light"
+            android:dividerHeight="1dp"
          />
+        <!--include layout="@layout/rsvp_list_item"/-->
     </LinearLayout>
 </LinearLayout>

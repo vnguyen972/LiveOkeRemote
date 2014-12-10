@@ -3,6 +3,7 @@ package com.vnguyen.mytestapplication;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
@@ -25,10 +26,13 @@ import android.widget.ViewFlipper;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.daimajia.swipe.SwipeLayout;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -104,6 +108,17 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
+//        SwipeLayout swipeLayout = (SwipeLayout) findViewById(R.id.swipe_layout);
+//        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+//        swipeLayout.setDragEdge(SwipeLayout.DragEdge.Right);
+
+        RsvpPanelHelper rph = new RsvpPanelHelper(MainActivity.this);
+        ArrayList<ReservedListItem> rsvpList = new ArrayList<>();
+        for (int i = 0; i < 50;i++) {
+            ReservedListItem item = new ReservedListItem("Requester " + 1, "Title " + i, null);
+            rsvpList.add(item);
+        }
+        rph.refreshRsvpList(rsvpList);
     }
 
 
@@ -180,26 +195,15 @@ public class MainActivity extends ActionBarActivity {
                 if (mSlidingPanel.isPanelExpanded()) {
                     mSlidingPanel.collapsePanel();
                     getSupportActionBar().setTitle("");
-                    updateRsvpCount(mNowPlayingTxtView.getText().charAt(0) + "");
+                    TextDrawableHelper.getInstance().buildDrawable(mReservedCountImgView, mNowPlayingTxtView.getText().charAt(0) + "", "roundrect");
                 } else {
                     mSlidingPanel.expandPanel();
                     getSupportActionBar().setTitle(R.string.rsvp_title);
                 }
             }
         });
-        updateRsvpCount("W");
+        TextDrawableHelper.getInstance().buildDrawable(mReservedCountImgView, "W", "roundrect");
         updateNowPlaying("Welcome<br>Reserve a song and start singing");
-    }
-
-    public void updateRsvpCount(String value) {
-        ColorGenerator generator = ColorGenerator.DEFAULT;
-        int color = generator.getColor(value);
-        TextDrawable drawable = TextDrawable.builder().
-                beginConfig()
-                .withBorder(4) /* thickness in px */
-                .endConfig()
-                .buildRoundRect(value, color, 5);
-        mReservedCountImgView.setImageDrawable(drawable);
     }
 
     public void updateNowPlaying(String title) {
