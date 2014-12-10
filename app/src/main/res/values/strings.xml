@@ -31,5 +31,6 @@
 
     <!-- Preferences -->
     <string name="ip_adress">ipAddress</string>
+    <string name="myName">myName</string>
 
 </resources>

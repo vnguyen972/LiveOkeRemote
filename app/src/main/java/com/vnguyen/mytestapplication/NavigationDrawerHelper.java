@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.thedazzler.droidicon.IconicFontDrawable;
 
@@ -20,9 +21,18 @@ import java.util.ArrayList;
 public class NavigationDrawerHelper {
 
     private final MainActivity context;
+    private static NavigationDrawerHelper helper;
 
-    public NavigationDrawerHelper(Context context) {
+    private NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
+    }
+
+    public static NavigationDrawerHelper getInstance(Context context) {
+        Toast.makeText(context, "NavigationDrawerHelper.getInstance()", Toast.LENGTH_LONG).show();
+//        if (helper == null) {
+            helper = new NavigationDrawerHelper(context);
+//        }
+        return helper;
     }
 
     public void setupSlidingNav(Toolbar toolbar) {
@@ -156,7 +166,7 @@ public class NavigationDrawerHelper {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 view.setSelected(true);
-                Log.v(context.TAG, "Position = " + position);
+                Log.v(context.app.TAG, "Position = " + position);
                 final NavDrawerListAdapter adapter = (NavDrawerListAdapter) mDrawerList.getAdapter();
                 NavDrawerListAdapter.NavViewHolder holder = (NavDrawerListAdapter.NavViewHolder) view.getTag();
                 switch (position) {

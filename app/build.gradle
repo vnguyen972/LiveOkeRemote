@@ -27,14 +27,19 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:appcompat-v7:21.0.+"
+    compile 'com.android.support:appcompat-v7:21.0.+'
     compile 'com.android.support:recyclerview-v7:21.+'
     compile 'com.getbase:floatingactionbutton:1.2.1'
     compile 'com.sothree.slidinguppanel:library:+'
-    compile 'com.joanzapata.android:android-iconify:1.0.8'// this library only creates icon from Font Awesome icon suite.
-    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.0'// this library only create icons for Text values
-    compile 'com.malinskiy:materialicons:1.0.0'// this library only create icons from Google Material Designs
-    compile 'com.github.theDazzler:droidicon:0.1.4@aar'// this library will create icons drawable from 5 different icon suites (yes!)
+    compile 'com.joanzapata.android:android-iconify:1.0.8'
+    // this library only creates icon from Font Awesome icon suite.
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.0'
+    // this library only create icons for Text values
+    compile 'com.malinskiy:materialicons:1.0.0'
+    // this library only create icons from Google Material Designs
+    compile 'com.github.theDazzler:droidicon:0.1.4@aar'
+    // this library will create icons drawable from 5 different icon suites (yes!)
     compile 'com.afollestad:material-dialogs:0.4.3'
-    compile "com.daimajia.swipelayout:library:1.1.7@aar"
+    compile 'com.daimajia.swipelayout:library:1.1.7@aar'
+    compile files('libs/android-query.0.26.7.jar')
 }

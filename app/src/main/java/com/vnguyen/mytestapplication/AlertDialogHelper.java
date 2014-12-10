@@ -17,6 +17,35 @@ public class AlertDialogHelper {
         this.context = (MainActivity) context;
     }
 
+    public void popupHello() {
+        final EditText input = new EditText(context);
+        new MaterialDialog.Builder(context)
+                .title("Hello, what is your name?")
+                .theme(Theme.LIGHT)
+                .positiveText("OK")
+                .customView(input)
+                .titleColor(R.color.half_black)
+                .callback(new MaterialDialog.Callback(){
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                    }
+
+                    @Override
+                    public void onPositive(MaterialDialog materialDialog) {
+                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
+                            String value = input.getEditableText().toString().trim();
+                            // store into Preference
+                            PreferencesHelper.getInstance(context).setStringPreference(
+                                    context.getResources().getString(R.string.myName), value);
+                            context.me = new User(value);
+                            Toast.makeText(context, "Hello "+ value, Toast.LENGTH_LONG).show();
+                            context.updateNowPlaying("Welcome " + value + "<br>Reserve a song and start singing");
+                        }
+                    }
+
+                }).show();
+    }
+
     public void popupIPAddressDialog(String title, String dialogMsg, final NavDrawerItem item, final NavDrawerListAdapter adapter) {
         final EditText input = new EditText(context);
         if (context.ipAddress != null && !context.ipAddress.equals("")) {

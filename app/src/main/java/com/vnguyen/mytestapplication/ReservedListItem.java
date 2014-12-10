@@ -2,9 +2,6 @@ package com.vnguyen.mytestapplication;
 
 import android.graphics.drawable.Drawable;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
-
 public class ReservedListItem {
     private String requester;
     private String title;
@@ -13,20 +10,7 @@ public class ReservedListItem {
     public ReservedListItem(String requester, String title, Drawable icon) {
         this.requester = requester;
         this.title = title;
-        if (icon != null) {
-            this.icon = icon;
-        } else {
-            ColorGenerator generator = ColorGenerator.DEFAULT;
-            int color = generator.getColor(title.charAt(0));
-            TextDrawable iconDrawable = TextDrawable.builder().
-                    beginConfig()
-                    .withBorder(4) /* thickness in px */
-                    .width(5)
-                    .textColor(R.color.white)
-                    .endConfig()
-                    .round().build("S", color);
-            this.icon = iconDrawable;
-        }
+        this.icon = icon;
     }
 
     public String getRequester() {

@@ -45,8 +45,11 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
     public void fillValues(int i, View view) {
         ReservedListItem item = rItems.get(i);
         ImageView iconImg = (ImageView) view.findViewById(R.id.rsvp_icon);
-        TextDrawableHelper.getInstance().buildDrawable(iconImg, "S", "round");
-        //((MainActivity)mContext).updateRsvpCount(iconImg,"S","round");
+        if (item.getIcon() == null) {
+            iconImg.setImageDrawable(DrawableHelper.getInstance().buildDrawable(item.getTitle().substring(0, 1), "round"));
+        } else {
+            iconImg.setImageDrawable(item.getIcon());
+        }
         TextView txtView = (TextView) view.findViewById(R.id.rsvp_title);
         txtView.setText(item.getTitle() + " - " + item.getRequester());
     }
@@ -64,5 +67,9 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public void clearData() {
+        rItems.clear();
     }
 }

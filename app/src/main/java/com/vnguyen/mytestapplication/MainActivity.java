@@ -2,10 +2,9 @@ package com.vnguyen.mytestapplication;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -24,9 +23,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.daimajia.swipe.SwipeLayout;
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxStatus;
+import com.androidquery.callback.BitmapAjaxCallback;
+import com.androidquery.callback.ImageOptions;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
@@ -37,7 +37,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
 
-    public String TAG = "-MainActivity-";
+    public AQuery aq;
+    public LiveOkeRemoteApplication app;
+
+    public User me;
+    public String myName;
 
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
@@ -60,9 +64,20 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        aq = new AQuery(getApplicationContext());
+        app = (LiveOkeRemoteApplication) getApplication();
+
         // Load Shared Preference
         ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                 getResources().getString(R.string.ip_adress));
+        myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                getResources().getString(R.string.myName));
+
+        if (myName == null || myName.equals("")) {
+            new AlertDialogHelper(MainActivity.this).popupHello();
+        } else {
+            me = new User(myName);
+        }
 
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         slide_in_left = AnimationUtils.loadAnimation(this,
@@ -80,10 +95,10 @@ public class MainActivity extends ActionBarActivity {
 
         // setup sliding Navigation panel (hidden from left)
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        new NavigationDrawerHelper(MainActivity.this).setupSlidingNav(toolbar);
+        NavigationDrawerHelper.getInstance(MainActivity.this).setupSlidingNav(toolbar);
 
         // setup floating action button(s)
-        new FloatingButtonsHelper(MainActivity.this).setupActionButtons();
+        FloatingButtonsHelper.getInstance(MainActivity.this).setupActionButtons();
 
         // setup sliding up panel layout
         mSlidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
@@ -104,7 +119,7 @@ public class MainActivity extends ActionBarActivity {
                 } else if (fam.getTag().equals("HORIZONTAL_DIRECTION")) {
                     fam.setTag("VERTICAL_DIRECTION");
                 }
-                Log.v(TAG, fam.getTag()+"");
+                Log.v(((LiveOkeRemoteApplication)getApplication()).TAG, fam.getTag()+"");
             }
         };
 
@@ -112,13 +127,8 @@ public class MainActivity extends ActionBarActivity {
 //        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
 //        swipeLayout.setDragEdge(SwipeLayout.DragEdge.Right);
 
-        RsvpPanelHelper rph = new RsvpPanelHelper(MainActivity.this);
-        ArrayList<ReservedListItem> rsvpList = new ArrayList<>();
-        for (int i = 0; i < 50;i++) {
-            ReservedListItem item = new ReservedListItem("Requester " + 1, "Title " + i, null);
-            rsvpList.add(item);
-        }
-        rph.refreshRsvpList(rsvpList);
+        RsvpPanelHelper rph = RsvpPanelHelper.getInstance(MainActivity.this);
+        rph.refreshRsvpList(app.generateTestRsvpList());
     }
 
 
@@ -142,7 +152,7 @@ public class MainActivity extends ActionBarActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         //searchView.setMaxWidth(800);
-        Log.v(TAG, searchView + "");
+        Log.v(app.TAG, searchView + "");
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
             searchView.setIconifiedByDefault(true);
@@ -195,15 +205,30 @@ public class MainActivity extends ActionBarActivity {
                 if (mSlidingPanel.isPanelExpanded()) {
                     mSlidingPanel.collapsePanel();
                     getSupportActionBar().setTitle("");
-                    TextDrawableHelper.getInstance().buildDrawable(mReservedCountImgView, mNowPlayingTxtView.getText().charAt(0) + "", "roundrect");
+                    //mReservedCountImgView.setImageDrawable(DrawableHelper.getInstance().buildDrawable(mNowPlayingTxtView.getText().charAt(0) + "", "roundrect"));
                 } else {
                     mSlidingPanel.expandPanel();
                     getSupportActionBar().setTitle(R.string.rsvp_title);
                 }
             }
         });
-        TextDrawableHelper.getInstance().buildDrawable(mReservedCountImgView, "W", "roundrect");
-        updateNowPlaying("Welcome<br>Reserve a song and start singing");
+
+
+        if (me.getPhotoURL() != null && !me.getPhotoURL().equals("")) {
+            aq.id(R.id.now_playing_image_view).image(me.getPhotoURL(), true, false, 0, 0, new BitmapAjaxCallback() {
+                public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
+                    RoundImgDrawable img = new RoundImgDrawable(bm);
+                    iv.setImageDrawable(img);
+                }
+            });
+        } else {
+            Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+            RoundImgDrawable img = new RoundImgDrawable(bm);
+            mReservedCountImgView.setImageDrawable(img);
+        }
+        if (myName != null && !myName.equals("")) {
+            updateNowPlaying("Welcome " + myName + "<br>Reserve a song and start singing");
+        }
     }
 
     public void updateNowPlaying(String title) {
