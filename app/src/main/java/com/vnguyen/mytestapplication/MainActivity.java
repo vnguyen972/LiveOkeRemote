@@ -112,8 +112,6 @@ public class MainActivity extends ActionBarActivity {
         viewFlipper.setInAnimation(slide_in_left);
         viewFlipper.setOutAnimation(slide_out_right);
 
-        setupFriendsListPanel();
-
         // setup toolbar as actionbar
         if (actionBarHelper == null) {
             actionBarHelper = new ActionBarHelper(MainActivity.this);
@@ -135,6 +133,7 @@ public class MainActivity extends ActionBarActivity {
             floatingButtonsHelper = new FloatingButtonsHelper(MainActivity.this);
         }
         floatingButtonsHelper.setupActionButtons();
+        floatingButtonsHelper.setupFriendsFloatingActionButtons();
 
         // setup sliding up panel layout
         mSlidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
@@ -167,13 +166,14 @@ public class MainActivity extends ActionBarActivity {
             rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
         }
         rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
+        setupFriendsListPanel();
+    }
+
+    public void setupFriendsListPanel() {
         if (friendsListHelper == null) {
             friendsListHelper = new FriendsListHelper(MainActivity.this);
         }
         friendsListHelper.initFriendList(app.generateTestFriends());
-    }
-
-    public void setupFriendsListPanel() {
         ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
 

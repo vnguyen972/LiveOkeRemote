@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class NavigationDrawerHelper {
 
     private final MainActivity context;
-    private boolean showFriendsList;
+    public boolean showFriendsList;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;

@@ -17,6 +17,37 @@ public class FloatingButtonsHelper {
     }
 
 
+    public void setupFriendsFloatingActionButtons() {
+        final IconDrawable addFriendBtnIcon = new IconDrawable(context, Iconify.IconValue.md_person_add);
+        addFriendBtnIcon.sizeDp(40);
+        addFriendBtnIcon.colorRes(R.color.light_blue_400);
+
+        final IconDrawable cancelBtnIcon = new IconDrawable(context, Iconify.IconValue.md_cancel);
+        cancelBtnIcon.sizeDp(40);
+        cancelBtnIcon.colorRes(R.color.light_blue_400);
+
+        final FloatingActionButton addFriendButton = (FloatingActionButton) context.findViewById(R.id.add_new_friend);
+        addFriendButton.setImageDrawable(addFriendBtnIcon);
+        addFriendButton.setTag("Add a Friend");
+        addFriendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        final FloatingActionButton cancelButton = (FloatingActionButton) context.findViewById(R.id.close_friends_list);
+        cancelButton.setImageDrawable(cancelBtnIcon);
+        cancelButton.setTag("Cancel");
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.viewFlipper.showNext();
+                context.navigationDrawerHelper.showFriendsList = false;
+                context.actionBarHelper.resetTitle();
+            }
+        });
+    }
     public void setupActionButtons() {
         final IconDrawable playBtnIcon = new IconDrawable(context, Iconify.IconValue.md_play_arrow);
         playBtnIcon.sizeDp(40);
