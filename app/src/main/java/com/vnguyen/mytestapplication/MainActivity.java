@@ -271,7 +271,7 @@ public class MainActivity extends ActionBarActivity {
                 RoundImgDrawable img = new RoundImgDrawable(bm);
                 mReservedCountImgView.setImageDrawable(img);
             }
-            updateNowPlaying("Welcome " + myName + "<br>Reserve a song and start singing");
+            updateNowPlaying("Welcome " + me.getName() + "<br>Reserve a song and start singing");
 //        } else {
 //            Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
 //            RoundImgDrawable img = new RoundImgDrawable(bm);
