@@ -19,10 +19,11 @@ import java.util.ArrayList;
 public class NavigationDrawerHelper {
 
     private final MainActivity context;
-    private static NavigationDrawerHelper helper;
+    private boolean showFriendsList;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
+        showFriendsList = false;
     }
 
     public void setupSlidingNav(Toolbar toolbar) {
@@ -178,6 +179,18 @@ public class NavigationDrawerHelper {
                         // Friends List
                         context.mDrawerLayout.closeDrawers();
                         context.viewFlipper.showNext();
+                        if (!showFriendsList) {
+                            showFriendsList = true;
+                            if (context.mSlidingPanel.isPanelExpanded()) {
+                                context.mSlidingPanel.collapsePanel();
+                                context.actionBarHelper.resetTitle();
+                            }
+                            context.actionBarHelper.setTitle("Friends List");
+                        } else {
+                            showFriendsList = false;
+                            context.actionBarHelper.resetTitle();
+                        }
+                        //context.invalidateOptionsMenu();
                         break;
                     case 9:
                         // your photo

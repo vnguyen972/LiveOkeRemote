@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +30,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -59,7 +65,8 @@ public class MainActivity extends ActionBarActivity {
     public NavigationDrawerHelper navigationDrawerHelper;
     public FloatingButtonsHelper floatingButtonsHelper;
     public RsvpPanelHelper rsvpPanelHelper;
-    public IconImageHelper iconImageHelper;
+    public FriendsListHelper friendsListHelper;
+    public ActionBarHelper actionBarHelper;
 
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
@@ -85,10 +92,6 @@ public class MainActivity extends ActionBarActivity {
         aq = new AQuery(getApplicationContext());
         app = (LiveOkeRemoteApplication) getApplication();
 
-        if (iconImageHelper == null) {
-            iconImageHelper = new IconImageHelper(MainActivity.this);
-        }
-
         // Load Shared Preference
         ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                 getResources().getString(R.string.ip_adress));
@@ -109,11 +112,16 @@ public class MainActivity extends ActionBarActivity {
         viewFlipper.setInAnimation(slide_in_left);
         viewFlipper.setOutAnimation(slide_out_right);
 
+        setupFriendsListPanel();
+
         // setup toolbar as actionbar
+        if (actionBarHelper == null) {
+            actionBarHelper = new ActionBarHelper(MainActivity.this);
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Tool-Bar");
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_TITLE);
+        actionBarHelper.setTitle("LiveOke Remote");
 
         // setup sliding Navigation panel (hidden from left)
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -159,6 +167,14 @@ public class MainActivity extends ActionBarActivity {
             rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
         }
         rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
+        if (friendsListHelper == null) {
+            friendsListHelper = new FriendsListHelper(MainActivity.this);
+        }
+        friendsListHelper.initFriendList(app.generateTestFriends());
+    }
+
+    public void setupFriendsListPanel() {
+        ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
 
 
@@ -234,11 +250,11 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 if (mSlidingPanel.isPanelExpanded()) {
                     mSlidingPanel.collapsePanel();
-                    getSupportActionBar().setTitle("");
+                    actionBarHelper.resetTitle();
                     //mReservedCountImgView.setImageDrawable(DrawableHelper.getInstance().buildDrawable(mNowPlayingTxtView.getText().charAt(0) + "", "roundrect"));
                 } else {
                     mSlidingPanel.expandPanel();
-                    getSupportActionBar().setTitle(R.string.rsvp_title);
+                    actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
                 }
             }
         });
@@ -324,4 +340,5 @@ public class MainActivity extends ActionBarActivity {
         }
         return bitmap;
     }
+
 }

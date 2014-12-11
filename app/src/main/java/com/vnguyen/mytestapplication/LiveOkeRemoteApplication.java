@@ -34,4 +34,13 @@ public class LiveOkeRemoteApplication extends Application {
         //Toast.makeText(getApplicationContext(), "rsvpList.size() =  " + rsvpList.size(), Toast.LENGTH_LONG).show();
         return rsvpList;
     }
+
+    public ArrayList<User> generateTestFriends() {
+        ArrayList<User> friends = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            User friend = new User("Friend " + i);
+            friends.add(friend);
+        }
+        return friends;
+    }
 }

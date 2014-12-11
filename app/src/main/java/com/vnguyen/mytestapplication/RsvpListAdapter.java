@@ -61,12 +61,12 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
 
     @Override
     public int getCount() {
-        return 50;
+        return rItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return rItems.get(position);
     }
 
     @Override
@@ -92,11 +92,11 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         ImageView moveBottomImg = (ImageView) vBottom.findViewById(R.id.ic_move_bottom_id);
         ImageView deleteImg = (ImageView) vBottom.findViewById(R.id.ic_delete_id);
 
-        mContext.iconImageHelper.setIconAsBackground("fa-angle-double-up",R.color.white,moveTopImg);
-        mContext.iconImageHelper.setIconAsBackground("fa-angle-up",R.color.white,moveUpImg);
-        mContext.iconImageHelper.setIconAsBackground("fa-angle-down", R.color.white, moveDownImg);
-        mContext.iconImageHelper.setIconAsBackground("fa-angle-double-down", R.color.white, moveBottomImg);
-        mContext.iconImageHelper.setIconAsBackground("fa-trash", R.color.white, deleteImg);
+        DrawableHelper.getInstance().setIconAsBackground("fa-angle-double-up",R.color.white,moveTopImg,mContext);
+        DrawableHelper.getInstance().setIconAsBackground("fa-angle-up",R.color.white,moveUpImg,mContext);
+        DrawableHelper.getInstance().setIconAsBackground("fa-angle-down", R.color.white, moveDownImg,mContext);
+        DrawableHelper.getInstance().setIconAsBackground("fa-angle-double-down", R.color.white, moveBottomImg,mContext);
+        DrawableHelper.getInstance().setIconAsBackground("fa-trash", R.color.white, deleteImg,mContext);
 
         moveTopImg.setOnClickListener(new View.OnClickListener() {
             @Override

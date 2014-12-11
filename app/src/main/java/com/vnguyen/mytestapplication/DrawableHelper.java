@@ -1,12 +1,17 @@
 package com.vnguyen.mytestapplication;
 
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.thedazzler.droidicon.IconicFontDrawable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,5 +67,20 @@ public class DrawableHelper {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public void setIconAsBackground(String iconName,int color, ImageView img, Context context) {
+        IconicFontDrawable icon = new IconicFontDrawable(context);
+        icon.setIcon(iconName);
+        icon.setIconColor(context.getResources().getColor(color));
+        img.setImageDrawable(null);
+        int currentVersion = Build.VERSION.SDK_INT;
+        if (currentVersion >= 16) {
+            img.setBackground(icon);
+        } else {
+            img.setBackgroundDrawable(icon);
+        }
     }
 }
