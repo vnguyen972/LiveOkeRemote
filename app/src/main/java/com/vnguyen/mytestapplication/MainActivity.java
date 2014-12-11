@@ -43,6 +43,11 @@ public class MainActivity extends ActionBarActivity {
     public User me;
     public String myName;
 
+    // Helpers
+    public NavigationDrawerHelper navigationDrawerHelper;
+    public FloatingButtonsHelper floatingButtonsHelper;
+    public RsvpPanelHelper rsvpPanelHelper;
+
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
 
@@ -95,10 +100,16 @@ public class MainActivity extends ActionBarActivity {
 
         // setup sliding Navigation panel (hidden from left)
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        NavigationDrawerHelper.getInstance(MainActivity.this).setupSlidingNav(toolbar);
+        if (navigationDrawerHelper == null) {
+            navigationDrawerHelper = new NavigationDrawerHelper(MainActivity.this);
+        }
+        navigationDrawerHelper.setupSlidingNav(toolbar);
 
         // setup floating action button(s)
-        FloatingButtonsHelper.getInstance(MainActivity.this).setupActionButtons();
+        if (floatingButtonsHelper == null) {
+            floatingButtonsHelper = new FloatingButtonsHelper(MainActivity.this);
+        }
+        floatingButtonsHelper.setupActionButtons();
 
         // setup sliding up panel layout
         mSlidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
@@ -127,8 +138,10 @@ public class MainActivity extends ActionBarActivity {
 //        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
 //        swipeLayout.setDragEdge(SwipeLayout.DragEdge.Right);
 
-        RsvpPanelHelper rph = RsvpPanelHelper.getInstance(MainActivity.this);
-        rph.refreshRsvpList(app.generateTestRsvpList());
+        if (rsvpPanelHelper == null) {
+            rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
+        }
+        rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
     }
 
 
@@ -214,13 +227,19 @@ public class MainActivity extends ActionBarActivity {
         });
 
 
-        if (me.getPhotoURL() != null && !me.getPhotoURL().equals("")) {
-            aq.id(R.id.now_playing_image_view).image(me.getPhotoURL(), true, false, 0, 0, new BitmapAjaxCallback() {
-                public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
-                    RoundImgDrawable img = new RoundImgDrawable(bm);
-                    iv.setImageDrawable(img);
-                }
-            });
+        if (me != null) {
+            if (me.getPhotoURL() != null && !me.getPhotoURL().equals("")) {
+                aq.id(R.id.now_playing_image_view).image(me.getPhotoURL(), true, false, 0, 0, new BitmapAjaxCallback() {
+                    public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
+                        RoundImgDrawable img = new RoundImgDrawable(bm);
+                        iv.setImageDrawable(img);
+                    }
+                });
+            } else {
+                Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+                RoundImgDrawable img = new RoundImgDrawable(bm);
+                mReservedCountImgView.setImageDrawable(img);
+            }
         } else {
             Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
             RoundImgDrawable img = new RoundImgDrawable(bm);

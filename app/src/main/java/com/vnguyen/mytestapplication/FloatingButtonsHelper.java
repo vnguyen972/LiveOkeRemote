@@ -11,18 +11,11 @@ import com.malinskiy.materialicons.Iconify;
 public class FloatingButtonsHelper {
 
     private final MainActivity context;
-    private static FloatingButtonsHelper helper;
 
-    private FloatingButtonsHelper(Context context) {
+    public FloatingButtonsHelper(Context context) {
         this.context = (MainActivity) context;
     }
 
-    public static FloatingButtonsHelper getInstance(Context context) {
-        if (helper == null) {
-            helper = new FloatingButtonsHelper(context);
-        }
-        return helper;
-    }
 
     public void setupActionButtons() {
         final IconDrawable playBtnIcon = new IconDrawable(context, Iconify.IconValue.md_play_arrow);

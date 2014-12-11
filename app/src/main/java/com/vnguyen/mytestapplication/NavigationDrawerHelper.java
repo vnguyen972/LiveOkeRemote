@@ -23,16 +23,8 @@ public class NavigationDrawerHelper {
     private final MainActivity context;
     private static NavigationDrawerHelper helper;
 
-    private NavigationDrawerHelper(Context context) {
+    public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
-    }
-
-    public static NavigationDrawerHelper getInstance(Context context) {
-        Toast.makeText(context, "NavigationDrawerHelper.getInstance()", Toast.LENGTH_LONG).show();
-//        if (helper == null) {
-            helper = new NavigationDrawerHelper(context);
-//        }
-        return helper;
     }
 
     public void setupSlidingNav(Toolbar toolbar) {

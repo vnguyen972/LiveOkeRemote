@@ -10,18 +10,10 @@ public class RsvpPanelHelper {
     private final MainActivity context;
     private RsvpListAdapter rsvpAdapter;
 
-    private static RsvpPanelHelper helper;
-
-    private RsvpPanelHelper(Context context) {
+    public RsvpPanelHelper(Context context) {
         this.context = (MainActivity) context;
     }
 
-    public static RsvpPanelHelper getInstance(Context context) {
-        if (helper == null) {
-            helper = new RsvpPanelHelper(context);
-        }
-        return helper;
-    }
 
     public void refreshRsvpList(ArrayList<ReservedListItem> items) {
         if (rsvpAdapter != null) {
