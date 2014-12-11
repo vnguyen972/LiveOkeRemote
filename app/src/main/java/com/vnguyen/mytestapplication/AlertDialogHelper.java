@@ -1,17 +1,26 @@
 package com.vnguyen.mytestapplication;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
-import com.thedazzler.droidicon.IconicFontDrawable;
+
+import java.io.File;
 
 public class AlertDialogHelper {
 
     private final MainActivity context;
+    public static int FILE_PICK_FROM_CAMERA = 1;
+    public static int FILE_PICK_FROM_FILE = 2;
 
     public AlertDialogHelper(Context context) {
         this.context = (MainActivity) context;
@@ -91,5 +100,45 @@ public class AlertDialogHelper {
                     }
                 })
                 .show();
+    }
+
+    public void popupFileChooser() {
+        final String [] items           = new String [] {"From Camera", "From SD Card"};
+        ArrayAdapter<String> adapter  = new ArrayAdapter<String>(context, android.R.layout.select_dialog_item,items);
+        AlertDialog.Builder builder     = new AlertDialog.Builder(context);
+
+        builder.setTitle("Select Image");
+        builder.setAdapter( adapter, new DialogInterface.OnClickListener() {
+            public void onClick( DialogInterface dialog, int item ) {
+                if (item == 0) {
+                    Intent intent    = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    File file        = new File(Environment.getExternalStorageDirectory(),
+                            "tmp_avatar_" + String.valueOf(System.currentTimeMillis()) + ".jpg");
+                    context.mImageCaptureUri = Uri.fromFile(file);
+
+                    try {
+                        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, context.mImageCaptureUri);
+                        intent.putExtra("return-data", true);
+
+                        context.startActivityForResult(intent, FILE_PICK_FROM_CAMERA);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    dialog.cancel();
+                } else {
+                    Intent intent = new Intent();
+
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+
+                    context.startActivityForResult(Intent.createChooser(intent, "Complete action using"), FILE_PICK_FROM_FILE);
+                }
+            }
+        } );
+
+        AlertDialog dialog = builder.create();
+
+        dialog.show();
     }
 }

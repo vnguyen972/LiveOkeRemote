@@ -1,6 +1,5 @@
 package com.vnguyen.mytestapplication;
 
-
 import android.content.Context;
 import android.widget.ListView;
 

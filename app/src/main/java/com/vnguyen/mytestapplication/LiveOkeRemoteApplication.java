@@ -31,7 +31,7 @@ public class LiveOkeRemoteApplication extends Application {
                 rsvpList.add(item);
             }
         }
-        Toast.makeText(getApplicationContext(), "rsvpList.size() =  " + rsvpList.size(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "rsvpList.size() =  " + rsvpList.size(), Toast.LENGTH_LONG).show();
         return rsvpList;
     }
 }

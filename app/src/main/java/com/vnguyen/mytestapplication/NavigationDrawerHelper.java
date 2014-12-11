@@ -5,14 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.thedazzler.droidicon.IconicFontDrawable;
 
@@ -141,6 +139,14 @@ public class NavigationDrawerHelper {
                     showCounter = false;
                     break;
                 case 9:
+                    // your photo
+                    IconicFontDrawable profile = new IconicFontDrawable(context.getApplicationContext());
+                    profile.setIcon("gmd-account-circle");
+                    profile.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = profile;
+                    showCounter = false;
+                    break;
+                case 10:
                     // Help
                     IconicFontDrawable helpIcon = new IconicFontDrawable(context.getApplicationContext());
                     helpIcon.setIcon("gmd-help");
@@ -172,6 +178,11 @@ public class NavigationDrawerHelper {
                         // Friends List
                         context.mDrawerLayout.closeDrawers();
                         context.viewFlipper.showNext();
+                        break;
+                    case 9:
+                        // your photo
+                        context.mDrawerLayout.closeDrawers();
+                        (new AlertDialogHelper(context)).popupFileChooser();
                         break;
                 }
             }

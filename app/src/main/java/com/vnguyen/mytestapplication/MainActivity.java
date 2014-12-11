@@ -2,9 +2,14 @@ package com.vnguyen.mytestapplication;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -21,6 +26,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.androidquery.AQuery;
@@ -32,6 +38,9 @@ import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 
 
@@ -42,6 +51,8 @@ public class MainActivity extends ActionBarActivity {
 
     public User me;
     public String myName;
+
+    public Uri mImageCaptureUri;
 
     // Helpers
     public NavigationDrawerHelper navigationDrawerHelper;
@@ -228,6 +239,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         if (me != null) {
+            // Display the Avatar Photo
             if (me.getPhotoURL() != null && !me.getPhotoURL().equals("")) {
                 aq.id(R.id.now_playing_image_view).image(me.getPhotoURL(), true, false, 0, 0, new BitmapAjaxCallback() {
                     public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
@@ -236,17 +248,28 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
             } else {
-                Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+                Uri imgURI;
+                Bitmap bm;
+                String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                        getResources().getString(R.string.myAvatarURI));
+                Log.v(app.TAG, "Avatar from Pref. URI: " + avatarURI);
+                if (avatarURI != null && !avatarURI.equals("")) {
+                    imgURI = Uri.parse(avatarURI);
+                    bm = uriToBitmap(imgURI);
+                } else {
+                    bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+                }
+                if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+                    bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+                }
                 RoundImgDrawable img = new RoundImgDrawable(bm);
                 mReservedCountImgView.setImageDrawable(img);
             }
-        } else {
-            Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
-            RoundImgDrawable img = new RoundImgDrawable(bm);
-            mReservedCountImgView.setImageDrawable(img);
-        }
-        if (myName != null && !myName.equals("")) {
             updateNowPlaying("Welcome " + myName + "<br>Reserve a song and start singing");
+//        } else {
+//            Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+//            RoundImgDrawable img = new RoundImgDrawable(bm);
+//            mReservedCountImgView.setImageDrawable(img);
         }
     }
 
@@ -254,4 +277,44 @@ public class MainActivity extends ActionBarActivity {
         mNowPlayingTxtView.setText(Html.fromHtml(title));
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) return;
+        Bitmap bitmap   = null;
+        String path     = "";
+
+        if (requestCode == AlertDialogHelper.FILE_PICK_FROM_FILE) {
+            mImageCaptureUri = data.getData();
+        }
+        bitmap = uriToBitmap(mImageCaptureUri);
+        Log.v(app.TAG, "URL + " + mImageCaptureUri.toString());
+        Log.v(app.TAG,"Path = " + path);
+        // Save to SharedPreference
+        PreferencesHelper.getInstance(MainActivity.this).setStringPreference(
+                getResources().getString(R.string.myAvatarURI), mImageCaptureUri.toString());
+        if (bitmap != null) {
+            Bitmap bm = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
+            RoundImgDrawable img = new RoundImgDrawable(bm);
+            mReservedCountImgView.setImageDrawable(img);
+        } else {
+            Toast.makeText(this, "Unable to find file. Path =  " + path, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private Bitmap uriToBitmap(Uri imgUri) {
+        Bitmap bitmap = null;
+        try {
+            if (imgUri != null) {
+                if (imgUri.toString().startsWith("content://com.google.android.apps.photo.contents")) {
+                    InputStream is = getContentResolver().openInputStream(Uri.parse(imgUri.toString()));
+                    bitmap = BitmapFactory.decodeStream(is);
+                } else {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imgUri);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
 }
