@@ -27,7 +27,7 @@ public class LiveOkeRemoteApplication extends Application {
     public ArrayList<ReservedListItem> generateTestRsvpList() {
         if (rsvpList == null || rsvpList.isEmpty()) {
             for (int i = 0; i < 50; i++) {
-                ReservedListItem item = new ReservedListItem("Requester " + 1, "Title " + i, null);
+                ReservedListItem item = new ReservedListItem("Requester " + 1, "Title " + i, null,Math.round(1000 + Math.random() * (9999 - 1000)));
                 rsvpList.add(item);
             }
         }

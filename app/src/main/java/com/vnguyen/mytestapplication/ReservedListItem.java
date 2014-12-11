@@ -6,11 +6,13 @@ public class ReservedListItem {
     private String requester;
     private String title;
     private Drawable icon;
+    private String number;
 
-    public ReservedListItem(String requester, String title, Drawable icon) {
+    public ReservedListItem(String requester, String title, Drawable icon, double num) {
         this.requester = requester;
         this.title = title;
         this.icon = icon;
+        this.number = num + "";
     }
 
     public String getRequester() {
@@ -35,5 +37,13 @@ public class ReservedListItem {
 
     public void setIcon(Drawable icon) {
         this.icon = icon;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 }

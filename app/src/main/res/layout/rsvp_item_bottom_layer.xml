@@ -14,8 +14,9 @@
         android:background="@android:color/holo_green_light"
         >
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/ic_move_to_top_id"
+            android:layout_width="@dimen/lower_layer_width"
+            android:layout_height="@dimen/lower_layer_height"
             android:layout_gravity="center_vertical"
             android:layout_margin="5dp"
             android:src="@android:drawable/stat_sys_upload"
@@ -27,8 +28,9 @@
         android:background="@android:color/holo_orange_light"
         >
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/ic_move_up_id"
+            android:layout_width="@dimen/lower_layer_width"
+            android:layout_height="@dimen/lower_layer_height"
             android:layout_gravity="center_vertical"
             android:layout_margin="8dp"
             android:src="@android:drawable/arrow_up_float"
@@ -40,8 +42,9 @@
         android:background="@android:color/holo_blue_dark"
         >
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/ic_move_down_id"
+            android:layout_width="@dimen/lower_layer_width"
+            android:layout_height="@dimen/lower_layer_height"
             android:layout_gravity="center_vertical"
             android:layout_margin="8dp"
             android:src="@android:drawable/arrow_down_float"
@@ -53,8 +56,9 @@
         android:background="@android:color/holo_blue_bright"
         >
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/ic_move_bottom_id"
+            android:layout_width="@dimen/lower_layer_width"
+            android:layout_height="@dimen/lower_layer_height"
             android:layout_gravity="center_vertical"
             android:layout_margin="5dp"
             android:src="@android:drawable/stat_sys_download"
@@ -66,8 +70,9 @@
         android:background="@android:color/holo_red_dark"
         >
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/ic_delete_id"
+            android:layout_width="@dimen/lower_layer_width"
+            android:layout_height="@dimen/lower_layer_height"
             android:layout_gravity="center_vertical"
             android:layout_margin="8dp"
             android:src="@android:drawable/ic_menu_delete"

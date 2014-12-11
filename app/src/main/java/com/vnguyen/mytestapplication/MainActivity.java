@@ -37,6 +37,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.thedazzler.droidicon.IconicFontDrawable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +59,7 @@ public class MainActivity extends ActionBarActivity {
     public NavigationDrawerHelper navigationDrawerHelper;
     public FloatingButtonsHelper floatingButtonsHelper;
     public RsvpPanelHelper rsvpPanelHelper;
+    public IconImageHelper iconImageHelper;
 
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
@@ -82,6 +84,10 @@ public class MainActivity extends ActionBarActivity {
 
         aq = new AQuery(getApplicationContext());
         app = (LiveOkeRemoteApplication) getApplication();
+
+        if (iconImageHelper == null) {
+            iconImageHelper = new IconImageHelper(MainActivity.this);
+        }
 
         // Load Shared Preference
         ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
@@ -271,6 +277,7 @@ public class MainActivity extends ActionBarActivity {
 //            RoundImgDrawable img = new RoundImgDrawable(bm);
 //            mReservedCountImgView.setImageDrawable(img);
         }
+
     }
 
     public void updateNowPlaying(String title) {
