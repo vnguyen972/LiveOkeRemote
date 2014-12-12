@@ -3,15 +3,14 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
-
     defaultConfig {
-        applicationId "com.vnguyen.mytestapplication"
+        applicationId 'com.vnguyen.liveokeremote'
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
-    repositories{
+    repositories {
         maven {
             url 'http://dl.bintray.com/amulyakhare/maven'
         }
@@ -22,6 +21,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    productFlavors {
     }
 }
 
@@ -42,4 +43,5 @@ dependencies {
     compile 'com.afollestad:material-dialogs:0.4.3'
     compile 'com.daimajia.swipelayout:library:1.1.7@aar'
     compile files('libs/android-query.0.26.7.jar')
+    compile files('libs/FaceCropper-library.jar')
 }

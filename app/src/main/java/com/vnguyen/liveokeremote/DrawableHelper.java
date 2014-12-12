@@ -1,4 +1,4 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -18,15 +18,10 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class DrawableHelper {
-    private static DrawableHelper helper;
 
-    public static DrawableHelper getInstance() {
-        if (helper == null) {
-            helper = new DrawableHelper();
-        }
-        return helper;
+    public DrawableHelper() {
+
     }
-
     public Drawable buildDrawable(String value, String shape) {
         ColorGenerator generator = ColorGenerator.DEFAULT;
         int color = generator.getColor(value);

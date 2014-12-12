@@ -26,36 +26,23 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginEnd="16dp"
-                android:scaleType="fitXY"
                 android:layout_gravity="center_vertical" />
         </LinearLayout>
-        <ViewFlipper
-            android:id="@+id/friend_view_flipper"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/friends_name"
             android:layout_toRightOf="@+id/friends_icon_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/friends_name"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                android:gravity="center_vertical"
-                android:textSize="15sp"
-                android:textColor="@android:color/black"
-                android:text="This is a TOP"
-                android:layout_alignParentTop="true"
-                />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_height="match_parent"
-                    android:layout_width="match_parent"
-                    android:text="Bottom HERE"
-                />
-            </LinearLayout>
-        </ViewFlipper>
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="@android:color/black"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:gravity="center_vertical"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:selectAllOnFocus="true"
+            />
     </RelativeLayout>
 </LinearLayout>

@@ -9,8 +9,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        fab:fab_addButtonColorNormal="@color/light_blue_400"
-        fab:fab_addButtonColorPressed="@color/white_pressed"
+        fab:fab_addButtonColorNormal="@color/light_blue_500"
+        fab:fab_addButtonColorPressed="@color/light_blue_200"
         fab:fab_addButtonPlusIconColor="@android:color/white"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
@@ -21,19 +21,19 @@
         android:id="@+id/close_friends_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        fab:fab_colorNormal="@color/light_green_A400"
-        fab:fab_colorPressed="@color/light_blue_400"
-        fab:fab_addButtonColorNormal="@color/light_green_A400"
-        fab:fab_addButtonColorPressed="@color/light_blue_400"
+        fab:fab_colorNormal="@color/light_blue_200"
+        fab:fab_colorPressed="@color/light_blue_500"
+        fab:fab_addButtonColorNormal="@color/light_blue_200"
+        fab:fab_addButtonColorPressed="@color/light_blue_500"
         />
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_new_friend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        fab:fab_colorNormal="@color/light_green_A400"
-        fab:fab_colorPressed="@color/light_blue_400"
-        fab:fab_addButtonColorNormal="@color/light_green_A400"
-        fab:fab_addButtonColorPressed="@color/light_blue_400"
+        fab:fab_colorNormal="@color/light_blue_200"
+        fab:fab_colorPressed="@color/light_blue_500"
+        fab:fab_addButtonColorNormal="@color/light_blue_200"
+        fab:fab_addButtonColorPressed="@color/light_blue_500"
         />
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 </RelativeLayout>

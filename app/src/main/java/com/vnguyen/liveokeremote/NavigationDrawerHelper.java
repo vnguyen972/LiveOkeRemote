@@ -1,4 +1,4 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.mytestapplication.R;
 
 import java.util.ArrayList;
 
@@ -195,7 +196,9 @@ public class NavigationDrawerHelper {
                     case 9:
                         // your photo
                         context.mDrawerLayout.closeDrawers();
-                        (new AlertDialogHelper(context)).popupFileChooser();
+                        (new AlertDialogHelper(context)).popupFileChooser(
+                                context.mReservedCountImgView,
+                                context.getResources().getString(R.string.myAvatarURI));
                         break;
                 }
             }

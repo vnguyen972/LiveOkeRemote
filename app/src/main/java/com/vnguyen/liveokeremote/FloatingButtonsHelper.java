@@ -1,12 +1,16 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 
 import android.content.Context;
 import android.view.View;
+import android.widget.EditText;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
+import com.vnguyen.mytestapplication.R;
 
 public class FloatingButtonsHelper {
 
@@ -20,11 +24,11 @@ public class FloatingButtonsHelper {
     public void setupFriendsFloatingActionButtons() {
         final IconDrawable addFriendBtnIcon = new IconDrawable(context, Iconify.IconValue.md_person_add);
         addFriendBtnIcon.sizeDp(40);
-        addFriendBtnIcon.colorRes(R.color.light_blue_400);
+        addFriendBtnIcon.colorRes(R.color.white);
 
-        final IconDrawable cancelBtnIcon = new IconDrawable(context, Iconify.IconValue.md_cancel);
+        final IconDrawable cancelBtnIcon = new IconDrawable(context, Iconify.IconValue.md_undo);
         cancelBtnIcon.sizeDp(40);
-        cancelBtnIcon.colorRes(R.color.light_blue_400);
+        cancelBtnIcon.colorRes(R.color.white);
 
         final FloatingActionButton addFriendButton = (FloatingActionButton) context.findViewById(R.id.add_new_friend);
         addFriendButton.setImageDrawable(addFriendBtnIcon);
@@ -32,7 +36,29 @@ public class FloatingButtonsHelper {
         addFriendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final EditText input = new EditText(context);
+                new MaterialDialog.Builder(context)
+                        .title("Add a new friend")
+                        .theme(Theme.LIGHT)
+                        .customView(input)
+                        .positiveText("OK")
+                        .titleColor(R.color.half_black)
+                        .negativeText("Cancel")
+                        .callback(new MaterialDialog.Callback() {
+                            @Override
+                            public void onNegative(MaterialDialog materialDialog) {
+                            }
 
+                            @Override
+                            public void onPositive(MaterialDialog materialDialog) {
+                                if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
+                                    User u = new User(input.getEditableText().toString());
+                                    context.friendsListHelper.adapter.friends.add(u);
+                                    context.friendsListHelper.adapter.notifyDataSetChanged();
+                                    PreferencesHelper.getInstance(context).saveFriends(context.friendsListHelper.adapter.friends);
+                                }
+                            }
+                        }).show();
             }
         });
 

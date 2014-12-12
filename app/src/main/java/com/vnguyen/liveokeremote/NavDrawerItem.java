@@ -1,4 +1,4 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.graphics.drawable.Drawable;
 

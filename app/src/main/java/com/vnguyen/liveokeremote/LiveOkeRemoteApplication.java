@@ -1,10 +1,6 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.app.Application;
-import android.content.Context;
-import android.widget.Toast;
-
-import com.androidquery.AQuery;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,10 +9,12 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.vnguyen.mytestapplication.R;
 
 import java.io.File;
 
@@ -103,7 +105,7 @@ public class AlertDialogHelper {
                 .show();
     }
 
-    public void popupFileChooser() {
+    public void popupFileChooser(final ImageView imgView, final String key) {
         final String [] items           = new String [] {"From Camera", "From SD Card"};
         ArrayAdapter<String> adapter  = new ArrayAdapter<String>(context, android.R.layout.select_dialog_item,items);
         AlertDialog.Builder builder     = new AlertDialog.Builder(context);
@@ -111,16 +113,17 @@ public class AlertDialogHelper {
         builder.setTitle("Select Image");
         builder.setAdapter( adapter, new DialogInterface.OnClickListener() {
             public void onClick( DialogInterface dialog, int item ) {
+                context.aquiredPhoto.imgView = imgView;
+                context.aquiredPhoto.prefKey = key;
                 if (item == 0) {
                     Intent intent    = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     File file        = new File(Environment.getExternalStorageDirectory(),
                             "tmp_avatar_" + String.valueOf(System.currentTimeMillis()) + ".jpg");
-                    context.mImageCaptureUri = Uri.fromFile(file);
+                    context.aquiredPhoto.mImageCaptureUri = Uri.fromFile(file);
 
                     try {
                         intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, context.mImageCaptureUri);
                         intent.putExtra("return-data", true);
-
                         context.startActivityForResult(intent, FILE_PICK_FROM_CAMERA);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -132,7 +135,6 @@ public class AlertDialogHelper {
 
                     intent.setType("image/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-
                     context.startActivityForResult(Intent.createChooser(intent, "Complete action using"), FILE_PICK_FROM_FILE);
                 }
             }

@@ -1,4 +1,4 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 
 import android.annotation.TargetApi;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.mytestapplication.R;
 
 import java.util.ArrayList;
 
@@ -49,7 +49,7 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         ReservedListItem item = rItems.get(i);
         ImageView iconImg = (ImageView) view.findViewById(R.id.rsvp_icon);
         if (item.getIcon() == null) {
-            iconImg.setImageDrawable(DrawableHelper.getInstance().buildDrawable(item.getTitle().substring(0, 1), "round"));
+            iconImg.setImageDrawable(mContext.drawableHelper.buildDrawable(item.getTitle().substring(0, 1), "round"));
         } else {
             iconImg.setImageDrawable(item.getIcon());
         }
@@ -92,11 +92,11 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         ImageView moveBottomImg = (ImageView) vBottom.findViewById(R.id.ic_move_bottom_id);
         ImageView deleteImg = (ImageView) vBottom.findViewById(R.id.ic_delete_id);
 
-        DrawableHelper.getInstance().setIconAsBackground("fa-angle-double-up",R.color.white,moveTopImg,mContext);
-        DrawableHelper.getInstance().setIconAsBackground("fa-angle-up",R.color.white,moveUpImg,mContext);
-        DrawableHelper.getInstance().setIconAsBackground("fa-angle-down", R.color.white, moveDownImg,mContext);
-        DrawableHelper.getInstance().setIconAsBackground("fa-angle-double-down", R.color.white, moveBottomImg,mContext);
-        DrawableHelper.getInstance().setIconAsBackground("fa-trash", R.color.white, deleteImg,mContext);
+        mContext.drawableHelper.setIconAsBackground("fa-angle-double-up", R.color.white, moveTopImg, mContext);
+        mContext.drawableHelper.setIconAsBackground("fa-angle-up", R.color.white, moveUpImg, mContext);
+        mContext.drawableHelper.setIconAsBackground("fa-angle-down", R.color.white, moveDownImg, mContext);
+        mContext.drawableHelper.setIconAsBackground("fa-angle-double-down", R.color.white, moveBottomImg, mContext);
+        mContext.drawableHelper.setIconAsBackground("fa-trash", R.color.white, deleteImg, mContext);
 
         moveTopImg.setOnClickListener(new View.OnClickListener() {
             @Override

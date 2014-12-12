@@ -40,7 +40,7 @@
         <item name="android:typeface">monospace</item>
         <item name="android:textSize">10sp</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
-        <item name="android:editTextBackground">@color/light_blue_400</item>
+        <item name="android:editTextBackground">@color/light_blue_500</item>
     </style>
 
 </resources>

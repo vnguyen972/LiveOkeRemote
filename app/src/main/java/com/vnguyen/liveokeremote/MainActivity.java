@@ -1,13 +1,10 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,10 +15,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,17 +31,16 @@ import android.widget.ViewFlipper;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
-import com.androidquery.callback.ImageOptions;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.mytestapplication.R;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
+
+import cat.lafosca.facecropper.FaceCropper;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -60,6 +52,7 @@ public class MainActivity extends ActionBarActivity {
     public String myName;
 
     public Uri mImageCaptureUri;
+    public AquiredPhoto aquiredPhoto;
 
     // Helpers
     public NavigationDrawerHelper navigationDrawerHelper;
@@ -67,6 +60,7 @@ public class MainActivity extends ActionBarActivity {
     public RsvpPanelHelper rsvpPanelHelper;
     public FriendsListHelper friendsListHelper;
     public ActionBarHelper actionBarHelper;
+    public DrawableHelper drawableHelper;
 
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
@@ -91,6 +85,7 @@ public class MainActivity extends ActionBarActivity {
 
         aq = new AQuery(getApplicationContext());
         app = (LiveOkeRemoteApplication) getApplication();
+        aquiredPhoto = new AquiredPhoto();
 
         // Load Shared Preference
         ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
@@ -102,6 +97,11 @@ public class MainActivity extends ActionBarActivity {
             new AlertDialogHelper(MainActivity.this).popupHello();
         } else {
             me = new User(myName);
+        }
+
+        // Init helpers
+        if (drawableHelper == null) {
+            drawableHelper = new DrawableHelper();
         }
 
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
@@ -173,7 +173,8 @@ public class MainActivity extends ActionBarActivity {
         if (friendsListHelper == null) {
             friendsListHelper = new FriendsListHelper(MainActivity.this);
         }
-        friendsListHelper.initFriendList(app.generateTestFriends());
+        //friendsListHelper.initFriendList(app.generateTestFriends());
+        friendsListHelper.initFriendList(PreferencesHelper.getInstance(MainActivity.this).retrieveFriends());
         ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
 
@@ -279,8 +280,10 @@ public class MainActivity extends ActionBarActivity {
                     imgURI = Uri.parse(avatarURI);
                     bm = uriToBitmap(imgURI);
                 } else {
-                    bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+                    bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
                 }
+                FaceCropper mFaceCropper = new FaceCropper();
+                bm = mFaceCropper.getCroppedImage(bm);
                 if (bm.getWidth() > 120 || bm.getHeight() > 120) {
                     bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
                 }
@@ -307,18 +310,23 @@ public class MainActivity extends ActionBarActivity {
         String path     = "";
 
         if (requestCode == AlertDialogHelper.FILE_PICK_FROM_FILE) {
-            mImageCaptureUri = data.getData();
+            aquiredPhoto.mImageCaptureUri = data.getData();
         }
-        bitmap = uriToBitmap(mImageCaptureUri);
-        Log.v(app.TAG, "URL + " + mImageCaptureUri.toString());
+        bitmap = uriToBitmap(aquiredPhoto.mImageCaptureUri);
+        Log.v(app.TAG, "URL + " + aquiredPhoto.mImageCaptureUri.toString());
         Log.v(app.TAG,"Path = " + path);
         // Save to SharedPreference
         PreferencesHelper.getInstance(MainActivity.this).setStringPreference(
-                getResources().getString(R.string.myAvatarURI), mImageCaptureUri.toString());
+                aquiredPhoto.prefKey, aquiredPhoto.mImageCaptureUri.toString());
         if (bitmap != null) {
-            Bitmap bm = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
-            RoundImgDrawable img = new RoundImgDrawable(bm);
-            mReservedCountImgView.setImageDrawable(img);
+            FaceCropper mFaceCropper = new FaceCropper();
+            bitmap = mFaceCropper.getCroppedImage(bitmap);
+            if (bitmap.getHeight() > 120 && bitmap.getWidth() > 120) {
+                bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
+            }
+            RoundImgDrawable img = new RoundImgDrawable(bitmap);
+            //mReservedCountImgView.setImageDrawable(img);
+            aquiredPhoto.imgView.setImageDrawable(img);
         } else {
             Toast.makeText(this, "Unable to find file. Path =  " + path, Toast.LENGTH_LONG).show();
         }

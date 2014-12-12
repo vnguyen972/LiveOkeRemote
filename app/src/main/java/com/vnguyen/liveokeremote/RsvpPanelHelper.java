@@ -1,10 +1,10 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.content.Context;
-import android.widget.ImageView;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.mytestapplication.R;
 
 import java.util.ArrayList;
 
@@ -24,6 +24,19 @@ public class RsvpPanelHelper {
         rsvpAdapter = new RsvpListAdapter(context, items);
         ListView rsvpListView = (ListView) context.findViewById(R.id.rsvp_drawer);
         rsvpListView.setAdapter(rsvpAdapter);
+        rsvpListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (rsvpAdapter.getOpenItems().size() > 0) {
+                    rsvpAdapter.closeAllExcept(null);
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
         rsvpAdapter.notifyDataSetChanged();
     }
 

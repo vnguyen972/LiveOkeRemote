@@ -1,4 +1,4 @@
-package com.vnguyen.mytestapplication;
+package com.vnguyen.liveokeremote;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.vnguyen.mytestapplication.R;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
