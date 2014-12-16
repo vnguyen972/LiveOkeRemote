@@ -2,6 +2,7 @@ package com.vnguyen.liveokeremote;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -10,7 +11,6 @@ import com.afollestad.materialdialogs.Theme;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
-import com.vnguyen.mytestapplication.R;
 
 public class FloatingButtonsHelper {
 
@@ -54,8 +54,12 @@ public class FloatingButtonsHelper {
                                 if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
                                     User u = new User(input.getEditableText().toString());
                                     context.friendsListHelper.adapter.friends.add(u);
-                                    context.friendsListHelper.adapter.notifyDataSetChanged();
-                                    PreferencesHelper.getInstance(context).saveFriends(context.friendsListHelper.adapter.friends);
+                                    context.runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            context.friendsListHelper.adapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                    PreferencesHelper.getInstance(context).addFriend(u);
                                 }
                             }
                         }).show();
@@ -109,6 +113,11 @@ public class FloatingButtonsHelper {
                     playButton.setTag("PLAY");
                     ((MainActivity)context).updateNowPlaying("<b>PAUSE<br>Press PLAY to resume</b>");
                 }
+                Log.v(context.app.TAG, "floating 1");
+                context.viewFlipper.showPrevious();
+                Log.v(context.app.TAG, "floating 2");
+                context.navigationDrawerHelper.showFriendsList = true;
+//                context.actionBarHelper.resetTitle();
             }
         });
 

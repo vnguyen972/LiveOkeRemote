@@ -26,16 +26,20 @@ public class ActionBarHelper {
 
     public void setTitle(String newTitle) {
         String oldTitle = context.getSupportActionBar().getTitle().toString();
-        if (oldTitle != null) {
+        if (oldTitle != null && !oldTitle.equalsIgnoreCase(newTitle)) {
             titleStack.push(oldTitle);
         }
         context.getSupportActionBar().setTitle(formatActionBarTitle(newTitle));
     }
 
     public void resetTitle() {
-        String oldTitle = (String) titleStack.pop();
-        if (oldTitle != null) {
-            context.getSupportActionBar().setTitle(formatActionBarTitle(oldTitle));
+        if (!titleStack.isEmpty()) {
+            String oldTitle = (String) titleStack.pop();
+            if (oldTitle != null) {
+                context.getSupportActionBar().setTitle(formatActionBarTitle(oldTitle));
+            }
+        } else {
+            context.getSupportActionBar().setTitle(formatActionBarTitle("LiveOke Remote"));
         }
     }
 

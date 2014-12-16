@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.vnguyen.mytestapplication.R;
+
 
 import java.util.ArrayList;
 

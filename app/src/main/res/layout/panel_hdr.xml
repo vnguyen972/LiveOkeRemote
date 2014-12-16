@@ -59,7 +59,6 @@
             android:choiceMode="singleChoice"
             android:divider="@color/primary_material_light"
             android:dividerHeight="1dp"
-         />
-        <!--include layout="@layout/rsvp_list_item"/-->
+            />
     </LinearLayout>
 </LinearLayout>

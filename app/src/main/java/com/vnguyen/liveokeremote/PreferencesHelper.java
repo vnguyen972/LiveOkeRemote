@@ -42,8 +42,22 @@ public class PreferencesHelper {
         preferences.edit().putInt("total_friends", friends.size()).apply();
         for (int i = 0; i < friends.size();i++) {
             User aFriend = friends.get(i);
-            setStringPreference("friend_"+i,aFriend.getName().trim()+"|"+aFriend.getPhotoURL());
+            setStringPreference("friend_"+i,aFriend.getName().trim());
         }
+    }
+
+    public void addFriend(User friend) {
+        int total = getPreferences().getInt("total_friends",0);
+        int position = total;
+        getPreferences().edit().putString("friend_"+position,friend.getName().trim()).apply();
+        getPreferences().edit().putInt("total_friends", total+1).apply();
+    }
+
+    public void removeFriend(User friend, int position) {
+        getPreferences().edit().remove("friend_"+position).apply();
+        int total = getPreferences().getInt("total_friends",0);
+        total--;
+        getPreferences().edit().putInt("total_friends",total).apply();
     }
 
     public ArrayList<User> retrieveFriends() {
@@ -54,11 +68,7 @@ public class PreferencesHelper {
             String userInfo = preferences.getString("friend_"+i,"");
             Log.v(context.app.TAG,"userInfo = " + userInfo);
             if (!userInfo.equals("")) {
-                StringTokenizer stok = new StringTokenizer(userInfo,"|");
-                String name = stok.nextToken();
-                String url = stok.nextToken();
-                User u = new User(name);
-                u.setPhotoURL(url);
+                User u = new User(userInfo);
                 list.add(u);
             }
         }

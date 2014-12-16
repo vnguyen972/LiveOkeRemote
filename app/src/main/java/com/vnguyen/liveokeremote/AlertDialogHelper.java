@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
-import com.vnguyen.mytestapplication.R;
+
 
 import java.io.File;
 

@@ -19,11 +19,13 @@
             sothree:panelHeight="68dp"
             sothree:shadowHeight="4dp"
             >
-            <ViewFlipper
+            <!--ViewFlipper
                 android:id="@+id/view_flipper"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <RelativeLayout android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:measureAllChildren="false"-->
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
                     <TextView
@@ -35,7 +37,7 @@
                         android:textColor="@color/half_black" />
                     <include layout="@layout/main_fab"/>
                 </RelativeLayout>
-                <RelativeLayout android:layout_width="match_parent"
+                <!--RelativeLayout android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
                     <ListView
@@ -47,8 +49,8 @@
                         android:dividerHeight="1dp"
                     />
                     <include layout="@layout/friend_list_fab"/>
-                </RelativeLayout>
-            </ViewFlipper>
+                </RelativeLayout-->
+            <!--/ViewFlipper-->
             <include layout="@layout/panel_hdr"/>
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>
     </LinearLayout>

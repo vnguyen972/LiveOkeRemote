@@ -3,11 +3,15 @@ package com.vnguyen.liveokeremote;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -27,18 +31,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+import android.widget.ViewSwitcher;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
+import com.daimajia.swipe.SwipeLayout;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.vnguyen.mytestapplication.R;
+
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import cat.lafosca.facecropper.FaceCropper;
 
@@ -50,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
 
     public User me;
     public String myName;
+    public ArrayList<User> friendsList;
 
     public Uri mImageCaptureUri;
     public AquiredPhoto aquiredPhoto;
@@ -58,12 +66,12 @@ public class MainActivity extends ActionBarActivity {
     public NavigationDrawerHelper navigationDrawerHelper;
     public FloatingButtonsHelper floatingButtonsHelper;
     public RsvpPanelHelper rsvpPanelHelper;
-    public FriendsListHelper friendsListHelper;
     public ActionBarHelper actionBarHelper;
+    public FriendsListHelper friendsListHelper;
     public DrawableHelper drawableHelper;
 
     public Animation slide_in_left, slide_out_right;
-    public ViewFlipper viewFlipper;
+    public ViewSwitcher viewFlipper;
 
     // Variables to hold values from POPUP dialogs in SETTINGS
     public String ipAddress;
@@ -88,11 +96,26 @@ public class MainActivity extends ActionBarActivity {
         aquiredPhoto = new AquiredPhoto();
 
         // Load Shared Preference
-        ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
-                getResources().getString(R.string.ip_adress));
-        myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
-                getResources().getString(R.string.myName));
+        if (ipAddress == null) {
+            ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                    getResources().getString(R.string.ip_adress));
+        }
+        if (myName == null) {
+            myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                    getResources().getString(R.string.myName));
+        }
 
+        if (friendsList == null || friendsList.isEmpty()) {
+            Log.v(app.TAG,friendsList+"-BEFORE");
+            friendsList = (ArrayList<User>) getLastCustomNonConfigurationInstance();
+            if (friendsList == null) {
+                Log.v(app.TAG,"NULL from Retaining...");
+                friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
+            }
+            Log.v(app.TAG,friendsList+"-AFTER");
+        }
+
+        // if myName is still not found (brand new use)
         if (myName == null || myName.equals("")) {
             new AlertDialogHelper(MainActivity.this).popupHello();
         } else {
@@ -104,13 +127,14 @@ public class MainActivity extends ActionBarActivity {
             drawableHelper = new DrawableHelper();
         }
 
-        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
-        slide_in_left = AnimationUtils.loadAnimation(this,
-                android.R.anim.slide_in_left);
-        slide_out_right = AnimationUtils.loadAnimation(this,
-                android.R.anim.slide_out_right);
-        viewFlipper.setInAnimation(slide_in_left);
-        viewFlipper.setOutAnimation(slide_out_right);
+//        viewFlipper = (ViewSwitcher) findViewById(R.id.view_flipper);
+//        slide_in_left = AnimationUtils.loadAnimation(this,
+//                android.R.anim.slide_in_left);
+//        slide_out_right = AnimationUtils.loadAnimation(this,
+//                android.R.anim.slide_out_right);
+//        viewFlipper.setInAnimation(slide_in_left);
+//        viewFlipper.setOutAnimation(slide_out_right);
+
 
         // setup toolbar as actionbar
         if (actionBarHelper == null) {
@@ -123,6 +147,7 @@ public class MainActivity extends ActionBarActivity {
 
         // setup sliding Navigation panel (hidden from left)
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+
         if (navigationDrawerHelper == null) {
             navigationDrawerHelper = new NavigationDrawerHelper(MainActivity.this);
         }
@@ -133,30 +158,30 @@ public class MainActivity extends ActionBarActivity {
             floatingButtonsHelper = new FloatingButtonsHelper(MainActivity.this);
         }
         floatingButtonsHelper.setupActionButtons();
-        floatingButtonsHelper.setupFriendsFloatingActionButtons();
 
         // setup sliding up panel layout
         mSlidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         mSlidingPanel.setEnabled(false); // disable swiping to slide
 
         setupReservedPanel(); // setup reserved list panel
+        //floatingButtonsHelper.setupFriendsFloatingActionButtons();
 
-        final FloatingActionsMenu fam = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
-        fam.setTag("VERTICAL_DIRECTION");
+//        final FloatingActionsMenu fam = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
+//        fam.setTag("VERTICAL_DIRECTION");
 
         // FUTURE FEATURE
         // See if we could detect orientation change to expand the floating button accordingly
-        myOrientationEventListener = new OrientationEventListener(getApplicationContext()) {
-            @Override
-            public void onOrientationChanged(int orientation) {
-                if (fam.getTag().equals("VERTICAL_DIRECTION")) {
-                    fam.setTag("HORIZONTAL_DIRECTION");
-                } else if (fam.getTag().equals("HORIZONTAL_DIRECTION")) {
-                    fam.setTag("VERTICAL_DIRECTION");
-                }
-                Log.v(((LiveOkeRemoteApplication)getApplication()).TAG, fam.getTag()+"");
-            }
-        };
+//        myOrientationEventListener = new OrientationEventListener(getApplicationContext()) {
+//            @Override
+//            public void onOrientationChanged(int orientation) {
+////                if (fam.getTag().equals("VERTICAL_DIRECTION")) {
+//                    fam.setTag("HORIZONTAL_DIRECTION");
+//                } else if (fam.getTag().equals("HORIZONTAL_DIRECTION")) {
+//                    fam.setTag("VERTICAL_DIRECTION");
+//                }
+//                Log.v(((LiveOkeRemoteApplication)getApplication()).TAG, fam.getTag()+"");
+//            }
+//        };
 
 //        SwipeLayout swipeLayout = (SwipeLayout) findViewById(R.id.swipe_layout);
 //        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
@@ -167,6 +192,13 @@ public class MainActivity extends ActionBarActivity {
         }
         rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
         setupFriendsListPanel();
+
+        // Start main fragment
+//        FragmentManager manager = getSupportFragmentManager();
+//        FragmentTransaction transaction = manager.beginTransaction();
+//        transaction.replace(R.id.contain_body,new MainFragment(),"main_contain_panel");
+//        transaction.commit();
+
     }
 
     public void setupFriendsListPanel() {
@@ -174,8 +206,9 @@ public class MainActivity extends ActionBarActivity {
             friendsListHelper = new FriendsListHelper(MainActivity.this);
         }
         //friendsListHelper.initFriendList(app.generateTestFriends());
-        friendsListHelper.initFriendList(PreferencesHelper.getInstance(MainActivity.this).retrieveFriends());
-        ListView friendList = (ListView) findViewById(R.id.friends_list);
+        Log.v(app.TAG,"setupFriendsListPanel is called!!!");
+//        friendsListHelper.initFriendList(friendsList);
+//        ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
 
 
@@ -263,38 +296,25 @@ public class MainActivity extends ActionBarActivity {
 
         if (me != null) {
             // Display the Avatar Photo
-            if (me.getPhotoURL() != null && !me.getPhotoURL().equals("")) {
-                aq.id(R.id.now_playing_image_view).image(me.getPhotoURL(), true, false, 0, 0, new BitmapAjaxCallback() {
-                    public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
-                        RoundImgDrawable img = new RoundImgDrawable(bm);
-                        iv.setImageDrawable(img);
-                    }
-                });
+            Uri imgURI;
+            Bitmap bm;
+            String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                    getResources().getString(R.string.myAvatarURI));
+            Log.v(app.TAG, "Avatar from Pref. URI: " + avatarURI);
+            if (avatarURI != null && !avatarURI.equals("")) {
+                imgURI = Uri.parse(avatarURI);
+                bm = uriToBitmap(imgURI);
             } else {
-                Uri imgURI;
-                Bitmap bm;
-                String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
-                        getResources().getString(R.string.myAvatarURI));
-                Log.v(app.TAG, "Avatar from Pref. URI: " + avatarURI);
-                if (avatarURI != null && !avatarURI.equals("")) {
-                    imgURI = Uri.parse(avatarURI);
-                    bm = uriToBitmap(imgURI);
-                } else {
-                    bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
-                }
-                FaceCropper mFaceCropper = new FaceCropper();
-                bm = mFaceCropper.getCroppedImage(bm);
-                if (bm.getWidth() > 120 || bm.getHeight() > 120) {
-                    bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
-                }
-                RoundImgDrawable img = new RoundImgDrawable(bm);
-                mReservedCountImgView.setImageDrawable(img);
+                bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
             }
+            FaceCropper mFaceCropper = new FaceCropper();
+            bm = mFaceCropper.getCroppedImage(bm);
+            if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+                bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+            }
+            RoundImgDrawable img = new RoundImgDrawable(bm);
+            mReservedCountImgView.setImageDrawable(img);
             updateNowPlaying("Welcome " + me.getName() + "<br>Reserve a song and start singing");
-//        } else {
-//            Bitmap bm = DrawableHelper.getInstance().drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
-//            RoundImgDrawable img = new RoundImgDrawable(bm);
-//            mReservedCountImgView.setImageDrawable(img);
         }
 
     }
@@ -348,5 +368,11 @@ public class MainActivity extends ActionBarActivity {
         }
         return bitmap;
     }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return friendsList;
+    }
+
 
 }

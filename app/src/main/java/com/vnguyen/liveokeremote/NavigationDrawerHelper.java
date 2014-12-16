@@ -1,26 +1,36 @@
 package com.vnguyen.liveokeremote;
 
+import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.thedazzler.droidicon.IconicFontDrawable;
-import com.vnguyen.mytestapplication.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class NavigationDrawerHelper {
 
     private final MainActivity context;
     public boolean showFriendsList;
+    private Handler mHandler = new Handler();
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -28,6 +38,9 @@ public class NavigationDrawerHelper {
     }
 
     public void setupSlidingNav(Toolbar toolbar) {
+        // Setup Nav menu
+        String[] navMenuTitles = context.getResources().getStringArray(R.array.nav_menu_items);
+        final ListView mDrawerList = (ListView) context.findViewById(R.id.list_slidermenu);
 
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(context, context.mDrawerLayout, toolbar, R.string.open, R.string.close){
             @Override
@@ -43,8 +56,24 @@ public class NavigationDrawerHelper {
 
             @Override
             public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                //invalidateOptionsMenu();
+//                final long startTime = System.currentTimeMillis();
+//                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
+                if (mDrawerList.getCheckedItemPosition() == 7) {
+                    context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
+                    context.mSlidingPanel.expandPanel();
+                    mDrawerList.setItemChecked(7, false);
+                }
+//                if (!showFriendsList) {
+//                    showFriendsList = true;
+//                    if (context.mSlidingPanel.isPanelExpanded()) {
+//                        context.mSlidingPanel.collapsePanel();
+//                        context.actionBarHelper.resetTitle();
+//                    }
+//                    context.actionBarHelper.setTitle("Friends List");
+//                } else {
+//                    showFriendsList = false;
+//                    context.actionBarHelper.resetTitle();
+//                }
             }
 
             @Override
@@ -57,9 +86,6 @@ public class NavigationDrawerHelper {
         context.getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
 
-        // Setup Nav menu
-        String[] navMenuTitles = context.getResources().getStringArray(R.array.nav_menu_items);
-        final ListView mDrawerList = (ListView) context.findViewById(R.id.list_slidermenu);
 
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<>();
 
@@ -161,6 +187,11 @@ public class NavigationDrawerHelper {
             }
             navDrawerItems.add(new NavDrawerItem((title != null ? title : navMenuTitles[i]), iconDrawable, showCounter, navCounter));
         }
+        NavDrawerListAdapter navAdapter = new NavDrawerListAdapter(context.getApplicationContext());
+        for (int i = 0; i < navDrawerItems.size();i++) {
+            navAdapter.addItem(navDrawerItems.get(i));
+        }
+        mDrawerList.setAdapter(navAdapter);
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -169,7 +200,22 @@ public class NavigationDrawerHelper {
                 Log.v(context.app.TAG, "Position = " + position);
                 final NavDrawerListAdapter adapter = (NavDrawerListAdapter) mDrawerList.getAdapter();
                 NavDrawerListAdapter.NavViewHolder holder = (NavDrawerListAdapter.NavViewHolder) view.getTag();
+                FragmentManager manager;
+                android.support.v4.app.FragmentTransaction transaction;
                 switch (position) {
+                    case 0:
+                        // Home
+//                        manager = context.getSupportFragmentManager();
+//                        transaction = manager.beginTransaction();
+//                        //transaction.replace(R.id.contain_body,new MainFragment(),"main_contain_panel");
+//                        manager.popBackStack();
+//                        transaction.commit();
+//                        context.mDrawerLayout.closeDrawers();
+//                        if (context.mSlidingPanel.isPanelExpanded()) {
+//                            context.mSlidingPanel.collapsePanel();
+//                        }
+//                        context.actionBarHelper.resetTitle();
+                        break;
                     case 6:
                         // IP Address
                         (new AlertDialogHelper(context)).
@@ -177,21 +223,35 @@ public class NavigationDrawerHelper {
                                         adapter.getItem(position),adapter);
                         break;
                     case 7:
+//                        manager = context.getSupportFragmentManager();
+//                        transaction = manager.beginTransaction();
+//                        transaction.replace(R.id.contain_body,new FriendsListFragment(),"friends_list_panel");
+//                        transaction.addToBackStack("");
+//                        transaction.commit();
+//                        context.mDrawerLayout.closeDrawers();
+//                        if (context.mSlidingPanel.isPanelExpanded()) {
+//                            context.mSlidingPanel.collapsePanel();
+//                            context.actionBarHelper.resetTitle();
+//                        }
+//                        context.actionBarHelper.setTitle("Friends List");
+
                         // Friends List
-                        context.mDrawerLayout.closeDrawers();
-                        context.viewFlipper.showNext();
-                        if (!showFriendsList) {
-                            showFriendsList = true;
-                            if (context.mSlidingPanel.isPanelExpanded()) {
-                                context.mSlidingPanel.collapsePanel();
-                                context.actionBarHelper.resetTitle();
+                        mDrawerList.setItemChecked(position, true);
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.mDrawerLayout.closeDrawers();
                             }
-                            context.actionBarHelper.setTitle("Friends List");
-                        } else {
-                            showFriendsList = false;
-                            context.actionBarHelper.resetTitle();
-                        }
-                        //context.invalidateOptionsMenu();
+                        },150);
+
+//                        long endTime = System.currentTimeMillis();
+//                        long elapsedTime = endTime - startTime;
+//                        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+//                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//                        Toast.makeText(context,
+//                                "Total time loaded: " +
+//                                        dateFormat.format(new Date(elapsedTime))
+//                                , Toast.LENGTH_LONG).show();
                         break;
                     case 9:
                         // your photo
@@ -204,11 +264,7 @@ public class NavigationDrawerHelper {
             }
         });
 
-        NavDrawerListAdapter navAdapter = new NavDrawerListAdapter(context.getApplicationContext());
-        for (int i = 0; i < navDrawerItems.size();i++) {
-            navAdapter.addItem(navDrawerItems.get(i));
-        }
-        mDrawerList.setAdapter(navAdapter);
+
 
     }
 }

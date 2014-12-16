@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.thedazzler.droidicon.IconicFontDrawable;
-import com.vnguyen.mytestapplication.R;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,9 +25,11 @@ import cat.lafosca.facecropper.FaceCropper;
 public class FriendListAdapter extends BaseSwipeAdapter {
     private MainActivity context;
     public ArrayList<User> friends;
+    private SwipeLayout swipeLayout;
 
     public FriendListAdapter(Context context, ArrayList<User> list) {
         this.context = (MainActivity) context;
+        Log.v(this.context.app.TAG, "New Adapter!");
         friends = new ArrayList<>();
         friends.addAll(list);
     }
@@ -45,10 +47,9 @@ public class FriendListAdapter extends BaseSwipeAdapter {
     @Override
     public View generateView(int position, ViewGroup viewGroup) {
         View v = LayoutInflater.from(context).inflate(R.layout.friends_list_item, null);
-        SwipeLayout swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
+        swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
-        setupActionButtonsBelow(swipeLayout);
         return v;
     }
 
@@ -56,29 +57,16 @@ public class FriendListAdapter extends BaseSwipeAdapter {
     public void fillValues(int i, View view) {
         final User friend = friends.get(i);
         final ImageView friendIcon = (ImageView) view.findViewById(R.id.friends_icon);
-        if (friend.getPhotoURL() == null || friend.getPhotoURL().equals("") || friend.getPhotoURL().equalsIgnoreCase("null")) {
-            //Bitmap genericFrBM = BitmapFactory.decodeResource(context.getResources(), R.drawable.generic_friend);
-            //BitmapDrawable iconDrawable = new BitmapDrawable(context.getResources(), genericFrBM);
-//            Bitmap b = DrawableHelper.getInstance().drawableToBitmap(
-//                    context.getResources().getDrawable(R.drawable.default_profile));
-            FaceCropper mFaceCropper = new FaceCropper();
-            Bitmap b = mFaceCropper.getCroppedImage(context,R.drawable.default_profile);
-            if (b.getWidth() > 120 || b.getHeight() > 120) {
-                b = Bitmap.createScaledBitmap(b, 120, 120, false);
-            }
-            RoundImgDrawable img = new RoundImgDrawable(b);
-            friendIcon.setImageDrawable(img);
+        FaceCropper mFaceCropper = new FaceCropper();
+        Bitmap b = mFaceCropper.getCroppedImage(context,R.drawable.default_profile);
+        if (b.getWidth() > 120 || b.getHeight() > 120) {
+            b = Bitmap.createScaledBitmap(b, 120, 120, false);
         }
-//        friendIcon.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                (new AlertDialogHelper(context)).popupFileChooser(friendIcon, friend.getName().trim());
-//            }
-//        });
+        RoundImgDrawable img = new RoundImgDrawable(b);
+        friendIcon.setImageDrawable(img);
         TextView fName = (TextView) view.findViewById(R.id.friends_name);
         fName.setText(friend.getName());
-
-
+        setupActionButtonsBelow(swipeLayout);
     }
 
     @Override
@@ -133,15 +121,16 @@ public class FriendListAdapter extends BaseSwipeAdapter {
 
                             @Override
                             public void onPositive(MaterialDialog materialDialog) {
-                                for (Iterator<User> it = friends.iterator();it.hasNext();) {
+                                int i = 0;
+                                for (Iterator<User> it = friends.iterator();it.hasNext();i++) {
                                     User u = it.next();
                                     if (u.getName().equalsIgnoreCase(frName.getText().toString())) {
                                         // delete
+                                        PreferencesHelper.getInstance(context).removeFriend(u,i);
                                         it.remove();
                                         break;
                                     }
                                 }
-                                PreferencesHelper.getInstance(context).saveFriends(friends);
                                 notifyDataSetChanged();
                             }
                         }).show();
