@@ -1,17 +1,14 @@
 package com.vnguyen.liveokeremote;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.provider.MediaStore;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -27,22 +24,16 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-import android.widget.ViewSwitcher;
 
 import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.callback.BitmapAjaxCallback;
-import com.daimajia.swipe.SwipeLayout;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -71,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
     public DrawableHelper drawableHelper;
 
     public Animation slide_in_left, slide_out_right;
-    public ViewSwitcher viewFlipper;
+    public ViewFlipper viewFlipper;
 
     // Variables to hold values from POPUP dialogs in SETTINGS
     public String ipAddress;
@@ -105,15 +96,15 @@ public class MainActivity extends ActionBarActivity {
                     getResources().getString(R.string.myName));
         }
 
-        if (friendsList == null || friendsList.isEmpty()) {
-            Log.v(app.TAG,friendsList+"-BEFORE");
-            friendsList = (ArrayList<User>) getLastCustomNonConfigurationInstance();
-            if (friendsList == null) {
-                Log.v(app.TAG,"NULL from Retaining...");
-                friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
-            }
-            Log.v(app.TAG,friendsList+"-AFTER");
-        }
+//        if (friendsList == null || friendsList.isEmpty()) {
+//            Log.v(app.TAG,friendsList+"-BEFORE");
+//            friendsList = (ArrayList<User>) getLastCustomNonConfigurationInstance();
+//            if (friendsList == null) {
+//                Log.v(app.TAG,"NULL from Retaining...");
+//                friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
+//            }
+//            Log.v(app.TAG,friendsList+"-AFTER");
+//        }
 
         // if myName is still not found (brand new use)
         if (myName == null || myName.equals("")) {
@@ -127,13 +118,13 @@ public class MainActivity extends ActionBarActivity {
             drawableHelper = new DrawableHelper();
         }
 
-//        viewFlipper = (ViewSwitcher) findViewById(R.id.view_flipper);
-//        slide_in_left = AnimationUtils.loadAnimation(this,
-//                android.R.anim.slide_in_left);
-//        slide_out_right = AnimationUtils.loadAnimation(this,
-//                android.R.anim.slide_out_right);
-//        viewFlipper.setInAnimation(slide_in_left);
-//        viewFlipper.setOutAnimation(slide_out_right);
+        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        slide_in_left = AnimationUtils.loadAnimation(this,
+                android.R.anim.slide_in_left);
+        slide_out_right = AnimationUtils.loadAnimation(this,
+                android.R.anim.slide_out_right);
+        viewFlipper.setInAnimation(slide_in_left);
+        viewFlipper.setOutAnimation(slide_out_right);
 
 
         // setup toolbar as actionbar
@@ -164,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
         mSlidingPanel.setEnabled(false); // disable swiping to slide
 
         setupReservedPanel(); // setup reserved list panel
-        //floatingButtonsHelper.setupFriendsFloatingActionButtons();
+        floatingButtonsHelper.setupFriendsFloatingActionButtons();
 
 //        final FloatingActionsMenu fam = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
 //        fam.setTag("VERTICAL_DIRECTION");
@@ -323,6 +314,7 @@ public class MainActivity extends ActionBarActivity {
         mNowPlayingTxtView.setText(Html.fromHtml(title));
     }
 
+    @SuppressLint("NewApi")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) return;
@@ -331,6 +323,10 @@ public class MainActivity extends ActionBarActivity {
 
         if (requestCode == AlertDialogHelper.FILE_PICK_FROM_FILE) {
             aquiredPhoto.mImageCaptureUri = data.getData();
+        } else if (requestCode == AlertDialogHelper.FILE_PICK_FROM_FILE_KITKAT) {
+            aquiredPhoto.mImageCaptureUri = data.getData();
+            final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            getContentResolver().takePersistableUriPermission(aquiredPhoto.mImageCaptureUri, takeFlags);
         }
         bitmap = uriToBitmap(aquiredPhoto.mImageCaptureUri);
         Log.v(app.TAG, "URL + " + aquiredPhoto.mImageCaptureUri.toString());
@@ -352,7 +348,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private Bitmap uriToBitmap(Uri imgUri) {
+    public Bitmap uriToBitmap(Uri imgUri) {
         Bitmap bitmap = null;
         try {
             if (imgUri != null) {
@@ -360,7 +356,11 @@ public class MainActivity extends ActionBarActivity {
                     InputStream is = getContentResolver().openInputStream(Uri.parse(imgUri.toString()));
                     bitmap = BitmapFactory.decodeStream(is);
                 } else {
-                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imgUri);
+                    ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(imgUri,"r");
+                    FileDescriptor fd = pfd.getFileDescriptor();
+                    bitmap = BitmapFactory.decodeFileDescriptor(fd);
+                    pfd.close();
+                    //bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imgUri);
                 }
             }
         } catch (IOException e) {

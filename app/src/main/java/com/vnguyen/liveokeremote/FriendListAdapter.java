@@ -3,6 +3,7 @@ package com.vnguyen.liveokeremote;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,13 +58,33 @@ public class FriendListAdapter extends BaseSwipeAdapter {
     public void fillValues(int i, View view) {
         final User friend = friends.get(i);
         final ImageView friendIcon = (ImageView) view.findViewById(R.id.friends_icon);
-        FaceCropper mFaceCropper = new FaceCropper();
-        Bitmap b = mFaceCropper.getCroppedImage(context,R.drawable.default_profile);
-        if (b.getWidth() > 120 || b.getHeight() > 120) {
-            b = Bitmap.createScaledBitmap(b, 120, 120, false);
+        Uri imgURI;
+        Bitmap bm;
+        Bitmap _bm;
+        String avatarURI = PreferencesHelper.getInstance(context).getPreference(friend.getName()+"_avatar");
+        Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
+        if (avatarURI != null && !avatarURI.equals("")) {
+            imgURI = Uri.parse(avatarURI);
+            _bm = context.uriToBitmap(imgURI);
+        } else {
+            _bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
         }
-        RoundImgDrawable img = new RoundImgDrawable(b);
-        friendIcon.setImageDrawable(img);
+        FaceCropper mFaceCropper = new FaceCropper();
+        if (!_bm.isRecycled()) {
+            bm = mFaceCropper.getCroppedImage(_bm);
+            if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+                bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+            }
+            RoundImgDrawable img = new RoundImgDrawable(bm);
+//
+//        FaceCropper mFaceCropper = new FaceCropper();
+//        Bitmap b = mFaceCropper.getCroppedImage(context,R.drawable.default_profile);
+//        if (b.getWidth() > 120 || b.getHeight() > 120) {
+//            b = Bitmap.createScaledBitmap(b, 120, 120, false);
+//        }
+//        RoundImgDrawable img = new RoundImgDrawable(b);
+            friendIcon.setImageDrawable(img);
+        }
         TextView fName = (TextView) view.findViewById(R.id.friends_name);
         fName.setText(friend.getName());
         setupActionButtonsBelow(swipeLayout);

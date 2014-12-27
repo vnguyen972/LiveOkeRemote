@@ -1,14 +1,13 @@
 package com.vnguyen.liveokeremote;
 
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -16,15 +15,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.thedazzler.droidicon.IconicFontDrawable;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 public class NavigationDrawerHelper {
 
@@ -58,22 +53,61 @@ public class NavigationDrawerHelper {
             public void onDrawerClosed(View view) {
 //                final long startTime = System.currentTimeMillis();
 //                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-                if (mDrawerList.getCheckedItemPosition() == 7) {
-                    context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
-                    context.mSlidingPanel.expandPanel();
-                    mDrawerList.setItemChecked(7, false);
+                if (mDrawerList.getCheckedItemPosition() == 7 ||
+                        mDrawerList.getCheckedItemPosition() == 8) {
+                    //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
+                    final ArrayList<User> friends = new ArrayList<User>();
+                    final ArrayList<ReservedListItem> rsvpItems = new ArrayList<ReservedListItem>();
+                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                        ProgressDialog pd;
+                        AlertDialogHelper ah = new AlertDialogHelper(context);
+
+                        @Override
+                        protected void onPreExecute() {
+                            ah.popupProgress(true);
+                        }
+
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                if (mDrawerList.getCheckedItemPosition() == 7) {
+                                    //friends.addAll(context.app.generateTestFriends());
+                                    context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
+                                } else {
+                                    rsvpItems.addAll(context.app.generateTestRsvpList());
+                                }
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (mDrawerList.getCheckedItemPosition() == 7) {
+                                            context.friendsListHelper.initFriendList(context.friendsList);
+                                            if (context.viewFlipper.getDisplayedChild() == 0) {
+                                                context.viewFlipper.showNext();
+                                            }
+                                            context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
+                                            mDrawerList.setItemChecked(7, false);
+                                        } else {
+                                            context.rsvpPanelHelper.refreshRsvpList(rsvpItems);
+                                            ((TextView) context.findViewById(R.id.panel_header)).setText(context.getResources().getString(R.string.rsvp_header));
+                                            context.mSlidingPanel.expandPanel();
+                                            mDrawerList.setItemChecked(8, false);
+                                        }
+                                    }
+                                });
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            ah.popupProgress(false);
+                        }
+                    };
+                    task.execute((Void[])null);
                 }
-//                if (!showFriendsList) {
-//                    showFriendsList = true;
-//                    if (context.mSlidingPanel.isPanelExpanded()) {
-//                        context.mSlidingPanel.collapsePanel();
-//                        context.actionBarHelper.resetTitle();
-//                    }
-//                    context.actionBarHelper.setTitle("Friends List");
-//                } else {
-//                    showFriendsList = false;
-//                    context.actionBarHelper.resetTitle();
-//                }
             }
 
             @Override
@@ -159,6 +193,14 @@ public class NavigationDrawerHelper {
                     showCounter = false;
                     break;
                 case 8:
+                    // Reserved List
+                    IconicFontDrawable reservedListIcon = new IconicFontDrawable(context.getApplicationContext());
+                    reservedListIcon.setIcon("gmd-assignment-turned-in");
+                    reservedListIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = reservedListIcon;
+                    showCounter = false;
+                    break;
+                case 9:
                     // send comments to screen
                     IconicFontDrawable send2ScreenIcon = new IconicFontDrawable(context.getApplicationContext());
                     send2ScreenIcon.setIcon("gmd-insert-comment");
@@ -166,7 +208,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = send2ScreenIcon;
                     showCounter = false;
                     break;
-                case 9:
+                case 10:
                     // your photo
                     IconicFontDrawable profile = new IconicFontDrawable(context.getApplicationContext());
                     profile.setIcon("gmd-account-circle");
@@ -174,7 +216,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = profile;
                     showCounter = false;
                     break;
-                case 10:
+                case 11:
                     // Help
                     IconicFontDrawable helpIcon = new IconicFontDrawable(context.getApplicationContext());
                     helpIcon.setIcon("gmd-help");
@@ -205,36 +247,25 @@ public class NavigationDrawerHelper {
                 switch (position) {
                     case 0:
                         // Home
-//                        manager = context.getSupportFragmentManager();
-//                        transaction = manager.beginTransaction();
-//                        //transaction.replace(R.id.contain_body,new MainFragment(),"main_contain_panel");
-//                        manager.popBackStack();
-//                        transaction.commit();
-//                        context.mDrawerLayout.closeDrawers();
-//                        if (context.mSlidingPanel.isPanelExpanded()) {
-//                            context.mSlidingPanel.collapsePanel();
-//                        }
-//                        context.actionBarHelper.resetTitle();
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.mDrawerLayout.closeDrawers();
+                            }
+                        },10);
+                        if (context.viewFlipper.getDisplayedChild() == 1) {
+                            context.viewFlipper.showPrevious();
+                        }
+                        context.actionBarHelper.setTitle(context.getResources().getString(R.string.app_name));
                         break;
                     case 6:
                         // IP Address
                         (new AlertDialogHelper(context)).
-                                popupIPAddressDialog("Karaoke4Pro IP Address", "Enter IP Address",
+                                popupIPAddressDialog("LiveOke IP Address", "Enter IP Address",
                                         adapter.getItem(position),adapter);
                         break;
                     case 7:
-//                        manager = context.getSupportFragmentManager();
-//                        transaction = manager.beginTransaction();
-//                        transaction.replace(R.id.contain_body,new FriendsListFragment(),"friends_list_panel");
-//                        transaction.addToBackStack("");
-//                        transaction.commit();
-//                        context.mDrawerLayout.closeDrawers();
-//                        if (context.mSlidingPanel.isPanelExpanded()) {
-//                            context.mSlidingPanel.collapsePanel();
-//                            context.actionBarHelper.resetTitle();
-//                        }
-//                        context.actionBarHelper.setTitle("Friends List");
-
+                    case 8:
                         // Friends List
                         mDrawerList.setItemChecked(position, true);
                         mHandler.postDelayed(new Runnable() {
@@ -242,18 +273,9 @@ public class NavigationDrawerHelper {
                             public void run() {
                                 context.mDrawerLayout.closeDrawers();
                             }
-                        },150);
-
-//                        long endTime = System.currentTimeMillis();
-//                        long elapsedTime = endTime - startTime;
-//                        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-//                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//                        Toast.makeText(context,
-//                                "Total time loaded: " +
-//                                        dateFormat.format(new Date(elapsedTime))
-//                                , Toast.LENGTH_LONG).show();
+                        },10);
                         break;
-                    case 9:
+                    case 10:
                         // your photo
                         context.mDrawerLayout.closeDrawers();
                         (new AlertDialogHelper(context)).popupFileChooser(

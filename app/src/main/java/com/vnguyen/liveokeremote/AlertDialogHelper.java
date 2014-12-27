@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -23,9 +26,30 @@ public class AlertDialogHelper {
     private final MainActivity context;
     public static int FILE_PICK_FROM_CAMERA = 1;
     public static int FILE_PICK_FROM_FILE = 2;
+    public static int FILE_PICK_FROM_FILE_KITKAT = 3;
+
+    private MaterialDialog progressDialog;
 
     public AlertDialogHelper(Context context) {
         this.context = (MainActivity) context;
+    }
+
+
+    public void popupProgress(boolean show) {
+        if (progressDialog == null) {
+            progressDialog = new MaterialDialog.Builder(context)
+                    .title("Please wait")
+                    .customView(R.layout.progress_dialog)
+                    .build();
+            View customView = progressDialog.getCustomView();
+            TextView tvMessage = (TextView)customView.findViewById(R.id.progress_message);
+            tvMessage.setText("Loading friends list...");
+        }
+        if (show) {
+            progressDialog.show();
+        } else {
+            progressDialog.dismiss();
+        }
     }
 
     public void popupHello() {
@@ -108,7 +132,7 @@ public class AlertDialogHelper {
     public void popupFileChooser(final ImageView imgView, final String key) {
         final String [] items           = new String [] {"From Camera", "From SD Card"};
         ArrayAdapter<String> adapter  = new ArrayAdapter<String>(context, android.R.layout.select_dialog_item,items);
-        AlertDialog.Builder builder     = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder     = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
 
         builder.setTitle("Select Image");
         builder.setAdapter( adapter, new DialogInterface.OnClickListener() {
@@ -131,11 +155,18 @@ public class AlertDialogHelper {
 
                     dialog.cancel();
                 } else {
-                    Intent intent = new Intent();
-
-                    intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    context.startActivityForResult(Intent.createChooser(intent, "Complete action using"), FILE_PICK_FROM_FILE);
+                    if (Build.VERSION.SDK_INT < 19) {
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        context.startActivityForResult(Intent.createChooser(intent, "Complete action using"), FILE_PICK_FROM_FILE);
+                    } else {
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        context.startActivityForResult(Intent.createChooser(intent, "Complete action using"), FILE_PICK_FROM_FILE_KITKAT);
+                    }
                 }
             }
         } );

@@ -33,7 +33,7 @@ public class FriendsListHelper {
                     final ImageView friendIcon = (ImageView) view.findViewById(R.id.friends_icon);
 
                     if (swipeLayout.getOpenStatus() == SwipeLayout.Status.Close) {
-                        (new AlertDialogHelper(context)).popupFileChooser(friendIcon, friend.getName().trim());
+                        (new AlertDialogHelper(context)).popupFileChooser(friendIcon, friend.getName().trim()+"_avatar");
                     }
                 }
             });

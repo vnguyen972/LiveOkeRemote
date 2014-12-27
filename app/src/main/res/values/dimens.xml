@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="lower_layer_width">30dp</dimen>
     <dimen name="lower_layer_height">30dp</dimen>
+    <dimen name="alert_dialog_padding_material">24dp</dimen>
 </resources>
