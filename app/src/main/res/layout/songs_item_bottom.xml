@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:background="@android:color/white"
+    android:gravity="left">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_orange_dark"
+        >
+        <ImageView
+            android:id="@+id/reserve_for_me_id"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_menu_add"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_orange_light"
+        >
+        <ImageView
+            android:id="@+id/reserve_for_friends_id"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_menu_myplaces"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_green_light"
+        >
+        <ImageView
+            android:id="@+id/f_ic_delete_id"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_menu_more"
+            />
+    </LinearLayout>
+</LinearLayout>

@@ -82,6 +82,36 @@ public class AlertDialogHelper {
                 }).show();
     }
 
+    public void popupIPAddressDialogGeneric() {
+        final EditText input = new EditText(context);
+        new MaterialDialog.Builder(context)
+                .title("LiveOke IP Address")
+                .content("Enter IP Address")
+                .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                .positiveText("OK")
+                .customView(input)
+                .titleColor(R.color.half_black)
+                .negativeText("CANCEL")
+                .callback(new MaterialDialog.Callback() {
+
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                    }
+
+                    @Override
+                    public void onPositive(MaterialDialog materialDialog) {
+                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
+                            String value = input.getEditableText().toString().trim();
+                            // store into Preference
+                            PreferencesHelper.getInstance(context).setStringPreference(
+                                    context.getResources().getString(R.string.ip_adress), value);
+                            context.ipAddress = value;
+                        }
+                    }
+                })
+                .show();
+    }
+
     public void popupIPAddressDialog(String title, String dialogMsg, final NavDrawerItem item, final NavDrawerListAdapter adapter) {
         final EditText input = new EditText(context);
         if (context.ipAddress != null && !context.ipAddress.equals("")) {

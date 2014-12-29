@@ -39,4 +39,15 @@ public class LiveOkeRemoteApplication extends Application {
         }
         return friends;
     }
+
+    public ArrayList<Song> generateTestSongs() {
+        ArrayList<Song> songs = new ArrayList<>();
+        for (int i = 0; i < 20;i++) {
+            Song song = new Song();
+            song.setTitle("Ai Dua Em Ve");
+            song.setSinger("Dam Vinh Hung");
+            songs.add(song);
+        }
+        return songs;
+    }
 }

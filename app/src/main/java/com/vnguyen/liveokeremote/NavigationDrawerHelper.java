@@ -53,8 +53,7 @@ public class NavigationDrawerHelper {
             public void onDrawerClosed(View view) {
 //                final long startTime = System.currentTimeMillis();
 //                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-                if (mDrawerList.getCheckedItemPosition() == 7 ||
-                        mDrawerList.getCheckedItemPosition() == 8) {
+                if (mDrawerList.getCheckedItemPosition() == 7 ) {
                     //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
                     final ArrayList<User> friends = new ArrayList<User>();
                     final ArrayList<ReservedListItem> rsvpItems = new ArrayList<ReservedListItem>();
@@ -70,28 +69,16 @@ public class NavigationDrawerHelper {
                         @Override
                         protected Void doInBackground(Void... params) {
                             try {
-                                if (mDrawerList.getCheckedItemPosition() == 7) {
-                                    //friends.addAll(context.app.generateTestFriends());
-                                    context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-                                } else {
-                                    rsvpItems.addAll(context.app.generateTestRsvpList());
-                                }
+                                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
                                 context.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (mDrawerList.getCheckedItemPosition() == 7) {
-                                            context.friendsListHelper.initFriendList(context.friendsList);
-                                            if (context.viewFlipper.getDisplayedChild() == 0) {
-                                                context.viewFlipper.showNext();
-                                            }
-                                            context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
-                                            mDrawerList.setItemChecked(7, false);
-                                        } else {
-                                            context.rsvpPanelHelper.refreshRsvpList(rsvpItems);
-                                            ((TextView) context.findViewById(R.id.panel_header)).setText(context.getResources().getString(R.string.rsvp_header));
-                                            context.mSlidingPanel.expandPanel();
-                                            mDrawerList.setItemChecked(8, false);
+                                        context.friendsListHelper.initFriendList(context.friendsList);
+                                        if (context.viewFlipper.getDisplayedChild() == 0) {
+                                            context.viewFlipper.showNext();
                                         }
+                                        context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
+                                        mDrawerList.setItemChecked(7, false);
                                     }
                                 });
                                 Thread.sleep(100);
@@ -193,11 +180,11 @@ public class NavigationDrawerHelper {
                     showCounter = false;
                     break;
                 case 8:
-                    // Reserved List
-                    IconicFontDrawable reservedListIcon = new IconicFontDrawable(context.getApplicationContext());
-                    reservedListIcon.setIcon("gmd-assignment-turned-in");
-                    reservedListIcon.setIconColor(context.getResources().getColor(R.color.primary));
-                    iconDrawable = reservedListIcon;
+                    // Update Songs List
+                    IconicFontDrawable updateSongsListIcon = new IconicFontDrawable(context.getApplicationContext());
+                    updateSongsListIcon.setIcon("gmd-assignment-turned-in");
+                    updateSongsListIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = updateSongsListIcon;
                     showCounter = false;
                     break;
                 case 9:
@@ -265,7 +252,6 @@ public class NavigationDrawerHelper {
                                         adapter.getItem(position),adapter);
                         break;
                     case 7:
-                    case 8:
                         // Friends List
                         mDrawerList.setItemChecked(position, true);
                         mHandler.postDelayed(new Runnable() {
@@ -277,7 +263,12 @@ public class NavigationDrawerHelper {
                         break;
                     case 10:
                         // your photo
-                        context.mDrawerLayout.closeDrawers();
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.mDrawerLayout.closeDrawers();
+                            }
+                        },10);
                         (new AlertDialogHelper(context)).popupFileChooser(
                                 context.mReservedCountImgView,
                                 context.getResources().getString(R.string.myAvatarURI));

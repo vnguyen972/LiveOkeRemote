@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <ListView
-        android:id="@+id/friends_list"
+        android:id="@+id/songs_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff"
         android:choiceMode="singleChoice"
+        android:divider="@color/primary_material_light"
         android:dividerHeight="1dp"
         />
-    <include layout="@layout/friend_list_fab"/>
 </RelativeLayout>

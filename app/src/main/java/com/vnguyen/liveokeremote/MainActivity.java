@@ -9,11 +9,16 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
@@ -23,6 +28,7 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +43,8 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cat.lafosca.facecropper.FaceCropper;
 
@@ -49,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
     public User me;
     public String myName;
     public ArrayList<User> friendsList;
+    public ConcurrentHashMap<String, String> pagerTitles;
 
     public Uri mImageCaptureUri;
     public AquiredPhoto aquiredPhoto;
@@ -60,6 +69,7 @@ public class MainActivity extends ActionBarActivity {
     public ActionBarHelper actionBarHelper;
     public FriendsListHelper friendsListHelper;
     public DrawableHelper drawableHelper;
+    public WebSocketHelper webSocketHelper;
 
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
@@ -74,6 +84,8 @@ public class MainActivity extends ActionBarActivity {
     public ImageView mReservedCountImgView;
     public TextView mNowPlayingTxtView;
     public MenuItem onOffSwitch;
+    public ViewPager mViewPager;
+    public SongsListPageAdapter mSongsListPagerAdapter;
 
     public OrientationEventListener myOrientationEventListener;
 
@@ -85,6 +97,14 @@ public class MainActivity extends ActionBarActivity {
         aq = new AQuery(getApplicationContext());
         app = (LiveOkeRemoteApplication) getApplication();
         aquiredPhoto = new AquiredPhoto();
+
+        pagerTitles = new ConcurrentHashMap<>();
+        getPagerTitles();
+
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mSongsListPagerAdapter = new SongsListPageAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mSongsListPagerAdapter);
+
 
         // Load Shared Preference
         if (ipAddress == null) {
@@ -134,7 +154,7 @@ public class MainActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_TITLE);
-        actionBarHelper.setTitle("LiveOke Remote");
+        actionBarHelper.setTitle(getResources().getString(R.string.app_name));
 
         // setup sliding Navigation panel (hidden from left)
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -214,6 +234,25 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
+        SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (webSocketHelper == null) {
+                        webSocketHelper = new WebSocketHelper(MainActivity.this);
+                    }
+                    webSocketHelper.connect();
+                    Log.i(app.TAG,"SWITCHED ON");
+                } else {
+                    if (webSocketHelper != null) {
+                        webSocketHelper.disconnect();
+                    }
+                    Log.i(app.TAG, "SWITCHED OFF");
+                }
+            }
+        });
+
 
         IconDrawable searchIcon = new IconDrawable(getApplicationContext(), Iconify.IconValue.md_search);
         searchIcon.sizeDp(30);
@@ -374,5 +413,45 @@ public class MainActivity extends ActionBarActivity {
         return friendsList;
     }
 
+    public void getPagerTitles() {
+        pagerTitles.put("A","200");
+        pagerTitles.put("B","100");
+        pagerTitles.put("C","200");
+    }
+
+
+    private class SongsListPageAdapter extends FragmentStatePagerAdapter {
+
+        public SongsListPageAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            ArrayList<String> sortedKeys = new ArrayList<>(pagerTitles.size());
+            sortedKeys.addAll(pagerTitles.keySet());
+            Collections.sort(sortedKeys);
+            String title = "";
+            if (position < sortedKeys.size()) {
+                String key = sortedKeys.get(position);
+                title = key + " (" + pagerTitles.get(key) + " songs)";
+            }
+            return title;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Fragment fragment = new SongListFragment();
+            Bundle args = new Bundle();
+            args.putInt(SongListFragment.ARG_SECTION_NUMBER, position);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return pagerTitles.size();
+        }
+    }
 
 }
