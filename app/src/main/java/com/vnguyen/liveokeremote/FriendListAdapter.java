@@ -60,6 +60,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
         final User friend = friends.get(i);
         FriendsViewHolder holder = (FriendsViewHolder) view.getTag();
         if (holder == null) {
+            holder = new FriendsViewHolder();
             holder.icon = (ImageView) view.findViewById(R.id.friends_icon);
             holder.name = (TextView) view.findViewById(R.id.friends_name);
             view.setTag(holder);
