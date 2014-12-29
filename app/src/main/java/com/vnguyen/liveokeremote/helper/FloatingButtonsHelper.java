@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 
 import android.content.Context;
@@ -11,6 +11,10 @@ import com.afollestad.materialdialogs.Theme;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
+import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.PreferencesHelper;
+import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.data.User;
 
 public class FloatingButtonsHelper {
 

@@ -1,10 +1,12 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+
+import com.vnguyen.liveokeremote.MainActivity;
 
 import java.util.Stack;
 

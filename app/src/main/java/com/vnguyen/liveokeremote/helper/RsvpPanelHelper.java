@@ -1,8 +1,14 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.widget.AbsListView;
 import android.widget.ListView;
+
+import com.vnguyen.liveokeremote.FriendListAdapter;
+import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.RsvpListAdapter;
+import com.vnguyen.liveokeremote.data.ReservedListItem;
 
 import java.util.ArrayList;
 

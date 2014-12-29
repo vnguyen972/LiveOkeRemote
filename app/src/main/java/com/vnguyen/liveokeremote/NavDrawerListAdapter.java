@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.vnguyen.liveokeremote.data.NavDrawerItem;
+
 import java.util.ArrayList;
 import java.util.TreeSet;
 

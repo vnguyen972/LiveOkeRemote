@@ -1,10 +1,7 @@
 package com.vnguyen.liveokeremote;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +10,9 @@ import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.vnguyen.liveokeremote.data.Song;
 
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class SongsListAdapter extends BaseSwipeAdapter {
     private MainActivity context;
@@ -50,11 +47,6 @@ public class SongsListAdapter extends BaseSwipeAdapter {
     public void fillValues(int position, View view) {
         SongListViewHolder holder = (SongListViewHolder) view.getTag();
         Song song = songs.get(position);
-        if (position % 2 == 0) {
-            view.setBackgroundColor(Color.parseColor("#ffffff"));
-        } else {
-            view.setBackgroundColor(Color.parseColor("#BCF7F0"));
-        }
         if (holder == null) {
             holder = new SongListViewHolder();
             holder.iconImgView = (ImageView) view.findViewById(R.id.songs_icon);
@@ -67,6 +59,12 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         holder.titleTxtView.setText(song.title);
         holder.singerTxtView.setTypeface(font2);
         holder.singerTxtView.setText(song.singer);
+//        View sv = swipeLayout.findViewById(R.id.surfaceView);
+//        if (position % 2 == 0) {
+//            sv.setBackgroundColor(Color.parseColor("#ffffff"));
+//        } else {
+//            sv.setBackgroundColor(Color.parseColor("#BCF7F0"));
+//        }
     }
 
     @Override

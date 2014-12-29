@@ -14,10 +14,10 @@ import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.vnguyen.liveokeremote.data.ReservedListItem;
 
 
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RsvpListAdapter extends BaseSwipeAdapter {
 

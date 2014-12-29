@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,6 +17,12 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.NavDrawerListAdapter;
+import com.vnguyen.liveokeremote.PreferencesHelper;
+import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.data.NavDrawerItem;
+import com.vnguyen.liveokeremote.data.User;
 
 
 import java.io.File;
@@ -35,21 +41,24 @@ public class AlertDialogHelper {
     }
 
 
-    public void popupProgress(boolean show) {
+    public void popupProgress(String message) {
         if (progressDialog == null) {
             progressDialog = new MaterialDialog.Builder(context)
                     .title("Please wait")
                     .customView(R.layout.progress_dialog)
                     .build();
-            View customView = progressDialog.getCustomView();
-            TextView tvMessage = (TextView)customView.findViewById(R.id.progress_message);
-            tvMessage.setText("Loading friends list...");
         }
-        if (show) {
-            progressDialog.show();
-        } else {
+        View customView = progressDialog.getCustomView();
+        TextView tvMessage = (TextView)customView.findViewById(R.id.progress_message);
+        tvMessage.setText(message);
+        progressDialog.show();
+    }
+
+    public void dismissProgress() {
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
+        progressDialog = null;
     }
 
     public void popupHello() {
@@ -100,13 +109,13 @@ public class AlertDialogHelper {
 
                     @Override
                     public void onPositive(MaterialDialog materialDialog) {
-                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
-                            String value = input.getEditableText().toString().trim();
-                            // store into Preference
-                            PreferencesHelper.getInstance(context).setStringPreference(
-                                    context.getResources().getString(R.string.ip_adress), value);
-                            context.ipAddress = value;
-                        }
+//                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
+//                            String value = input.getEditableText().toString().trim();
+//                            // store into Preference
+//                            PreferencesHelper.getInstance(context).setStringPreference(
+//                                    context.getResources().getString(R.string.ip_adress), value);
+//                            context.ipAddress = value;
+//                        }
                     }
                 })
                 .show();
@@ -114,8 +123,8 @@ public class AlertDialogHelper {
 
     public void popupIPAddressDialog(String title, String dialogMsg, final NavDrawerItem item, final NavDrawerListAdapter adapter) {
         final EditText input = new EditText(context);
-        if (context.ipAddress != null && !context.ipAddress.equals("")) {
-            input.setText(context.ipAddress);
+        if (context.wsInfo != null && context.wsInfo.ipAddress != null && !context.wsInfo.ipAddress.equals("")) {
+            input.setText(context.wsInfo.ipAddress);
         }
         new MaterialDialog.Builder(context)
                 .title(title)
@@ -138,7 +147,7 @@ public class AlertDialogHelper {
                             // store into Preference
                             PreferencesHelper.getInstance(context).setStringPreference(
                                     context.getResources().getString(R.string.ip_adress), value);
-                            context.ipAddress = value;
+                            context.wsInfo.ipAddress = value;
                             Toast.makeText(context, "IP Address Set To: "+ value, Toast.LENGTH_LONG).show();
                             // Change the list item by appending the IP to it
                             if (item.title.contains("(")) {

@@ -2,8 +2,6 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +15,10 @@ import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import cat.lafosca.facecropper.FaceCropper;
 
 public class FriendListAdapter extends BaseSwipeAdapter {
     private MainActivity context;

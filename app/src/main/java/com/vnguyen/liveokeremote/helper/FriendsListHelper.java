@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.view.View;
@@ -8,6 +8,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.daimajia.swipe.SwipeLayout;
+import com.vnguyen.liveokeremote.FriendListAdapter;
+import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.data.User;
 
 
 import java.util.ArrayList;

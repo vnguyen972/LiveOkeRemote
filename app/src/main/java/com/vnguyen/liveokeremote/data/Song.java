@@ -1,7 +1,6 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.data;
 
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -35,7 +34,6 @@ public class Song implements Comparable<Song> {
     public String requester;
     public boolean favInSongList;
 
-    public Uri iconURI;
     public Drawable icon;
 
     @Override

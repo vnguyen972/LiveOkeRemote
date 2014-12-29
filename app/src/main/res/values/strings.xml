@@ -34,6 +34,7 @@
 
     <!-- Preferences -->
     <string name="ip_adress">ipAddress</string>
+    <string name="port">port</string>
     <string name="myName">myName</string>
     <string name="myAvatarURI">myAvatarURI</string>
 

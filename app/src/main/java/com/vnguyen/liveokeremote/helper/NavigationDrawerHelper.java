@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,9 +15,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.NavDrawerListAdapter;
+import com.vnguyen.liveokeremote.PreferencesHelper;
+import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.data.NavDrawerItem;
+import com.vnguyen.liveokeremote.data.ReservedListItem;
+import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
 
@@ -63,7 +69,7 @@ public class NavigationDrawerHelper {
 
                         @Override
                         protected void onPreExecute() {
-                            ah.popupProgress(true);
+                            ah.popupProgress("Loading friends...");
                         }
 
                         @Override
@@ -79,6 +85,7 @@ public class NavigationDrawerHelper {
                                         }
                                         context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
                                         mDrawerList.setItemChecked(7, false);
+                                        ah.popupProgress(context.friendsList.size() + " friends loaded.");
                                     }
                                 });
                                 Thread.sleep(100);
@@ -90,7 +97,7 @@ public class NavigationDrawerHelper {
 
                         @Override
                         protected void onPostExecute(Void aVoid) {
-                            ah.popupProgress(false);
+                            ah.dismissProgress();
                         }
                     };
                     task.execute((Void[])null);

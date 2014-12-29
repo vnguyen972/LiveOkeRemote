@@ -7,7 +7,8 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import java.net.URI;
+import com.vnguyen.liveokeremote.data.User;
+
 import java.util.ArrayList;
 
 import cat.lafosca.facecropper.FaceCropper;

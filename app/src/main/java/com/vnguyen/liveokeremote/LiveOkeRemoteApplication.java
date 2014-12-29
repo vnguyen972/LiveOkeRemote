@@ -2,6 +2,11 @@ package com.vnguyen.liveokeremote;
 
 import android.app.Application;
 
+import com.vnguyen.liveokeremote.data.ReservedListItem;
+import com.vnguyen.liveokeremote.data.Song;
+import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.DrawableHelper;
+
 import java.util.ArrayList;
 
 public class LiveOkeRemoteApplication extends Application {
@@ -45,7 +50,7 @@ public class LiveOkeRemoteApplication extends Application {
         ArrayList<Song> songs = new ArrayList<>();
         for (int i = 0; i < 20;i++) {
             Song song = new Song();
-            song.title = "Ai Dua Em Ve";
+            song.title = "Ai Dua Em Ve_" + i;
             song.singer = "Dam Vinh Hung";
             song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
             songs.add(song);

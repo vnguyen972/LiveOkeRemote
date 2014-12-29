@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.annotation.TargetApi;
 import android.content.Context;

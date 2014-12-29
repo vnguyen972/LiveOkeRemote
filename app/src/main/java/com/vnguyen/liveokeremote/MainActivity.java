@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -37,7 +38,22 @@ import android.widget.ViewFlipper;
 import com.androidquery.AQuery;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.vnguyen.liveokeremote.data.AquiredPhoto;
+import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.data.WebSocketInfo;
+import com.vnguyen.liveokeremote.helper.ActionBarHelper;
+import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
+import com.vnguyen.liveokeremote.helper.DrawableHelper;
+import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
+import com.vnguyen.liveokeremote.helper.FriendsListHelper;
+import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
+import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
+import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
+import com.vnguyen.liveokeremote.helper.WebSocketHelper;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -58,6 +74,7 @@ public class MainActivity extends ActionBarActivity {
     public String myName;
     public ArrayList<User> friendsList;
     public ConcurrentHashMap<String, String> pagerTitles;
+    public int totalSong;
 
     public Uri mImageCaptureUri;
     public AquiredPhoto aquiredPhoto;
@@ -75,7 +92,7 @@ public class MainActivity extends ActionBarActivity {
     public ViewFlipper viewFlipper;
 
     // Variables to hold values from POPUP dialogs in SETTINGS
-    public String ipAddress;
+    public WebSocketInfo wsInfo;
     public String comment2Send2Screen;
 
     // GUI Components
@@ -107,9 +124,13 @@ public class MainActivity extends ActionBarActivity {
 
 
         // Load Shared Preference
-        if (ipAddress == null) {
-            ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+        if (wsInfo == null) {
+            wsInfo = new WebSocketInfo();
+            wsInfo.ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                     getResources().getString(R.string.ip_adress));
+            wsInfo.port = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                    getResources().getString(R.string.port));
+            wsInfo.uri = "ws://"+wsInfo.ipAddress+":"+wsInfo.port;
         }
         if (myName == null) {
             myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
@@ -234,16 +255,39 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
-        SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
         switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    if (webSocketHelper == null) {
-                        webSocketHelper = new WebSocketHelper(MainActivity.this);
-                    }
-                    webSocketHelper.connect();
                     Log.i(app.TAG,"SWITCHED ON");
+                    new Thread(new Runnable() {
+                        //WebSocketInfo _wsInfo;
+                        @Override
+                        public void run() {
+                            UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
+                            wsInfo = udpHelper.findServer();
+                            if (wsInfo != null) {
+                                if (webSocketHelper == null) {
+                                    webSocketHelper = new WebSocketHelper(MainActivity.this);
+                                }
+                                webSocketHelper.connect();
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        switchButton.toggle();
+                                        SnackbarManager.show(Snackbar.with(MainActivity.this)
+                                                .type(SnackbarType.MULTI_LINE)
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                .textColor(Color.WHITE)
+                                                .color(Color.RED)
+                                                .text("ERROR: Unable to find LiveOke!"));
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
                 } else {
                     if (webSocketHelper != null) {
                         webSocketHelper.disconnect();

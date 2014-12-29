@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.data;
 
 import android.graphics.drawable.Drawable;
 
