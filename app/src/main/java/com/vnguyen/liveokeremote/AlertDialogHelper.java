@@ -141,11 +141,11 @@ public class AlertDialogHelper {
                             context.ipAddress = value;
                             Toast.makeText(context, "IP Address Set To: "+ value, Toast.LENGTH_LONG).show();
                             // Change the list item by appending the IP to it
-                            if (item.getTitle().contains("(")) {
-                                String hdr = item.getTitle().substring(0, item.getTitle().indexOf(" ("));
-                                item.setTitle(hdr + " (" + value + ")");
+                            if (item.title.contains("(")) {
+                                String hdr = item.title.substring(0, item.title.indexOf(" ("));
+                                item.title = hdr + " (" + value + ")";
                             } else {
-                                item.setTitle(item.getTitle() + " (" + value + ")");
+                                item.title = item.title + " (" + value + ")";
                             }
                             // update the list
                             context.runOnUiThread(new Runnable() {

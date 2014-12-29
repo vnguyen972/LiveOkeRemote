@@ -1,16 +1,13 @@
 package com.vnguyen.liveokeremote;
 
+import android.graphics.drawable.Drawable;
+
 public class User {
-    private String name;
+    public String name;
+    public String avatarURI;
+    public Drawable avatar;
+
     public User(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 
@@ -21,6 +18,6 @@ public class User {
         }
         User that = (User) usr;
 
-        return this.getName().equalsIgnoreCase(that.getName());
+        return this.name.equalsIgnoreCase(that.name);
     }
 }

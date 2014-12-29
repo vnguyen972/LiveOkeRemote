@@ -4,6 +4,7 @@ package com.vnguyen.liveokeremote;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RsvpListAdapter extends BaseSwipeAdapter {
 
@@ -47,16 +49,17 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
     @Override
     public void fillValues(int i, View view) {
         ReservedListItem item = rItems.get(i);
-        ImageView iconImg = (ImageView) view.findViewById(R.id.rsvp_icon);
-        if (item.getIcon() == null) {
-            iconImg.setImageDrawable(mContext.drawableHelper.buildDrawable(item.getTitle().substring(0, 1), "round"));
-        } else {
-            iconImg.setImageDrawable(item.getIcon());
+        RsvpViewHolder holder = (RsvpViewHolder) view.getTag();
+        if (holder == null) {
+            holder = new RsvpViewHolder();
+            holder.icon = (ImageView) view.findViewById(R.id.rsvp_icon);
+            holder.title = (TextView) view.findViewById(R.id.rsvp_title);
+            holder.num = (TextView) view.findViewById(R.id.rsvp_number);
+            view.setTag(holder);
         }
-        TextView txtView = (TextView) view.findViewById(R.id.rsvp_title);
-        txtView.setText(item.getTitle() + " - " + item.getRequester());
-        TextView rsvpNbr = (TextView) view.findViewById(R.id.rsvp_number);
-        rsvpNbr.setText(item.getNumber());
+        holder.icon.setImageDrawable(item.icon);
+        holder.title.setText(Html.fromHtml(item.title + "<br>" + item.requester));
+        holder.num.setText(item.number);
     }
 
     @Override
@@ -131,4 +134,9 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
 
     }
 
+    private class RsvpViewHolder {
+        ImageView icon;
+        TextView title;
+        TextView num;
+    }
 }

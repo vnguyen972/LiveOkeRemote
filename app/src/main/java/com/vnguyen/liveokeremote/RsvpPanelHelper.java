@@ -16,29 +16,6 @@ public class RsvpPanelHelper {
     }
 
 
-    public void refreshFriendsList(ArrayList<User> friends) {
-        if (friendsAdapter != null) {
-            friendsAdapter = null;
-        }
-        friendsAdapter = new FriendListAdapter (context, friends);
-        ListView rsvpListView = (ListView) context.findViewById(R.id.rsvp_drawer);
-        rsvpListView.setAdapter(friendsAdapter);
-        rsvpListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (friendsAdapter.getOpenItems().size() > 0) {
-                    friendsAdapter.closeAllExcept(null);
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-            }
-        });
-        friendsAdapter.notifyDataSetChanged();
-    }
-
     public void refreshRsvpList(ArrayList<ReservedListItem> items) {
         if (rsvpAdapter != null) {
             rsvpAdapter = null;

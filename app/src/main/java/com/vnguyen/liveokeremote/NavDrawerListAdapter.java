@@ -33,7 +33,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
 
     public void addItem(NavDrawerItem item) {
         navDrawerItems.add(item);
-        if (item.getIcon() == null) {
+        if (item.icon == null) {
             sectionHeader.add(navDrawerItems.size()-1);
         }
         notifyDataSetChanged();
@@ -108,18 +108,18 @@ public class NavDrawerListAdapter extends BaseAdapter {
         if (holder.imgIcon != null) {
             int currentVersion = Build.VERSION.SDK_INT;
             if (currentVersion >= 16) {
-                holder.imgIcon.setBackground(navDrawerItems.get(position).getIcon());
+                holder.imgIcon.setBackground(navDrawerItems.get(position).icon);
             } else {
-                holder.imgIcon.setBackgroundDrawable(navDrawerItems.get(position).getIcon());
+                holder.imgIcon.setBackgroundDrawable(navDrawerItems.get(position).icon);
             }
         }
-        holder.txtTitle.setText(navDrawerItems.get(position).getTitle());
+        holder.txtTitle.setText(navDrawerItems.get(position).title);
 
         // displaying count
         // check whether it set visible or not
         if (holder.txtCount != null) {
-            if (navDrawerItems.get(position).isCounterVisible()) {
-                holder.txtCount.setText(navDrawerItems.get(position).getCount());
+            if (navDrawerItems.get(position).counterVisible) {
+                holder.txtCount.setText(navDrawerItems.get(position).count);
             } else {
                 // hide the counter view
                 holder.txtCount.setVisibility(View.GONE);

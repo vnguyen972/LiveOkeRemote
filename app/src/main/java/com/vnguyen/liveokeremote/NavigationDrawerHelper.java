@@ -217,8 +217,8 @@ public class NavigationDrawerHelper {
             navDrawerItems.add(new NavDrawerItem((title != null ? title : navMenuTitles[i]), iconDrawable, showCounter, navCounter));
         }
         NavDrawerListAdapter navAdapter = new NavDrawerListAdapter(context.getApplicationContext());
-        for (int i = 0; i < navDrawerItems.size();i++) {
-            navAdapter.addItem(navDrawerItems.get(i));
+        for (NavDrawerItem item : navDrawerItems) {
+            navAdapter.addItem(item);
         }
         mDrawerList.setAdapter(navAdapter);
 

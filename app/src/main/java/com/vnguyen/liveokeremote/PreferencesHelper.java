@@ -2,10 +2,15 @@ package com.vnguyen.liveokeremote;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.net.URI;
 import java.util.ArrayList;
+
+import cat.lafosca.facecropper.FaceCropper;
 
 public class PreferencesHelper {
     private MainActivity context;
@@ -39,16 +44,17 @@ public class PreferencesHelper {
 
     public void saveFriends(ArrayList<User> friends) {
         preferences.edit().putInt("total_friends", friends.size()).apply();
-        for (int i = 0; i < friends.size();i++) {
-            User aFriend = friends.get(i);
-            setStringPreference("friend_"+i,aFriend.getName().trim());
+        int i = 0;
+        for (User aFriend : friends) {
+            setStringPreference("friend_" + i, aFriend.name.trim());
+            i++;
         }
     }
 
     public void addFriend(User friend) {
         int total = getPreferences().getInt("total_friends",0);
         int position = total;
-        getPreferences().edit().putString("friend_"+position,friend.getName().trim()).apply();
+        getPreferences().edit().putString("friend_"+position,friend.name.trim()).apply();
         getPreferences().edit().putInt("total_friends", total+1).apply();
     }
 
@@ -64,11 +70,29 @@ public class PreferencesHelper {
         int total = preferences.getInt("total_friends",0);
         Log.v(context.app.TAG, "TOTAL FRIENDS = " + total);
         for (int i = 0; i < total;i++) {
-            String userInfo = preferences.getString("friend_"+i,"");
-            Log.v(context.app.TAG,"userInfo = " + userInfo);
-            if (!userInfo.equals("")) {
-                User u = new User(userInfo);
-                list.add(u);
+            String name = preferences.getString("friend_"+i,"");
+            Log.v(context.app.TAG,"userInfo = " + name);
+            if (!name.equals("")) {
+                User u = new User(name);
+                Bitmap _bm;
+                Bitmap bm;
+                String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
+                Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
+                if (avatarURI != null && !avatarURI.equals("")) {
+                    Uri imgURI = Uri.parse(avatarURI);
+                    _bm = context.uriToBitmap(imgURI);
+                } else {
+                    _bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+                }
+                FaceCropper mFaceCropper = new FaceCropper();
+                if (!_bm.isRecycled()) {
+                    bm = mFaceCropper.getCroppedImage(_bm);
+                    if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+                        bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+                    }
+                    u.avatar =  new RoundImgDrawable(bm);
+                    list.add(u);
+                }
             }
         }
         Log.v(context.app.TAG,"TOTAL IN LIST = " + list.size());

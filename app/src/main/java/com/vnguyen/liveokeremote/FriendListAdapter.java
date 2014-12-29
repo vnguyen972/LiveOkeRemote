@@ -51,43 +51,21 @@ public class FriendListAdapter extends BaseSwipeAdapter {
         swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
+        setupActionButtonsBelow(swipeLayout);
         return v;
     }
 
     @Override
     public void fillValues(int i, View view) {
         final User friend = friends.get(i);
-        final ImageView friendIcon = (ImageView) view.findViewById(R.id.friends_icon);
-        Uri imgURI;
-        Bitmap bm;
-        Bitmap _bm;
-        String avatarURI = PreferencesHelper.getInstance(context).getPreference(friend.getName()+"_avatar");
-        Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
-        if (avatarURI != null && !avatarURI.equals("")) {
-            imgURI = Uri.parse(avatarURI);
-            _bm = context.uriToBitmap(imgURI);
-        } else {
-            _bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+        FriendsViewHolder holder = (FriendsViewHolder) view.getTag();
+        if (holder == null) {
+            holder.icon = (ImageView) view.findViewById(R.id.friends_icon);
+            holder.name = (TextView) view.findViewById(R.id.friends_name);
+            view.setTag(holder);
         }
-        FaceCropper mFaceCropper = new FaceCropper();
-        if (!_bm.isRecycled()) {
-            bm = mFaceCropper.getCroppedImage(_bm);
-            if (bm.getWidth() > 120 || bm.getHeight() > 120) {
-                bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
-            }
-            RoundImgDrawable img = new RoundImgDrawable(bm);
-//
-//        FaceCropper mFaceCropper = new FaceCropper();
-//        Bitmap b = mFaceCropper.getCroppedImage(context,R.drawable.default_profile);
-//        if (b.getWidth() > 120 || b.getHeight() > 120) {
-//            b = Bitmap.createScaledBitmap(b, 120, 120, false);
-//        }
-//        RoundImgDrawable img = new RoundImgDrawable(b);
-            friendIcon.setImageDrawable(img);
-        }
-        TextView fName = (TextView) view.findViewById(R.id.friends_name);
-        fName.setText(friend.getName());
-        setupActionButtonsBelow(swipeLayout);
+        holder.icon.setImageDrawable(friend.avatar);
+        holder.name.setText(friend.name);
     }
 
     @Override
@@ -145,7 +123,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                                 int i = 0;
                                 for (Iterator<User> it = friends.iterator();it.hasNext();i++) {
                                     User u = it.next();
-                                    if (u.getName().equalsIgnoreCase(frName.getText().toString())) {
+                                    if (u.name.equalsIgnoreCase(frName.getText().toString())) {
                                         // delete
                                         PreferencesHelper.getInstance(context).removeFriend(u,i);
                                         it.remove();
@@ -158,5 +136,10 @@ public class FriendListAdapter extends BaseSwipeAdapter {
             }
         });
 
+    }
+
+    private class FriendsViewHolder {
+        ImageView icon;
+        TextView name;
     }
 }

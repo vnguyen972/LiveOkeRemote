@@ -23,7 +23,8 @@ public class LiveOkeRemoteApplication extends Application {
     public ArrayList<ReservedListItem> generateTestRsvpList() {
         if (rsvpList == null || rsvpList.isEmpty()) {
             for (int i = 0; i < 50; i++) {
-                ReservedListItem item = new ReservedListItem("Requester " + 1, "Title " + i, null,Math.round(1000 + Math.random() * (9999 - 1000)));
+                ReservedListItem item = new ReservedListItem(i+"_Requester", "Title " + i, null,Math.round(1000 + Math.random() * (9999 - 1000)));
+                item.icon = (new DrawableHelper()).buildDrawable(item.requester.substring(0, 1), "round");
                 rsvpList.add(item);
             }
         }
@@ -44,8 +45,9 @@ public class LiveOkeRemoteApplication extends Application {
         ArrayList<Song> songs = new ArrayList<>();
         for (int i = 0; i < 20;i++) {
             Song song = new Song();
-            song.setTitle("Ai Dua Em Ve");
-            song.setSinger("Dam Vinh Hung");
+            song.title = "Ai Dua Em Ve";
+            song.singer = "Dam Vinh Hung";
+            song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
             songs.add(song);
         }
         return songs;

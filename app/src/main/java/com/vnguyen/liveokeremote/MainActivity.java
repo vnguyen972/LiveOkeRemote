@@ -344,7 +344,7 @@ public class MainActivity extends ActionBarActivity {
             }
             RoundImgDrawable img = new RoundImgDrawable(bm);
             mReservedCountImgView.setImageDrawable(img);
-            updateNowPlaying("Welcome " + me.getName() + "<br>Reserve a song and start singing");
+            updateNowPlaying("Welcome " + me.name + "<br>Reserve a song and start singing");
         }
 
     }
