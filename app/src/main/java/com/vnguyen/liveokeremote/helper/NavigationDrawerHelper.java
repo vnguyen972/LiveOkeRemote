@@ -30,12 +30,15 @@ import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NavigationDrawerHelper {
 
     private final MainActivity context;
     public boolean showFriendsList;
     private Handler mHandler = new Handler();
+    public NavDrawerListAdapter navAdapter;
+    private ConcurrentHashMap<String, String> dataMap;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -63,7 +66,23 @@ public class NavigationDrawerHelper {
             public void onDrawerClosed(View view) {
 //                final long startTime = System.currentTimeMillis();
 //                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-                if (mDrawerList.getCheckedItemPosition() == 7 ) {
+                if (mDrawerList.getCheckedItemPosition() == 0) {
+                    context.getPagerTitles();
+                    context.updateMainDisplay();
+                    mDrawerList.setItemChecked(0, false);
+                } else if (mDrawerList.getCheckedItemPosition() == 2) {
+                    context.getPagerLanguage("VN");
+                    context.updateMainDisplay();
+                    mDrawerList.setItemChecked(2, false);
+                } else if (mDrawerList.getCheckedItemPosition() == 3) {
+                    context.getPagerLanguage("EN");
+                    context.updateMainDisplay();
+                    mDrawerList.setItemChecked(3, false);
+                } else if (mDrawerList.getCheckedItemPosition() == 4) {
+                    context.getPagerLanguage("CN");
+                    context.updateMainDisplay();
+                    mDrawerList.setItemChecked(4, false);
+                } else if (mDrawerList.getCheckedItemPosition() == 7 ) {
                     //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
                     final ArrayList<User> friends = new ArrayList<User>();
                     final ArrayList<ReservedListItem> rsvpItems = new ArrayList<ReservedListItem>();
@@ -129,6 +148,7 @@ public class NavigationDrawerHelper {
                                         Thread.sleep(1000);
                                         // waits for all songs downloaded
                                     }
+
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -143,6 +163,7 @@ public class NavigationDrawerHelper {
                                     @Override
                                     public void run() {
                                         context.updateMainDisplay();
+                                        mDrawerList.setItemChecked(8,false);
                                     }
                                 });
                             }
@@ -169,7 +190,6 @@ public class NavigationDrawerHelper {
         context.getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
 
-
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<>();
 
         Drawable iconDrawable = null;
@@ -186,7 +206,17 @@ public class NavigationDrawerHelper {
                     iconicFontDrawable.setIcon("gmd-home");
                     iconicFontDrawable.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = iconicFontDrawable;
-                    showCounter = false;
+                    showCounter = true;
+                    try {
+                        context.db.open();
+                        int count = context.db.getSongTotalNum();
+                        navCounter = ""+count;
+                        Log.v(context.app.TAG,"count = " + count);
+                    } catch (Exception ex) {
+                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                    } finally {
+                        context.db.close();
+                    }
                     break;
                 case 1:
                     // Songs List header
@@ -198,21 +228,49 @@ public class NavigationDrawerHelper {
                     Bitmap vnIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.vn);
                     iconDrawable = new BitmapDrawable(context.getResources(), vnIcon);
                     showCounter = true;
-                    navCounter = "2000";
+                    try {
+                        context.db.open();
+                        int count = context.db.getTotalLanguage("VN");
+                        navCounter = ""+count;
+                        Log.v(context.app.TAG,"count = " + count);
+                    } catch (Exception ex) {
+                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                    } finally {
+                        context.db.close();
+                    }
+
                     break;
                 case 3:
                     // English Songs
                     Bitmap usIcon = BitmapFactory.decodeResource(context.getResources(),R.drawable.us);
                     iconDrawable = new BitmapDrawable(context.getResources(), usIcon);
                     showCounter = true;
-                    navCounter = "1000";
+                    try {
+                        context.db.open();
+                        int count = context.db.getTotalLanguage("EN");
+                        navCounter = ""+count;
+                        Log.v(context.app.TAG,"count = " + count);
+                    } catch (Exception ex) {
+                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                    } finally {
+                        context.db.close();
+                    }
                     break;
                 case 4:
                     // Chinese Songs
                     Bitmap cnIcon = BitmapFactory.decodeResource(context.getResources(),R.drawable.cn);
                     iconDrawable = new BitmapDrawable(context.getResources(), cnIcon);
                     showCounter = true;
-                    navCounter = "1000";
+                    try {
+                        context.db.open();
+                        int count = context.db.getTotalLanguage("CN");
+                        navCounter = ""+count;
+                        Log.v(context.app.TAG,"count = " + count);
+                    } catch (Exception ex) {
+                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                    } finally {
+                        context.db.close();
+                    }
                     break;
                 case 5:
                     // Settings header
@@ -278,7 +336,7 @@ public class NavigationDrawerHelper {
             }
             navDrawerItems.add(new NavDrawerItem((title != null ? title : navMenuTitles[i]), iconDrawable, showCounter, navCounter));
         }
-        NavDrawerListAdapter navAdapter = new NavDrawerListAdapter(context.getApplicationContext());
+        navAdapter = new NavDrawerListAdapter(context.getApplicationContext());
         for (NavDrawerItem item : navDrawerItems) {
             navAdapter.addItem(item);
         }
@@ -313,6 +371,9 @@ public class NavigationDrawerHelper {
                                 popupIPAddressDialog("LiveOke IP Address", "Enter IP Address",
                                         adapter.getItem(position),adapter);
                         break;
+                    case 2:
+                    case 3:
+                    case 4:
                     case 7:
                     case 8:
                         // Friends List

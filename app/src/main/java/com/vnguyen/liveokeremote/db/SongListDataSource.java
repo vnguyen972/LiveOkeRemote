@@ -613,6 +613,32 @@ public class SongListDataSource {
         return queryTotalPages(query);
     }
 
+    public int getTotalLanguage(String language) throws Exception {
+        int count = 0;
+        String query = "select count(*) from songslist where language='"+language+"'";
+        Cursor cursor = database.rawQuery(query, null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                count = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return count;
+    }
+
+    public int getSongTotalNum() throws Exception {
+        int count = 0;
+        String query = "select count(*) from songslist";
+        Cursor cursor = database.rawQuery(query, null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                count = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return count;
+    }
+
     public ConcurrentHashMap<String, String> getFavoriteKeysMap() throws Exception {
         //ConcurrentHashMap<String, String> map = new ConcurrentHashMap<String, String>();
         //String query = "select distinct upper(substr(title,1,1)) from songslist";

@@ -1,6 +1,7 @@
 package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
@@ -308,6 +310,20 @@ public class MainActivity extends ActionBarActivity {
         searchIcon.colorRes(R.color.white);
         MenuItem search = menu.findItem(R.id.menu_search);
         search.setIcon(searchIcon);
+        MenuItemCompat.setOnActionExpandListener(search,new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                // reset to master song list when back from searching
+                getPagerTitles();
+                updateMainDisplay();
+                return true;
+            }
+        });
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         //searchView.setMaxWidth(800);
@@ -324,10 +340,13 @@ public class MainActivity extends ActionBarActivity {
                     return true;
                 }
 
-                public boolean onQueryTextSubmit(String query)
+                public boolean onQueryTextSubmit(final String query)
                 {
                     // this is your adapter that will be filtered
                     //adapter.getFilter().filter(query);
+                    Log.v(app.TAG,"SEARCH FOR = " + query);
+                    getPagerSearch(query);
+                    updateMainDisplay();
                     return true;
                 }
             };
@@ -346,7 +365,7 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.on_off_switch) {
+        if (id == R.id.homeAsUp) {
             return true;
         }
 
@@ -476,7 +495,30 @@ public class MainActivity extends ActionBarActivity {
             db.close();
         }
     }
+    public void getPagerSearch(String searchStr) {
+        try {
+            db.open();
+            listingBy = "search";
+            this.searchStr = searchStr;
+            pagerTitles = db.getNewSearchKeysMap(searchStr);
+        } catch (Exception e) {
+            Log.e(app.TAG,e.getLocalizedMessage(),e);
+        } finally {
+            db.close();
+        }
+    }
 
+    public void getPagerLanguage(String language) {
+        try {
+            db.open();
+            listingBy = language;
+            pagerTitles = db.getLanguageKeysMapNumber(language);
+        } catch (Exception e) {
+            Log.e(app.TAG, e.getLocalizedMessage(),e);
+        } finally {
+            db.close();
+        }
+    }
     public int getTotalSongs() {
         int count = 0;
         Collection<String> coll = pagerTitles.values();
