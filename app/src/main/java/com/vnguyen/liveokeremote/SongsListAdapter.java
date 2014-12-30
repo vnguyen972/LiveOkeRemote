@@ -26,7 +26,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         this.songs = new ArrayList<>(songs.size());
         this.songs.addAll(songs);
         font = Typeface.createFromAsset(context.getAssets(),"fonts/Vegur-B_0500.otf");
-        font2 = Typeface.createFromAsset(context.getAssets(),"fonts/Vegur-R_0500.otf");
+        font2 = Typeface.createFromAsset(context.getAssets(),"fonts/VPSLGAN.TTF");
     }
 
     @Override
@@ -56,8 +56,10 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         }
         holder.iconImgView.setImageDrawable(song.icon);
         holder.titleTxtView.setTypeface(font);
+//        holder.titleTxtView.setTextSize(30);
         holder.titleTxtView.setText(song.title);
         holder.singerTxtView.setTypeface(font2);
+//        holder.singerTxtView.setTextSize(30);
         holder.singerTxtView.setText(song.singer);
 //        View sv = swipeLayout.findViewById(R.id.surfaceView);
 //        if (position % 2 == 0) {

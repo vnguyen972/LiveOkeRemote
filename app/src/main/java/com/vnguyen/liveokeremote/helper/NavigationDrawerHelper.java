@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -16,6 +17,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
@@ -101,6 +105,57 @@ public class NavigationDrawerHelper {
                         }
                     };
                     task.execute((Void[])null);
+                } else if (mDrawerList.getCheckedItemPosition() == 8) {
+                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                            ProgressDialog pd;
+                            AlertDialogHelper ah = new AlertDialogHelper(context);
+
+                            @Override
+                            protected void onPreExecute() {
+                                context.webSocketHelper.sendMessage("getsonglist");
+                                ah.popupProgress("Updating songs list...");
+                            }
+
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    while (!context.webSocketHelper.gotTotalSongResponse) {
+                                        Thread.sleep(1000);
+                                        // waits until got the total songs response
+                                    }
+                                    ah.popupProgress("Downloading " + context.totalSong + " songs...");
+                                    while (!context.webSocketHelper.doneGettingSongList) {
+                                        Thread.sleep(1000);
+                                        // waits for all songs downloaded
+                                    }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                context.getPagerTitles();
+                                ah.dismissProgress();
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        context.updateMainDisplay();
+                                    }
+                                });
+                            }
+                        };
+                        task.execute((Void[])null);
+                    } else {
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(Color.RED)
+                                .text("ERROR: Not Connected"));
+                    }
                 }
             }
 
@@ -259,6 +314,7 @@ public class NavigationDrawerHelper {
                                         adapter.getItem(position),adapter);
                         break;
                     case 7:
+                    case 8:
                         // Friends List
                         mDrawerList.setItemChecked(position, true);
                         mHandler.postDelayed(new Runnable() {

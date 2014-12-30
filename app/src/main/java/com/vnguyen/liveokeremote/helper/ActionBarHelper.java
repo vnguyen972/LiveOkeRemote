@@ -7,6 +7,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 
 import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.R;
 
 import java.util.Stack;
 
@@ -26,6 +27,10 @@ public class ActionBarHelper {
         return newTitle;
     }
 
+    public void setSubTitle(String str) {
+        context.getSupportActionBar().setSubtitle(formatActionBarTitle(str));
+    }
+
     public void setTitle(String newTitle) {
         String oldTitle = context.getSupportActionBar().getTitle().toString();
         if (oldTitle != null && !oldTitle.equalsIgnoreCase(newTitle)) {
@@ -41,7 +46,7 @@ public class ActionBarHelper {
                 context.getSupportActionBar().setTitle(formatActionBarTitle(oldTitle));
             }
         } else {
-            context.getSupportActionBar().setTitle(formatActionBarTitle("LiveOke Remote"));
+            context.getSupportActionBar().setTitle(formatActionBarTitle(context.getResources().getString(R.string.app_name)));
         }
     }
 

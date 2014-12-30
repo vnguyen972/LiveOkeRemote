@@ -45,6 +45,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vnguyen.liveokeremote.data.AquiredPhoto;
 import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.data.WebSocketInfo;
+import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.ActionBarHelper;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
@@ -59,6 +60,7 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -87,6 +89,8 @@ public class MainActivity extends ActionBarActivity {
     public FriendsListHelper friendsListHelper;
     public DrawableHelper drawableHelper;
     public WebSocketHelper webSocketHelper;
+    public SongListDataSource db;
+    public String searchStr;
 
     public Animation slide_in_left, slide_out_right;
     public ViewFlipper viewFlipper;
@@ -105,6 +109,7 @@ public class MainActivity extends ActionBarActivity {
     public SongsListPageAdapter mSongsListPagerAdapter;
 
     public OrientationEventListener myOrientationEventListener;
+    public String listingBy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,13 +120,12 @@ public class MainActivity extends ActionBarActivity {
         app = (LiveOkeRemoteApplication) getApplication();
         aquiredPhoto = new AquiredPhoto();
 
+        db = new SongListDataSource(this);
+
         pagerTitles = new ConcurrentHashMap<>();
         getPagerTitles();
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mSongsListPagerAdapter = new SongsListPageAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mSongsListPagerAdapter);
-
 
         // Load Shared Preference
         if (wsInfo == null) {
@@ -230,6 +234,7 @@ public class MainActivity extends ActionBarActivity {
 //        FragmentTransaction transaction = manager.beginTransaction();
 //        transaction.replace(R.id.contain_body,new MainFragment(),"main_contain_panel");
 //        transaction.commit();
+        updateMainDisplay();
 
     }
 
@@ -458,9 +463,34 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void getPagerTitles() {
-        pagerTitles.put("A","200");
-        pagerTitles.put("B","100");
-        pagerTitles.put("C","200");
+//        pagerTitles.put("A","200");
+//        pagerTitles.put("B","100");
+//        pagerTitles.put("C","200");
+        try {
+            db.open();
+            listingBy = "title";
+            pagerTitles = db.getTitleKeysMap();
+        } catch (Exception ex) {
+            Log.e(app.TAG,ex.getMessage(),ex);
+        } finally {
+            db.close();
+        }
+    }
+
+    public int getTotalSongs() {
+        int count = 0;
+        Collection<String> coll = pagerTitles.values();
+        for (String s : coll) {
+            count += Integer.parseInt(s);
+        }
+        return count;
+    }
+
+    public void updateMainDisplay() {
+        mSongsListPagerAdapter = new SongsListPageAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mSongsListPagerAdapter);
+        mSongsListPagerAdapter.notifyDataSetChanged();
+        actionBarHelper.setSubTitle(getTotalSongs()+" Songs.");
     }
 
 
