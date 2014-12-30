@@ -83,7 +83,7 @@ public class AlertDialogHelper {
                                     context.getResources().getString(R.string.myName), value);
                             context.me = new User(value);
                             Toast.makeText(context, "Hello "+ value, Toast.LENGTH_LONG).show();
-                            context.updateNowPlaying("Welcome " + value + "<br>Reserve a song and start singing");
+                            context.nowPlayingHelper.popTitle();
                             context.setupReservedPanel();
                         }
                     }

@@ -5,6 +5,9 @@ import android.graphics.Color;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.malinskiy.materialicons.IconDrawable;
+import com.malinskiy.materialicons.Iconify;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -37,6 +40,7 @@ public class WebSocketHelper {
     private SongListDataSource db;
     public boolean doneGettingSongList;
     public boolean gotTotalSongResponse;
+    public String currentSong;
 
     public WebSocketHelper(Context context) {
         this.context = (MainActivity) context;
@@ -91,7 +95,23 @@ public class WebSocketHelper {
                                     .textColor(Color.WHITE)
                                     .text("Disconnected!"));
                         }
-                    }
+                        FloatingActionButton playButton = (FloatingActionButton) context.findViewById(R.id.playBtn);
+                        if (playButton.getTag().equals("PAUSE")) {
+                            final IconDrawable pauseBtnIcon = new IconDrawable(context, Iconify.IconValue.md_pause);
+                            pauseBtnIcon.sizeDp(40);
+                            pauseBtnIcon.colorRes(R.color.orange_800);
+                            playButton.setImageDrawable(pauseBtnIcon);
+                            playButton.setTag("PLAY");
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    context.nowPlayingHelper.popTitle();
+                                }
+                            });
+                        }
+
+
+                        }
                 });
             }
 
@@ -130,7 +150,7 @@ public class WebSocketHelper {
         return (mWebSocketClient.getReadyState() == WebSocket.READYSTATE.OPEN);
     }
 
-    private void processMessage(String message) {
+    private void processMessage(final String message) {
         if (message.startsWith("Songlist:")) {
             String songData = message.substring(9, message.length());
             songRawDataList.add(songData);
@@ -138,6 +158,61 @@ public class WebSocketHelper {
             context.totalSong = Integer.parseInt(message.substring(10, message.length()));
             songRawDataList = new ArrayList<>();
             gotTotalSongResponse = true;
+        } else if (message.startsWith("Track:")) {
+            String nextTrack = message.substring(6, message.length());
+            if (nextTrack.equalsIgnoreCase("Karaoke")) {
+                // assuming current is music
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        context.floatingButtonsHelper.micOff();
+                    }
+                });
+            } else {
+                // current is Karaoke
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        context.floatingButtonsHelper.micOn();
+                    }
+                });
+            }
+        } else if (message.startsWith("Pause:")) {
+            final String currentAudioTrack = message.substring(6, message.length());
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    context.nowPlayingHelper.pushTitle("Pause:<br><b>" + currentSong+"</b>");
+                    context.floatingButtonsHelper.togglePlayBtn();
+                    if (currentAudioTrack.equalsIgnoreCase("Karaoke")) {
+                        context.floatingButtonsHelper.micOn();
+                    } else {
+                        context.floatingButtonsHelper.micOff();
+                    }
+                }
+            });
+        } else if (message.startsWith("Play:")) {
+            final String currentAudioTrack = message.substring(5, message.length());
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    context.nowPlayingHelper.setTitle("Now Playing:<br><b>"+currentSong+"</b>");
+                    context.floatingButtonsHelper.togglePlayBtn();
+                    if (currentAudioTrack.equalsIgnoreCase("Karaoke")) {
+                        context.floatingButtonsHelper.micOn();
+                    } else {
+                        context.floatingButtonsHelper.micOff();
+                    }
+                }
+            });
+        } else if (message.startsWith("Playing:")) {
+            currentSong = message.substring(8, message.length());
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    context.nowPlayingHelper.setTitle("Current Song:<br><b>" + currentSong+"</b>");
+                }
+            });
         } else if (message.startsWith("Finish")) {
             // done receiving songs list
             try {

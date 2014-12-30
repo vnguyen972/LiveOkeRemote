@@ -15,8 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -107,7 +110,6 @@ public class NavigationDrawerHelper {
                                             context.viewFlipper.showNext();
                                         }
                                         context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
-                                        mDrawerList.setItemChecked(7, false);
                                         ah.popupProgress(context.friendsList.size() + " friends loaded.");
                                     }
                                 });
@@ -124,59 +126,110 @@ public class NavigationDrawerHelper {
                         }
                     };
                     task.execute((Void[])null);
+                    mDrawerList.setItemChecked(7, false);
                 } else if (mDrawerList.getCheckedItemPosition() == 8) {
-                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-                        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                            ProgressDialog pd;
-                            AlertDialogHelper ah = new AlertDialogHelper(context);
+                    new MaterialDialog.Builder(context)
+                            .title("Update Song List.")
+                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                            .content("Do you want to update your songs list?")
+                            .positiveText("OK")
+                            .negativeText("CANCEL")
+                            .callback(new MaterialDialog.Callback() {
 
-                            @Override
-                            protected void onPreExecute() {
-                                context.webSocketHelper.sendMessage("getsonglist");
-                                ah.popupProgress("Updating songs list...");
-                            }
-
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                try {
-                                    while (!context.webSocketHelper.gotTotalSongResponse) {
-                                        Thread.sleep(1000);
-                                        // waits until got the total songs response
-                                    }
-                                    ah.popupProgress("Downloading " + context.totalSong + " songs...");
-                                    while (!context.webSocketHelper.doneGettingSongList) {
-                                        Thread.sleep(1000);
-                                        // waits for all songs downloaded
-                                    }
-
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
                                 }
-                                return null;
-                            }
 
-                            @Override
-                            protected void onPostExecute(Void aVoid) {
-                                context.getPagerTitles();
-                                ah.dismissProgress();
-                                context.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        context.updateMainDisplay();
-                                        mDrawerList.setItemChecked(8,false);
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                                            ProgressDialog pd;
+                                            AlertDialogHelper ah = new AlertDialogHelper(context);
+
+                                            @Override
+                                            protected void onPreExecute() {
+                                                context.webSocketHelper.sendMessage("getsonglist");
+                                                ah.popupProgress("Updating songs list...");
+                                            }
+
+                                            @Override
+                                            protected Void doInBackground(Void... params) {
+                                                try {
+                                                    while (!context.webSocketHelper.gotTotalSongResponse) {
+                                                        Thread.sleep(1000);
+                                                        // waits until got the total songs response
+                                                    }
+                                                    ah.popupProgress("Downloading " + context.totalSong + " songs...");
+                                                    while (!context.webSocketHelper.doneGettingSongList) {
+                                                        Thread.sleep(1000);
+                                                        // waits for all songs downloaded
+                                                    }
+
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void onPostExecute(Void aVoid) {
+                                                context.getPagerTitles();
+                                                ah.dismissProgress();
+                                                context.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        context.updateMainDisplay();
+                                                    }
+                                                });
+                                            }
+                                        };
+                                        task.execute((Void[])null);
+                                    } else {
+                                        SnackbarManager.show(Snackbar.with(context)
+                                                .type(SnackbarType.MULTI_LINE)
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                .textColor(Color.WHITE)
+                                                .color(Color.RED)
+                                                .text("ERROR: Not Connected"));
                                     }
-                                });
-                            }
-                        };
-                        task.execute((Void[])null);
-                    } else {
-                        SnackbarManager.show(Snackbar.with(context)
-                                .type(SnackbarType.MULTI_LINE)
-                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                .textColor(Color.WHITE)
-                                .color(Color.RED)
-                                .text("ERROR: Not Connected"));
-                    }
+                                }
+                            })
+                            .show();
+                    mDrawerList.setItemChecked(8,false);
+
+                } else if (mDrawerList.getCheckedItemPosition() == 9) {
+                    // send comment to screen
+                    final EditText input = new EditText(context);
+                    new MaterialDialog.Builder(context)
+                            .title("Send your comment to TV Screen:")
+                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                            .customView(input)
+                            .positiveText("OK")
+                            .negativeText("CANCEL")
+                            .callback(new MaterialDialog.Callback() {
+
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
+                                }
+
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    String value = input.getEditableText().toString().trim();
+                                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                        context.webSocketHelper.sendMessage("msg," + value);
+                                    } else {
+                                        SnackbarManager.show(Snackbar.with(context)
+                                                .type(SnackbarType.MULTI_LINE)
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                .textColor(Color.WHITE)
+                                                .color(Color.RED)
+                                                .text("ERROR: Not Connected"));
+                                    }
+                                }
+                            })
+                            .show();
+                    mDrawerList.setItemChecked(9,false);
                 }
             }
 
@@ -376,7 +429,8 @@ public class NavigationDrawerHelper {
                     case 4:
                     case 7:
                     case 8:
-                        // Friends List
+                    case 9:
+                        // just close the nav bar
                         mDrawerList.setItemChecked(position, true);
                         mHandler.postDelayed(new Runnable() {
                             @Override

@@ -1,15 +1,14 @@
 package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
@@ -54,6 +53,7 @@ import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
 import com.vnguyen.liveokeremote.helper.FriendsListHelper;
 import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
+import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 import com.vnguyen.liveokeremote.helper.WebSocketHelper;
@@ -91,6 +91,7 @@ public class MainActivity extends ActionBarActivity {
     public FriendsListHelper friendsListHelper;
     public DrawableHelper drawableHelper;
     public WebSocketHelper webSocketHelper;
+    public NowPlayingHelper nowPlayingHelper;
     public SongListDataSource db;
     public String searchStr;
 
@@ -164,6 +165,10 @@ public class MainActivity extends ActionBarActivity {
         if (drawableHelper == null) {
             drawableHelper = new DrawableHelper();
         }
+        if (nowPlayingHelper == null) {
+            nowPlayingHelper = new NowPlayingHelper(MainActivity.this);
+        }
+
 
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         slide_in_left = AnimationUtils.loadAnimation(this,
@@ -230,6 +235,7 @@ public class MainActivity extends ActionBarActivity {
         }
         rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
         setupFriendsListPanel();
+
 
         // Start main fragment
 //        FragmentManager manager = getSupportFragmentManager();
@@ -374,6 +380,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void setupReservedPanel() {
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
+        mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/VPSLGAN.TTF"));
+        mNowPlayingTxtView.setTextSize(20);
 
         mReservedCountImgView = (ImageView) findViewById(R.id.now_playing_image_view);
         mReservedCountImgView.setOnClickListener(new View.OnClickListener() {
@@ -412,7 +420,7 @@ public class MainActivity extends ActionBarActivity {
             }
             RoundImgDrawable img = new RoundImgDrawable(bm);
             mReservedCountImgView.setImageDrawable(img);
-            updateNowPlaying("Welcome " + me.name + "<br>Reserve a song and start singing");
+            nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
         }
 
     }
