@@ -181,27 +181,29 @@ public class AlertDialogHelper {
 
                     @Override
                     public void onPositive(MaterialDialog materialDialog) {
-                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
-                            String value = input.getEditableText().toString().trim();
-                            // store into Preference
-                            PreferencesHelper.getInstance(context).setStringPreference(
-                                    context.getResources().getString(R.string.ip_adress), value);
-                            context.wsInfo.ipAddress = value;
-                            Toast.makeText(context, "IP Address Set To: "+ value, Toast.LENGTH_LONG).show();
-                            // Change the list item by appending the IP to it
+                        String value = input.getEditableText().toString().trim();
+                        // store into Preference
+                        PreferencesHelper.getInstance(context).setStringPreference(
+                                context.getResources().getString(R.string.ip_adress), value);
+                        context.wsInfo.ipAddress = value;
+                        Toast.makeText(context, "IP Address Set To: " + value, Toast.LENGTH_LONG).show();
+                        // Change the list item by appending the IP to it
+                        if (value != null && !value.equals("")) {
                             if (item.title.contains("(")) {
                                 String hdr = item.title.substring(0, item.title.indexOf(" ("));
                                 item.title = hdr + " (" + value + ")";
                             } else {
                                 item.title = item.title + " (" + value + ")";
                             }
-                            // update the list
-                            context.runOnUiThread(new Runnable() {
-                                public void run() {
-                                    adapter.notifyDataSetChanged();
-                                }
-                            });
+                        } else {
+                            item.title = item.title.substring(0, item.title.indexOf(" ("));
                         }
+                        // update the list
+                        context.runOnUiThread(new Runnable() {
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
                     }
                 })
                 .show();
@@ -281,7 +283,7 @@ public class AlertDialogHelper {
                                     if (masterCode != null && !masterCode.equals("") && context.serverMasterCode != null &&
                                             !context.serverMasterCode.equals("") &&
                                             masterCode.equalsIgnoreCase(context.serverMasterCode)) {
-                                            context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
+                                        context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)

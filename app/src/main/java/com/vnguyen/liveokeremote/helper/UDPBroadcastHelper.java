@@ -82,7 +82,8 @@ public class UDPBroadcastHelper {
                     Log.v(LiveOkeRemoteApplication.TAG,"message = " + message);
                     wsInfo = new WebSocketInfo();
                     wsInfo.uri = message.trim();
-                    wsInfo.ipAddress = receivePacket.getAddress().toString();
+                    String address = receivePacket.getAddress().toString();
+                    wsInfo.ipAddress = (address.startsWith("/") ? address.substring(1,address.length()) : address);
                     wsInfo.port = receivePacket.getPort()+"";
                 }
 

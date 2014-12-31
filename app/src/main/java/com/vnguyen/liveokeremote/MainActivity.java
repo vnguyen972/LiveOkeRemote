@@ -275,33 +275,45 @@ public class MainActivity extends ActionBarActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Log.i(app.TAG,"SWITCHED ON");
-                    new Thread(new Runnable() {
-                        //WebSocketInfo _wsInfo;
-                        @Override
-                        public void run() {
-                            UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
-                            wsInfo = udpHelper.findServer();
-                            if (wsInfo != null) {
-                                if (webSocketHelper == null) {
-                                    webSocketHelper = new WebSocketHelper(MainActivity.this);
-                                }
-                                webSocketHelper.connect();
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        switchButton.toggle();
-                                        SnackbarManager.show(Snackbar.with(MainActivity.this)
-                                                .type(SnackbarType.MULTI_LINE)
-                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                                .textColor(Color.WHITE)
-                                                .color(Color.RED)
-                                                .text("ERROR: Unable to find LiveOke!"));
-                                    }
-                                });
-                            }
+                    if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
+                        // if there's an IP presents
+                        wsInfo.port = "8181";
+                        wsInfo.uri = "ws://" + wsInfo.ipAddress + ":" + wsInfo.port;
+                        Log.v(app.TAG,"URI = " + wsInfo.uri);
+                        if (webSocketHelper == null) {
+                            webSocketHelper = new WebSocketHelper(MainActivity.this);
                         }
-                    }).start();
+                        webSocketHelper.connect();
+                    } else{
+                        // if not, we will search the network for it
+                        new Thread(new Runnable() {
+                            //WebSocketInfo _wsInfo;
+                            @Override
+                            public void run() {
+                                UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
+                                wsInfo = udpHelper.findServer();
+                                if (wsInfo != null) {
+                                    if (webSocketHelper == null) {
+                                        webSocketHelper = new WebSocketHelper(MainActivity.this);
+                                    }
+                                    webSocketHelper.connect();
+                                } else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            switchButton.toggle();
+                                            SnackbarManager.show(Snackbar.with(MainActivity.this)
+                                                    .type(SnackbarType.MULTI_LINE)
+                                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                    .textColor(Color.WHITE)
+                                                    .color(Color.RED)
+                                                    .text("ERROR: Unable to find LiveOke!"));
+                                        }
+                                    });
+                                }
+                            }
+                        }).start();
+                    }
                 } else {
                     if (webSocketHelper != null) {
                         webSocketHelper.disconnect();

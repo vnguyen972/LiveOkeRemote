@@ -469,7 +469,5 @@ public class NavigationDrawerHelper {
             }
         });
 
-
-
     }
 }
