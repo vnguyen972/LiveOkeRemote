@@ -20,6 +20,7 @@
             android:layout_height="60dp"
             android:layout_gravity="center_vertical"
             android:src="@android:drawable/ic_menu_add"
+            android:layout_margin="8dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -33,6 +34,7 @@
             android:layout_height="60dp"
             android:layout_gravity="center_vertical"
             android:src="@android:drawable/ic_menu_myplaces"
+            android:layout_margin="8dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -41,11 +43,12 @@
         android:background="@android:color/holo_green_light"
         >
         <ImageView
-            android:id="@+id/f_ic_delete_id"
+            android:id="@+id/add_to_favorites_id"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="center_vertical"
             android:src="@android:drawable/ic_menu_more"
+            android:layout_margin="8dp"
             />
     </LinearLayout>
 </LinearLayout>

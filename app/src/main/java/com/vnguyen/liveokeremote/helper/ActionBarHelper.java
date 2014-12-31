@@ -15,10 +15,12 @@ public class ActionBarHelper {
 
     private MainActivity context;
     private Stack titleStack;
+    private Stack subTitleStack;
 
     public ActionBarHelper(Context context) {
         this.context = (MainActivity) context;
         titleStack = new Stack();
+        subTitleStack = new Stack();
     }
 
     public Spannable formatActionBarTitle(String title) {
@@ -29,6 +31,23 @@ public class ActionBarHelper {
 
     public void setSubTitle(String str) {
         context.getSupportActionBar().setSubtitle(formatActionBarTitle(str));
+    }
+
+    public void pushSub(String newSub) {
+        String oldSub = context.getSupportActionBar().getSubtitle().toString();
+        if (oldSub != null && !oldSub.equalsIgnoreCase(newSub)) {
+            subTitleStack.push(oldSub);
+        }
+        context.getSupportActionBar().setSubtitle(formatActionBarTitle(newSub));
+    }
+
+    public void popSub() {
+        if (!subTitleStack.isEmpty()) {
+            String oldSub = (String) subTitleStack.pop();
+            if (oldSub != null) {
+                context.getSupportActionBar().setSubtitle(formatActionBarTitle(oldSub));
+            }
+        }
     }
 
     public void setTitle(String newTitle) {

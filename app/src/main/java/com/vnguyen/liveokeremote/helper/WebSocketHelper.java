@@ -13,6 +13,7 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 
@@ -22,6 +23,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
@@ -41,9 +43,11 @@ public class WebSocketHelper {
     public boolean doneGettingSongList;
     public boolean gotTotalSongResponse;
     public String currentSong;
+    public ArrayList<ReservedListItem> rsvpList;
 
     public WebSocketHelper(Context context) {
         this.context = (MainActivity) context;
+        this.rsvpList = new ArrayList<>();
 //        if (this.context.wsInfo == null || this.context.wsInfo.ipAddress.equals("")) {
 //            this.context.runOnUiThread(new Runnable() {
 //                @Override
@@ -210,7 +214,40 @@ public class WebSocketHelper {
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    context.nowPlayingHelper.setTitle("Current Song:<br><b>" + currentSong+"</b>");
+                    context.nowPlayingHelper.setTitle("Current Song:<br><b>" + currentSong + "</b>");
+                }
+            });
+        } else if (message.startsWith("Reserve:")) {
+            if (rsvpList != null) {
+                rsvpList.clear();
+            }
+            String msgList = message.substring(8, message.length());
+            StringTokenizer stok = new StringTokenizer(msgList," ");
+            Song song = null;
+            while (stok.hasMoreTokens()) {
+                StringTokenizer reqTok = new StringTokenizer(stok.nextToken(),".");
+                if (reqTok.hasMoreTokens()) {
+                    String songID = reqTok.nextToken();
+                    String requester = reqTok.nextToken().replace("_"," ");
+                    try {
+                        context.db.open();
+                        song = context.db.findSongByID(songID);
+                        song.icon = (new DrawableHelper()).buildDrawable(requester.substring(0, 1), "round");
+                        if (song != null) {
+                            ReservedListItem rsvpItem = new ReservedListItem(requester, song.title, song.icon, songID);
+                            rsvpList.add(rsvpItem);
+                        }
+                    } catch (Exception ex) {
+                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                    } finally {
+                        context.db.close();
+                    }
+                }
+            }
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    context.rsvpPanelHelper.refreshRsvpList(rsvpList);
                 }
             });
         } else if (message.startsWith("Finish")) {

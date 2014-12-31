@@ -381,7 +381,7 @@ public class MainActivity extends ActionBarActivity {
     public void setupReservedPanel() {
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
         mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/VPSLGAN.TTF"));
-        mNowPlayingTxtView.setTextSize(20);
+        mNowPlayingTxtView.setTextSize(15);
 
         mReservedCountImgView = (ImageView) findViewById(R.id.now_playing_image_view);
         mReservedCountImgView.setOnClickListener(new View.OnClickListener() {
@@ -391,10 +391,14 @@ public class MainActivity extends ActionBarActivity {
                 if (mSlidingPanel.isPanelExpanded()) {
                     mSlidingPanel.collapsePanel();
                     actionBarHelper.resetTitle();
+                    actionBarHelper.popSub();
                     //mReservedCountImgView.setImageDrawable(DrawableHelper.getInstance().buildDrawable(mNowPlayingTxtView.getText().charAt(0) + "", "roundrect"));
                 } else {
                     mSlidingPanel.expandPanel();
                     actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
+                    if (webSocketHelper != null && !webSocketHelper.rsvpList.isEmpty()) {
+                        actionBarHelper.pushSub(webSocketHelper.rsvpList.size() + " Songs.");
+                    }
                 }
             }
         });

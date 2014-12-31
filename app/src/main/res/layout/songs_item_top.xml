@@ -35,6 +35,11 @@
             android:layout_toEndOf="@+id/song_icon_layout"
             android:id="@+id/song_info_layout">
             <TextView
+                android:id="@+id/song_id"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"/>
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/song_title"

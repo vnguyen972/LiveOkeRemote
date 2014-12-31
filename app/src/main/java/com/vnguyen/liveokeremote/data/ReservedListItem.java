@@ -8,10 +8,10 @@ public class ReservedListItem {
     public Drawable icon;
     public String number;
 
-    public ReservedListItem(String requester, String title, Drawable icon, double num) {
+    public ReservedListItem(String requester, String title, Drawable icon, String num) {
         this.requester = requester;
         this.title = title;
         this.icon = icon;
-        this.number = num + "";
+        this.number = num;
     }
 }
