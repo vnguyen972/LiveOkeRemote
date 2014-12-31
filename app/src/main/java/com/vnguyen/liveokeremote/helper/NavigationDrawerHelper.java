@@ -230,6 +230,11 @@ public class NavigationDrawerHelper {
                             })
                             .show();
                     mDrawerList.setItemChecked(9,false);
+                } else if (mDrawerList.getCheckedItemPosition() == 11) {
+                    // master code
+                    (new AlertDialogHelper(context)).
+                            popupMasterCode("Enter Server Master Code");
+                    mDrawerList.setItemChecked(11, false);
                 }
             }
 
@@ -377,6 +382,14 @@ public class NavigationDrawerHelper {
                     showCounter = false;
                     break;
                 case 11:
+                    // master code
+                    IconicFontDrawable lockIcon = new IconicFontDrawable(context.getApplicationContext());
+                    lockIcon.setIcon("gmd-lock");
+                    lockIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = lockIcon;
+                    showCounter = false;
+                    break;
+                case 12:
                     // Help
                     IconicFontDrawable helpIcon = new IconicFontDrawable(context.getApplicationContext());
                     helpIcon.setIcon("gmd-help");
@@ -430,6 +443,7 @@ public class NavigationDrawerHelper {
                     case 7:
                     case 8:
                     case 9:
+                    case 11:
                         // just close the nav bar
                         mDrawerList.setItemChecked(position, true);
                         mHandler.postDelayed(new Runnable() {

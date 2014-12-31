@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -17,15 +18,22 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.PreferencesHelper;
 import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.RsvpListAdapter;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
+import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
 
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class AlertDialogHelper {
 
@@ -116,6 +124,37 @@ public class AlertDialogHelper {
 //                                    context.getResources().getString(R.string.ip_adress), value);
 //                            context.ipAddress = value;
 //                        }
+                    }
+                })
+                .show();
+    }
+    public void popupMasterCode(String title) {
+        final EditText input = new EditText(context);
+        String code = PreferencesHelper.getInstance(context).getPreference("MasterCode");
+        if (code != null && !code.equals("")) {
+            input.setText(code);
+        }
+        new MaterialDialog.Builder(context)
+                .title(title)
+                .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                .positiveText("OK")
+                .customView(input)
+                .titleColor(R.color.half_black)
+                .negativeText("CANCEL")
+                .callback(new MaterialDialog.Callback() {
+
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                    }
+
+                    @Override
+                    public void onPositive(MaterialDialog materialDialog) {
+                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
+                            String value = input.getEditableText().toString().trim();
+                            // store into Preference
+                            PreferencesHelper.getInstance(context).setStringPreference(
+                                    "MasterCode", value);
+                        }
                     }
                 })
                 .show();
@@ -213,5 +252,52 @@ public class AlertDialogHelper {
         AlertDialog dialog = builder.create();
 
         dialog.show();
+    }
+
+    public void popUpReservedListAction(final ArrayList<ReservedListItem> rItems,
+                                        final String rsvpNumber, final RsvpListAdapter rsvpListAdapter,
+                                        String dialogMsg, String dialogTitle, final String wsCommand) {
+        new MaterialDialog.Builder(context)
+                .title(dialogTitle)
+                .content(dialogMsg)
+                .theme(Theme.LIGHT)
+                .positiveText("OK")
+                .titleColor(R.color.black)
+                .negativeText("Cancel")
+                .callback(new MaterialDialog.Callback() {
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                    }
+
+                    @Override
+                    public void onPositive(MaterialDialog materialDialog) {
+                        int i = 0;
+                        for (Iterator<ReservedListItem> it = rItems.iterator(); it.hasNext(); ) {
+                            ReservedListItem item = it.next();
+                            if (item.number.equalsIgnoreCase(rsvpNumber)) {
+                                // delete
+                                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
+                                    if (masterCode != null && !masterCode.equals("") && context.serverMasterCode != null &&
+                                            !context.serverMasterCode.equals("") &&
+                                            masterCode.equalsIgnoreCase(context.serverMasterCode)) {
+                                            context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
+                                    } else {
+                                        SnackbarManager.show(Snackbar.with(context)
+                                                .type(SnackbarType.MULTI_LINE)
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                .textColor(Color.WHITE)
+                                                .color(Color.RED)
+                                                .text("ERROR: You do not have enough privileges to complete this action."));
+                                    }
+                                }
+                                it.remove();
+                                break;
+                            }
+                            i++;
+                        }
+                        rsvpListAdapter.notifyDataSetChanged();
+                    }
+                }).show();
     }
 }

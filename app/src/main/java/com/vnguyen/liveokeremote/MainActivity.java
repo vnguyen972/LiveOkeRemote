@@ -71,6 +71,7 @@ import cat.lafosca.facecropper.FaceCropper;
 
 public class MainActivity extends ActionBarActivity {
 
+    public String serverMasterCode;
     public AQuery aq;
     public LiveOkeRemoteApplication app;
 

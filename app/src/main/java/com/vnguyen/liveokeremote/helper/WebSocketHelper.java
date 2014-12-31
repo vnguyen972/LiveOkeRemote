@@ -155,7 +155,12 @@ public class WebSocketHelper {
     }
 
     private void processMessage(final String message) {
-        if (message.startsWith("Songlist:")) {
+        if (message.startsWith("MasterCode:")) {
+            String code = message.substring(11, message.length());
+            if (code != null && !code.equalsIgnoreCase("")) {
+                context.serverMasterCode = message.substring(11, message.length());
+            }
+        } else if (message.startsWith("Songlist:")) {
             String songData = message.substring(9, message.length());
             songRawDataList.add(songData);
         } else if (message.startsWith("totalsong:")) {

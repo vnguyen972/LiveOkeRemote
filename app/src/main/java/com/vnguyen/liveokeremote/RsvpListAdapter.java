@@ -3,6 +3,7 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -12,12 +13,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
+import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class RsvpListAdapter extends BaseSwipeAdapter {
 
@@ -87,6 +96,7 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         ViewGroup vBottom = swipeLayout.getBottomView();
         ViewGroup vTop = swipeLayout.getSurfaceView();
         final TextView rsvpNumber = (TextView) vTop.findViewById(R.id.rsvp_number);
+        final TextView rsvpTitle = (TextView) vTop.findViewById(R.id.rsvp_title);
 
         // Setup below layer for "actions"
         ImageView moveTopImg = (ImageView) vBottom.findViewById(R.id.ic_move_to_top_id);
@@ -101,34 +111,51 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         mContext.drawableHelper.setIconAsBackground("fa-angle-double-down", R.color.white, moveBottomImg, mContext);
         mContext.drawableHelper.setIconAsBackground("fa-trash", R.color.white, deleteImg, mContext);
 
+        final AlertDialogHelper alertDialogHelper = new AlertDialogHelper(mContext);
         moveTopImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "MoveToTOP itemNo = " + rsvpNumber.getText(), Toast.LENGTH_LONG).show();
+                alertDialogHelper.popUpReservedListAction(rItems,
+                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        "Are you sure to move " + rsvpTitle.getText().toString() +  " to the Top?",
+                        "Move Reserved Song.", "tofront");
             }
         });
+
         moveUpImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "MoveUP itemNo = " + rsvpNumber.getText(), Toast.LENGTH_LONG).show();
+                alertDialogHelper.popUpReservedListAction(rItems,
+                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        "Are you sure to Move '" + rsvpTitle.getText().toString() + "' up one position?",
+                        "Move Reserved Song.", "upone");
             }
         });
         moveDownImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "MoveDOWN itemNo = " + rsvpNumber.getText(), Toast.LENGTH_LONG).show();
+                alertDialogHelper.popUpReservedListAction(rItems,
+                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        "Are you sure to Move '" + rsvpTitle.getText().toString() + "' down one position?",
+                        "Move Reserved Song.", "backone");
             }
         });
         moveBottomImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "MoveToBOTTOM itemNo = " + rsvpNumber.getText(), Toast.LENGTH_LONG).show();
+                alertDialogHelper.popUpReservedListAction(rItems,
+                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        "Are you sure to Move '" + rsvpTitle.getText().toString() + "' to the BOTTOM?",
+                        "Move Reserved Song.", "tolast");
             }
         });
         deleteImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Delete itemNo = " + rsvpNumber.getText(), Toast.LENGTH_LONG).show();
+                alertDialogHelper.popUpReservedListAction(rItems,
+                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        "Are you sure to delete '" + rsvpTitle.getText().toString() + "'?",
+                        "Delete Reserved Song.", "deleter");
             }
         });
 
