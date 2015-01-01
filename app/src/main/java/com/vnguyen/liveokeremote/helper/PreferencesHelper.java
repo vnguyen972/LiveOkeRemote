@@ -1,4 +1,4 @@
-package com.vnguyen.liveokeremote;
+package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.RoundImgDrawable;
 import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
@@ -64,6 +67,22 @@ public class PreferencesHelper {
         int total = getPreferences().getInt("total_friends",0);
         total--;
         getPreferences().edit().putInt("total_friends",total).apply();
+    }
+
+    public ArrayList<User> retrieveFriendsList() {
+        ArrayList<User> list = new ArrayList<>();
+        int total = preferences.getInt("total_friends",0);
+        Log.v(context.app.TAG, "TOTAL FRIENDS = " + total);
+        for (int i = 0; i < total;i++) {
+            String name = preferences.getString("friend_"+i,"");
+            Log.v(context.app.TAG,"userInfo = " + name);
+            if (!name.equals("")) {
+                User u = new User(name);
+                list.add(u);
+            }
+        }
+        Log.v(context.app.TAG,"TOTAL IN LIST = " + list.size());
+        return list;
     }
 
     public ArrayList<User> retrieveFriends() {

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -54,6 +55,7 @@ import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
 import com.vnguyen.liveokeremote.helper.FriendsListHelper;
 import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
 import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
+import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 import com.vnguyen.liveokeremote.helper.WebSocketHelper;
@@ -64,6 +66,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cat.lafosca.facecropper.FaceCropper;
@@ -145,15 +148,22 @@ public class MainActivity extends ActionBarActivity {
                     getResources().getString(R.string.myName));
         }
 
-//        if (friendsList == null || friendsList.isEmpty()) {
-//            Log.v(app.TAG,friendsList+"-BEFORE");
-//            friendsList = (ArrayList<User>) getLastCustomNonConfigurationInstance();
-//            if (friendsList == null) {
-//                Log.v(app.TAG,"NULL from Retaining...");
-//                friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
+        // Load savedValues
+//        HashMap<String, Object> savedValues = (HashMap<String, Object>) getLastCustomNonConfigurationInstance();
+//        if (savedValues != null) {
+//            Log.v(app.TAG,"Got saved configurations!");
+//            friendsList = (ArrayList<User>) savedValues.get("friendsList");
+//            webSocketHelper = (WebSocketHelper) savedValues.get("webSocketHelper");
+//            rsvpPanelHelper = (RsvpPanelHelper) savedValues.get("rsvpPanelHelper");
+//            if (rsvpPanelHelper != null) {
+//                if (webSocketHelper != null) {
+//                    rsvpPanelHelper.refreshRsvpList(webSocketHelper.rsvpList);
+//                }
 //            }
-//            Log.v(app.TAG,friendsList+"-AFTER");
 //        }
+        if (rsvpPanelHelper == null) {
+            rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
+        }
 
         // if myName is still not found (brand new use)
         if (myName == null || myName.equals("")) {
@@ -231,10 +241,7 @@ public class MainActivity extends ActionBarActivity {
 //        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
 //        swipeLayout.setDragEdge(SwipeLayout.DragEdge.Right);
 
-        if (rsvpPanelHelper == null) {
-            rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
-        }
-        rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
+        //rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
         setupFriendsListPanel();
 
 
@@ -252,8 +259,21 @@ public class MainActivity extends ActionBarActivity {
             friendsListHelper = new FriendsListHelper(MainActivity.this);
         }
         //friendsListHelper.initFriendList(app.generateTestFriends());
+        if (friendsList == null || friendsList.isEmpty()) {
+            Log.v(app.TAG,friendsList+"-BEFORE");
+            HashMap<String, Object> savedValues = (HashMap<String,Object>)getLastCustomNonConfigurationInstance();
+            if (savedValues != null) {
+                friendsList = (ArrayList<User>) savedValues.get("friendsList");
+            }
+            if (friendsList == null) {
+                Log.v(app.TAG,"NULL from Retaining...");
+                friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
+            }
+            Log.v(app.TAG,friendsList+"-AFTER");
+        }
+
         Log.v(app.TAG,"setupFriendsListPanel is called!!!");
-//        friendsListHelper.initFriendList(friendsList);
+        friendsListHelper.initFriendList(friendsList);
 //        ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
 
@@ -270,6 +290,9 @@ public class MainActivity extends ActionBarActivity {
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
         final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+        if (webSocketHelper != null && webSocketHelper.isConnected()) {
+            switchButton.setChecked(true);
+        }
         switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -408,15 +431,15 @@ public class MainActivity extends ActionBarActivity {
                     //mReservedCountImgView.setImageDrawable(DrawableHelper.getInstance().buildDrawable(mNowPlayingTxtView.getText().charAt(0) + "", "roundrect"));
                 } else {
                     mSlidingPanel.expandPanel();
-                    actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
                     if (webSocketHelper != null && !webSocketHelper.rsvpList.isEmpty()) {
+                        actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
                         actionBarHelper.pushSub(webSocketHelper.rsvpList.size() + " Songs.");
                     }
                 }
             }
         });
-
-
+//        Log.v(app.TAG,"Building the RSVP Panel");
+//        rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
         if (me != null) {
             // Display the Avatar Photo
             Uri imgURI;
@@ -501,10 +524,15 @@ public class MainActivity extends ActionBarActivity {
         return bitmap;
     }
 
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return friendsList;
-    }
+//    @Override
+//    public Object onRetainCustomNonConfigurationInstance() {
+//        Log.v(app.TAG,"Saving configurations...");
+//        HashMap<String, Object> savedValues = new HashMap<String, Object>();
+//        savedValues.put("friendsList", friendsList);
+//        savedValues.put("webSocketHelper", webSocketHelper);
+//        savedValues.put("rsvpPanelHelper", rsvpPanelHelper);
+//        return savedValues;
+//    }
 
     public void getPagerTitles() {
 //        pagerTitles.put("A","200");

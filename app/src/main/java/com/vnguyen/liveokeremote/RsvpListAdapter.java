@@ -39,6 +39,12 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         rItems.addAll(itemList);
     }
 
+    public void reloadData(ArrayList<ReservedListItem> itemList) {
+        rItems.clear();
+        rItems.addAll(itemList);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getSwipeLayoutResourceId(int i) {
         return R.id.swipe_layout;
@@ -66,8 +72,12 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
             holder.num = (TextView) view.findViewById(R.id.rsvp_number);
             view.setTag(holder);
         }
-        holder.icon.setImageDrawable(item.icon);
-        holder.title.setText(Html.fromHtml(item.title + "<br>" + item.requester));
+        if (item.requester.avatar == null) {
+            holder.icon.setImageDrawable(item.icon);
+        } else {
+            holder.icon.setImageDrawable(item.requester.avatar);
+        }
+        holder.title.setText(Html.fromHtml(item.title + "<br>" + item.requester.name));
         holder.num.setText(item.number);
     }
 
@@ -92,7 +102,7 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
 
     @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public void setupActionButtonsBelow(SwipeLayout swipeLayout) {
+    public void setupActionButtonsBelow(final SwipeLayout swipeLayout) {
         ViewGroup vBottom = swipeLayout.getBottomView();
         ViewGroup vTop = swipeLayout.getSurfaceView();
         final TextView rsvpNumber = (TextView) vTop.findViewById(R.id.rsvp_number);
@@ -115,6 +125,7 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         moveTopImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                swipeLayout.toggle();
                 alertDialogHelper.popUpReservedListAction(rItems,
                         rsvpNumber.getText().toString(),RsvpListAdapter.this,
                         "Are you sure to move " + rsvpTitle.getText().toString() +  " to the Top?",
@@ -125,8 +136,9 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         moveUpImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                swipeLayout.toggle();
                 alertDialogHelper.popUpReservedListAction(rItems,
-                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        rsvpNumber.getText().toString(), RsvpListAdapter.this,
                         "Are you sure to Move '" + rsvpTitle.getText().toString() + "' up one position?",
                         "Move Reserved Song.", "upone");
             }
@@ -134,8 +146,9 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         moveDownImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                swipeLayout.toggle();
                 alertDialogHelper.popUpReservedListAction(rItems,
-                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        rsvpNumber.getText().toString(), RsvpListAdapter.this,
                         "Are you sure to Move '" + rsvpTitle.getText().toString() + "' down one position?",
                         "Move Reserved Song.", "backone");
             }
@@ -143,8 +156,9 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         moveBottomImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                swipeLayout.toggle();
                 alertDialogHelper.popUpReservedListAction(rItems,
-                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        rsvpNumber.getText().toString(), RsvpListAdapter.this,
                         "Are you sure to Move '" + rsvpTitle.getText().toString() + "' to the BOTTOM?",
                         "Move Reserved Song.", "tolast");
             }
@@ -152,8 +166,9 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
         deleteImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                swipeLayout.toggle();
                 alertDialogHelper.popUpReservedListAction(rItems,
-                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
+                        rsvpNumber.getText().toString(), RsvpListAdapter.this,
                         "Are you sure to delete '" + rsvpTitle.getText().toString() + "'?",
                         "Delete Reserved Song.", "deleter");
             }

@@ -23,7 +23,6 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
-import com.vnguyen.liveokeremote.PreferencesHelper;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.RsvpListAdapter;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
@@ -149,12 +148,10 @@ public class AlertDialogHelper {
 
                     @Override
                     public void onPositive(MaterialDialog materialDialog) {
-                        if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
-                            String value = input.getEditableText().toString().trim();
-                            // store into Preference
-                            PreferencesHelper.getInstance(context).setStringPreference(
-                                    "MasterCode", value);
-                        }
+                        String value = input.getEditableText().toString().trim();
+                        // store into Preference
+                        PreferencesHelper.getInstance(context).setStringPreference(
+                                "MasterCode", value);
                     }
                 })
                 .show();
@@ -277,13 +274,15 @@ public class AlertDialogHelper {
                         for (Iterator<ReservedListItem> it = rItems.iterator(); it.hasNext(); ) {
                             ReservedListItem item = it.next();
                             if (item.number.equalsIgnoreCase(rsvpNumber)) {
-                                // delete
                                 if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
                                     if (masterCode != null && !masterCode.equals("") && context.serverMasterCode != null &&
                                             !context.serverMasterCode.equals("") &&
                                             masterCode.equalsIgnoreCase(context.serverMasterCode)) {
                                         context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
+                                        if (wsCommand.equalsIgnoreCase("deleter")) {
+                                            it.remove();
+                                        }
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
@@ -293,7 +292,6 @@ public class AlertDialogHelper {
                                                 .text("ERROR: You do not have enough privileges to complete this action."));
                                     }
                                 }
-                                it.remove();
                                 break;
                             }
                             i++;

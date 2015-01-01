@@ -26,11 +26,8 @@ import com.nispok.snackbar.enums.SnackbarType;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
-import com.vnguyen.liveokeremote.PreferencesHelper;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
-import com.vnguyen.liveokeremote.data.ReservedListItem;
-import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,8 +84,6 @@ public class NavigationDrawerHelper {
                     mDrawerList.setItemChecked(4, false);
                 } else if (mDrawerList.getCheckedItemPosition() == 7 ) {
                     //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
-                    final ArrayList<User> friends = new ArrayList<User>();
-                    final ArrayList<ReservedListItem> rsvpItems = new ArrayList<ReservedListItem>();
                     AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                         ProgressDialog pd;
                         AlertDialogHelper ah = new AlertDialogHelper(context);
@@ -101,11 +96,13 @@ public class NavigationDrawerHelper {
                         @Override
                         protected Void doInBackground(Void... params) {
                             try {
-                                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
+                                if (context.friendsList == null || context.friendsList.isEmpty()) {
+                                    context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
+                                    context.friendsListHelper.initFriendList(context.friendsList);
+                                }
                                 context.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        context.friendsListHelper.initFriendList(context.friendsList);
                                         if (context.viewFlipper.getDisplayedChild() == 0) {
                                             context.viewFlipper.showNext();
                                         }

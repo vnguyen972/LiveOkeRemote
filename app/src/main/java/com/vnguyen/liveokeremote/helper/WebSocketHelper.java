@@ -1,7 +1,10 @@
 package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 
@@ -13,8 +16,10 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.RoundImgDrawable;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
+import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 
 import org.java_websocket.WebSocket;
@@ -33,6 +38,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import cat.lafosca.facecropper.FaceCropper;
+
 public class WebSocketHelper {
     private WebSocketClient mWebSocketClient;
     private MainActivity context;
@@ -42,6 +49,7 @@ public class WebSocketHelper {
     private SongListDataSource db;
     public boolean doneGettingSongList;
     public boolean gotTotalSongResponse;
+    public boolean updatingRsvpList;
     public String currentSong;
     public ArrayList<ReservedListItem> rsvpList;
 
@@ -93,11 +101,6 @@ public class WebSocketHelper {
                         SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
                         if (onOffSwitch.isChecked()) {
                             onOffSwitch.toggle();
-                            SnackbarManager.show(Snackbar.with(context)
-                                    .type(SnackbarType.MULTI_LINE)
-                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                    .textColor(Color.WHITE)
-                                    .text("Disconnected!"));
                         }
                         FloatingActionButton playButton = (FloatingActionButton) context.findViewById(R.id.playBtn);
                         if (playButton.getTag().equals("PAUSE")) {
@@ -113,8 +116,13 @@ public class WebSocketHelper {
                                 }
                             });
                         }
-
-
+                        context.webSocketHelper.rsvpList.clear();
+                        context.rsvpPanelHelper.refreshRsvpList(context.webSocketHelper.rsvpList);
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .text("Disconnected!"));
                         }
                 });
             }
@@ -228,19 +236,47 @@ public class WebSocketHelper {
             }
             String msgList = message.substring(8, message.length());
             StringTokenizer stok = new StringTokenizer(msgList," ");
-            Song song = null;
             while (stok.hasMoreTokens()) {
+                updatingRsvpList = true;
                 StringTokenizer reqTok = new StringTokenizer(stok.nextToken(),".");
                 if (reqTok.hasMoreTokens()) {
-                    String songID = reqTok.nextToken();
+                    final String songID = reqTok.nextToken();
                     String requester = reqTok.nextToken().replace("_"," ");
                     try {
                         context.db.open();
-                        song = context.db.findSongByID(songID);
-                        song.icon = (new DrawableHelper()).buildDrawable(requester.substring(0, 1), "round");
+                        final Song song = context.db.findSongByID(songID);
                         if (song != null) {
-                            ReservedListItem rsvpItem = new ReservedListItem(requester, song.title, song.icon, songID);
-                            rsvpList.add(rsvpItem);
+                            final User u = new User(requester);
+                            for (User user : context.friendsList) {
+                                if (user.name.equals(u.name)) {
+                                    u.avatar = user.avatar;
+                                    break;
+                                }
+                            }
+                            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+
+                                @Override
+                                protected Void doInBackground(Void... params) {
+                                    if (u.avatar == null) {
+                                        u.avatar = (new DrawableHelper()).buildDrawable(u.name.substring(0, 1), "round");
+                                    }
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(Void aVoid) {
+                                    final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
+                                    rsvpList.add(rsvpItem);
+                                    context.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.v(context.app.TAG,"Refreshing rsvp list: " + rsvpList.size());
+                                            context.rsvpPanelHelper.refreshRsvpList(rsvpList);
+                                        }
+                                    });
+                                }
+                            };
+                            task.execute((Void[])null);
                         }
                     } catch (Exception ex) {
                         Log.e(context.app.TAG,ex.getMessage(),ex);
@@ -249,12 +285,7 @@ public class WebSocketHelper {
                     }
                 }
             }
-            context.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    context.rsvpPanelHelper.refreshRsvpList(rsvpList);
-                }
-            });
+            updatingRsvpList = false;
         } else if (message.startsWith("Finish")) {
             // done receiving songs list
             try {

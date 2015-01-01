@@ -26,11 +26,13 @@ public class LiveOkeRemoteApplication extends Application {
     }
 
     public ArrayList<ReservedListItem> generateTestRsvpList() {
+
         if (rsvpList == null || rsvpList.isEmpty()) {
             for (int i = 0; i < 50; i++) {
-                ReservedListItem item = new ReservedListItem(i+"_Requester", "Title " + i, null,
+                User requester = new User(i+"_Requester");
+                ReservedListItem item = new ReservedListItem(requester, "Title " + i, null,
                         (Math.round(1000 + Math.random() * (9999 - 1000)))+"");
-                item.icon = (new DrawableHelper()).buildDrawable(item.requester.substring(0, 1), "round");
+                item.icon = (new DrawableHelper()).buildDrawable(item.requester.name.substring(0, 1), "round");
                 rsvpList.add(item);
             }
         }

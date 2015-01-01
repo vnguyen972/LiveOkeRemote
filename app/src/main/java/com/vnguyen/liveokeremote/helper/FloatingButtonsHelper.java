@@ -16,7 +16,6 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
-import com.vnguyen.liveokeremote.PreferencesHelper;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.User;
 

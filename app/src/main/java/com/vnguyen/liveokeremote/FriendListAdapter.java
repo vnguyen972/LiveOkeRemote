@@ -16,6 +16,7 @@ import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -7,8 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +18,8 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
+import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 
 import java.util.ArrayList;
 
@@ -100,6 +100,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         ViewGroup vBottom = swipeLayout.getBottomView();
         ViewGroup vTop = swipeLayout.getSurfaceView();
         final TextView idNumber = (TextView) vTop.findViewById(R.id.song_id);
+        final TextView songTitle = (TextView) vTop.findViewById(R.id.song_title);
 
         ImageView rsvp4MeImgView = (ImageView) vBottom.findViewById(R.id.reserve_for_me_id);
         ImageView rsvp4FriendsImgView = (ImageView) vBottom.findViewById(R.id.reserve_for_friends_id);
@@ -148,7 +149,40 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         rsvp4FriendsImgView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                ArrayList<User> friends = PreferencesHelper.getInstance(context).retrieveFriendsList();
+                String[] frNames = new String[friends.size()];
+                for (int i = 0; i < frNames.length;i++) {
+                    frNames[i] = friends.get(i).name;
+                }
+                new MaterialDialog.Builder(context)
+                        .title("Reserve for a friend")
+                        .items(frNames)
+                        .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                Log.v(context.app.TAG,"Selected: " + charSequence);
+                                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
+                                    SnackbarManager.show(Snackbar.with(context)
+                                            .type(SnackbarType.MULTI_LINE)
+                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                            .textColor(Color.WHITE)
+                                            .color(Color.BLACK)
+                                            .text("'" + songTitle.getText() + "' is reserved for " + charSequence));
+                                } else {
+                                    SnackbarManager.show(Snackbar.with(context)
+                                            .type(SnackbarType.MULTI_LINE)
+                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                            .textColor(Color.WHITE)
+                                            .color(Color.RED)
+                                            .text("ERROR: Not Connected"));
+                                }
+                                swipeLayout.toggle();
+                            }
+                        })
+                        .positiveText("Choose")
+                        .negativeText("Cancel")
+                        .show();
             }
         });
 

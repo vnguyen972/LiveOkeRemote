@@ -284,7 +284,7 @@ public class SongHelper {
 
     public static String getTheKey(String letter) throws Exception {
         String key = "Unknown";
-        Log.d(LiveOkeRemoteApplication.TAG, "the letter = " + letter);
+        //Log.d(LiveOkeRemoteApplication.TAG, "the letter = " + letter);
         Characters c = Characters.forString(letter.toUpperCase(Locale.US));
         if (c != null) {
             switch (c) {
