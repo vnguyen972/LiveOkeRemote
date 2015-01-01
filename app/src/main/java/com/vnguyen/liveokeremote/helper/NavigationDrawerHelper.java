@@ -40,6 +40,20 @@ public class NavigationDrawerHelper {
     public NavDrawerListAdapter navAdapter;
     private ConcurrentHashMap<String, String> dataMap;
 
+    public static final int HOME = 0;
+    public static final int HEADER_1 = 1;
+    public static final int VN_SONGS = 2;
+    public static final int EN_SONGS = 3;
+    public static final int CN_SONGS = 4;
+    public static final int HEADER_2 = 5;
+    public static final int IP_ADDRESS = 6;
+    public static final int FRIENDS_LIST = 7;
+    public static final int UPDATE_SONGS_LIST = 8;
+    public static final int COMMENT_TO_SCREEN = 9;
+    public static final int YOUR_PHOTO = 10;
+    public static final int MASTER_CODE = 11;
+    public static final int HELP = 12;
+
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
         showFriendsList = false;
@@ -66,26 +80,25 @@ public class NavigationDrawerHelper {
             public void onDrawerClosed(View view) {
 //                final long startTime = System.currentTimeMillis();
 //                context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-                if (mDrawerList.getCheckedItemPosition() == 0) {
+                if (mDrawerList.getCheckedItemPosition() == HOME) {
                     context.getPagerTitles();
                     context.updateMainDisplay();
-                    mDrawerList.setItemChecked(0, false);
-                } else if (mDrawerList.getCheckedItemPosition() == 2) {
+                    mDrawerList.setItemChecked(HOME, false);
+                } else if (mDrawerList.getCheckedItemPosition() == VN_SONGS) {
                     context.getPagerLanguage("VN");
                     context.updateMainDisplay();
-                    mDrawerList.setItemChecked(2, false);
-                } else if (mDrawerList.getCheckedItemPosition() == 3) {
+                    mDrawerList.setItemChecked(VN_SONGS, false);
+                } else if (mDrawerList.getCheckedItemPosition() == EN_SONGS) {
                     context.getPagerLanguage("EN");
                     context.updateMainDisplay();
-                    mDrawerList.setItemChecked(3, false);
-                } else if (mDrawerList.getCheckedItemPosition() == 4) {
+                    mDrawerList.setItemChecked(EN_SONGS, false);
+                } else if (mDrawerList.getCheckedItemPosition() == CN_SONGS) {
                     context.getPagerLanguage("CN");
                     context.updateMainDisplay();
-                    mDrawerList.setItemChecked(4, false);
-                } else if (mDrawerList.getCheckedItemPosition() == 7 ) {
+                    mDrawerList.setItemChecked(CN_SONGS, false);
+                } else if (mDrawerList.getCheckedItemPosition() == FRIENDS_LIST ) {
                     //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
                     AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                        ProgressDialog pd;
                         AlertDialogHelper ah = new AlertDialogHelper(context);
 
                         @Override
@@ -123,8 +136,8 @@ public class NavigationDrawerHelper {
                         }
                     };
                     task.execute((Void[])null);
-                    mDrawerList.setItemChecked(7, false);
-                } else if (mDrawerList.getCheckedItemPosition() == 8) {
+                    mDrawerList.setItemChecked(FRIENDS_LIST, false);
+                } else if (mDrawerList.getCheckedItemPosition() == UPDATE_SONGS_LIST) {
                     new MaterialDialog.Builder(context)
                             .title("Update Song List.")
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
@@ -193,9 +206,9 @@ public class NavigationDrawerHelper {
                                 }
                             })
                             .show();
-                    mDrawerList.setItemChecked(8,false);
+                    mDrawerList.setItemChecked(UPDATE_SONGS_LIST,false);
 
-                } else if (mDrawerList.getCheckedItemPosition() == 9) {
+                } else if (mDrawerList.getCheckedItemPosition() == COMMENT_TO_SCREEN) {
                     // send comment to screen
                     final EditText input = new EditText(context);
                     new MaterialDialog.Builder(context)
@@ -226,12 +239,12 @@ public class NavigationDrawerHelper {
                                 }
                             })
                             .show();
-                    mDrawerList.setItemChecked(9,false);
-                } else if (mDrawerList.getCheckedItemPosition() == 11) {
+                    mDrawerList.setItemChecked(COMMENT_TO_SCREEN,false);
+                } else if (mDrawerList.getCheckedItemPosition() == MASTER_CODE) {
                     // master code
                     (new AlertDialogHelper(context)).
                             popupMasterCode("Enter Server Master Code");
-                    mDrawerList.setItemChecked(11, false);
+                    mDrawerList.setItemChecked(MASTER_CODE, false);
                 }
             }
 
@@ -253,7 +266,7 @@ public class NavigationDrawerHelper {
         for (int i = 0; i < navMenuTitles.length;i++) {
             String title = null;
             switch (i) {
-                case 0:
+                case HOME:
                     // Home
 //                    iconDrawable = new IconDrawable(getApplicationContext(), Iconify.IconValue.md_home).
 //                            colorRes(R.color.primary).sizeDp(100);
@@ -273,12 +286,12 @@ public class NavigationDrawerHelper {
                         context.db.close();
                     }
                     break;
-                case 1:
+                case HEADER_1:
                     // Songs List header
                     iconDrawable = null;
                     showCounter = false;
                     break;
-                case 2:
+                case VN_SONGS:
                     // Vietnamese Songs
                     Bitmap vnIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.vn);
                     iconDrawable = new BitmapDrawable(context.getResources(), vnIcon);
@@ -295,7 +308,7 @@ public class NavigationDrawerHelper {
                     }
 
                     break;
-                case 3:
+                case EN_SONGS:
                     // English Songs
                     Bitmap usIcon = BitmapFactory.decodeResource(context.getResources(),R.drawable.us);
                     iconDrawable = new BitmapDrawable(context.getResources(), usIcon);
@@ -311,7 +324,7 @@ public class NavigationDrawerHelper {
                         context.db.close();
                     }
                     break;
-                case 4:
+                case CN_SONGS:
                     // Chinese Songs
                     Bitmap cnIcon = BitmapFactory.decodeResource(context.getResources(),R.drawable.cn);
                     iconDrawable = new BitmapDrawable(context.getResources(), cnIcon);
@@ -327,12 +340,12 @@ public class NavigationDrawerHelper {
                         context.db.close();
                     }
                     break;
-                case 5:
+                case HEADER_2:
                     // Settings header
                     iconDrawable = null;
                     showCounter = false;
                     break;
-                case 6:
+                case IP_ADDRESS:
                     // IP Address
 //                    iconDrawable = new com.joanzapata.android.iconify.IconDrawable(getApplicationContext(),
 //                            com.joanzapata.android.iconify.Iconify.IconValue.fa_plug).colorRes(R.color.primary);
@@ -346,7 +359,7 @@ public class NavigationDrawerHelper {
                         title = navMenuTitles[i] + " (" + ip  + ")";
                     }
                     break;
-                case 7:
+                case FRIENDS_LIST:
                     // Friends List
                     IconicFontDrawable peopleIcon = new IconicFontDrawable(context.getApplicationContext());
                     peopleIcon.setIcon("gmd-people");
@@ -354,7 +367,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = peopleIcon;
                     showCounter = false;
                     break;
-                case 8:
+                case UPDATE_SONGS_LIST:
                     // Update Songs List
                     IconicFontDrawable updateSongsListIcon = new IconicFontDrawable(context.getApplicationContext());
                     updateSongsListIcon.setIcon("gmd-assignment-turned-in");
@@ -362,7 +375,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = updateSongsListIcon;
                     showCounter = false;
                     break;
-                case 9:
+                case COMMENT_TO_SCREEN:
                     // send comments to screen
                     IconicFontDrawable send2ScreenIcon = new IconicFontDrawable(context.getApplicationContext());
                     send2ScreenIcon.setIcon("gmd-insert-comment");
@@ -370,7 +383,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = send2ScreenIcon;
                     showCounter = false;
                     break;
-                case 10:
+                case YOUR_PHOTO:
                     // your photo
                     IconicFontDrawable profile = new IconicFontDrawable(context.getApplicationContext());
                     profile.setIcon("gmd-account-circle");
@@ -378,7 +391,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = profile;
                     showCounter = false;
                     break;
-                case 11:
+                case MASTER_CODE:
                     // master code
                     IconicFontDrawable lockIcon = new IconicFontDrawable(context.getApplicationContext());
                     lockIcon.setIcon("gmd-lock");
@@ -386,7 +399,7 @@ public class NavigationDrawerHelper {
                     iconDrawable = lockIcon;
                     showCounter = false;
                     break;
-                case 12:
+                case HELP:
                     // Help
                     IconicFontDrawable helpIcon = new IconicFontDrawable(context.getApplicationContext());
                     helpIcon.setIcon("gmd-help");
@@ -415,7 +428,7 @@ public class NavigationDrawerHelper {
                 FragmentManager manager;
                 android.support.v4.app.FragmentTransaction transaction;
                 switch (position) {
-                    case 0:
+                    case HOME:
                         // Home
                         mHandler.postDelayed(new Runnable() {
                             @Override
@@ -428,29 +441,13 @@ public class NavigationDrawerHelper {
                         }
                         context.actionBarHelper.setTitle(context.getResources().getString(R.string.app_name));
                         break;
-                    case 6:
+                    case IP_ADDRESS:
                         // IP Address
                         (new AlertDialogHelper(context)).
                                 popupIPAddressDialog("LiveOke IP Address", "Enter IP Address",
                                         adapter.getItem(position),adapter);
                         break;
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 11:
-                        // just close the nav bar
-                        mDrawerList.setItemChecked(position, true);
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                context.mDrawerLayout.closeDrawers();
-                            }
-                        },10);
-                        break;
-                    case 10:
+                    case YOUR_PHOTO:
                         // your photo
                         mHandler.postDelayed(new Runnable() {
                             @Override
@@ -461,6 +458,16 @@ public class NavigationDrawerHelper {
                         (new AlertDialogHelper(context)).popupFileChooser(
                                 context.mReservedCountImgView,
                                 context.getResources().getString(R.string.myAvatarURI));
+                        break;
+                    default:
+                        // just close the nav bar
+                        mDrawerList.setItemChecked(position, true);
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.mDrawerLayout.closeDrawers();
+                            }
+                        },10);
                         break;
                 }
             }

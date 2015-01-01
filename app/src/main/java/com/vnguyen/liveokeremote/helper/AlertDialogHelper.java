@@ -42,12 +42,29 @@ public class AlertDialogHelper {
     public static int FILE_PICK_FROM_FILE_KITKAT = 3;
 
     private MaterialDialog progressDialog;
+    private MaterialDialog splashDialog;
 
     public AlertDialogHelper(Context context) {
         this.context = (MainActivity) context;
     }
 
 
+    public void popupSplash() {
+            if (splashDialog == null) {
+                splashDialog = new MaterialDialog.Builder(context)
+                        .title("Loading Application...")
+                        .customView(R.layout.splash_dialog)
+                        .build();
+            }
+        splashDialog.show();
+    }
+
+    public void dismissSplash() {
+        if (splashDialog != null) {
+            splashDialog.dismiss();
+        }
+        splashDialog = null;
+    }
     public void popupProgress(String message) {
         if (progressDialog == null) {
             progressDialog = new MaterialDialog.Builder(context)

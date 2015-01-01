@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
@@ -122,12 +123,11 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         aq = new AQuery(getApplicationContext());
         app = (LiveOkeRemoteApplication) getApplication();
         aquiredPhoto = new AquiredPhoto();
 
-        db = new SongListDataSource(this);
+        db = new SongListDataSource(MainActivity.this);
 
         pagerTitles = new ConcurrentHashMap<>();
         getPagerTitles();
@@ -147,20 +147,6 @@ public class MainActivity extends ActionBarActivity {
             myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                     getResources().getString(R.string.myName));
         }
-
-        // Load savedValues
-//        HashMap<String, Object> savedValues = (HashMap<String, Object>) getLastCustomNonConfigurationInstance();
-//        if (savedValues != null) {
-//            Log.v(app.TAG,"Got saved configurations!");
-//            friendsList = (ArrayList<User>) savedValues.get("friendsList");
-//            webSocketHelper = (WebSocketHelper) savedValues.get("webSocketHelper");
-//            rsvpPanelHelper = (RsvpPanelHelper) savedValues.get("rsvpPanelHelper");
-//            if (rsvpPanelHelper != null) {
-//                if (webSocketHelper != null) {
-//                    rsvpPanelHelper.refreshRsvpList(webSocketHelper.rsvpList);
-//                }
-//            }
-//        }
         if (rsvpPanelHelper == null) {
             rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
         }
@@ -182,9 +168,9 @@ public class MainActivity extends ActionBarActivity {
 
 
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
-        slide_in_left = AnimationUtils.loadAnimation(this,
+        slide_in_left = AnimationUtils.loadAnimation(MainActivity.this,
                 android.R.anim.slide_in_left);
-        slide_out_right = AnimationUtils.loadAnimation(this,
+        slide_out_right = AnimationUtils.loadAnimation(MainActivity.this,
                 android.R.anim.slide_out_right);
         viewFlipper.setInAnimation(slide_in_left);
         viewFlipper.setOutAnimation(slide_out_right);
@@ -219,38 +205,32 @@ public class MainActivity extends ActionBarActivity {
 
         setupReservedPanel(); // setup reserved list panel
         floatingButtonsHelper.setupFriendsFloatingActionButtons();
-
-//        final FloatingActionsMenu fam = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
-//        fam.setTag("VERTICAL_DIRECTION");
-
-        // FUTURE FEATURE
-        // See if we could detect orientation change to expand the floating button accordingly
-//        myOrientationEventListener = new OrientationEventListener(getApplicationContext()) {
-//            @Override
-//            public void onOrientationChanged(int orientation) {
-////                if (fam.getTag().equals("VERTICAL_DIRECTION")) {
-//                    fam.setTag("HORIZONTAL_DIRECTION");
-//                } else if (fam.getTag().equals("HORIZONTAL_DIRECTION")) {
-//                    fam.setTag("VERTICAL_DIRECTION");
-//                }
-//                Log.v(((LiveOkeRemoteApplication)getApplication()).TAG, fam.getTag()+"");
-//            }
-//        };
-
-//        SwipeLayout swipeLayout = (SwipeLayout) findViewById(R.id.swipe_layout);
-//        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
-//        swipeLayout.setDragEdge(SwipeLayout.DragEdge.Right);
-
-        //rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
-        setupFriendsListPanel();
+        //setupFriendsListPanel();
 
 
-        // Start main fragment
-//        FragmentManager manager = getSupportFragmentManager();
-//        FragmentTransaction transaction = manager.beginTransaction();
-//        transaction.replace(R.id.contain_body,new MainFragment(),"main_contain_panel");
-//        transaction.commit();
         updateMainDisplay();
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            AlertDialogHelper ah = new AlertDialogHelper(MainActivity.this);
+
+            @Override
+            protected void onPreExecute() {
+                ah.popupSplash();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                setupFriendsListPanel();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                ah.dismissSplash();
+                getPagerTitles();
+            }
+
+        };
+        task.execute((Void[])null);
 
     }
 
