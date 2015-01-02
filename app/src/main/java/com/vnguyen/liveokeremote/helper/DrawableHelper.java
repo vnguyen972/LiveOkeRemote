@@ -46,6 +46,9 @@ public class DrawableHelper {
         return drawable;
     }
 
+    /*
+    @deprecated
+     */
     public Bitmap drawableToBitmap (Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable)drawable).getBitmap();

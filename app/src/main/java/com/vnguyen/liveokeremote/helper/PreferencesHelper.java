@@ -3,6 +3,7 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -120,7 +121,9 @@ public class PreferencesHelper {
                     Uri imgURI = Uri.parse(avatarURI);
                     _bm = context.uriToBitmap(imgURI);
                 } else {
-                    _bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+                    //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+                    _bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
+
                 }
                 FaceCropper mFaceCropper = new FaceCropper();
                 if (!_bm.isRecycled()) {

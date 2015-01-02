@@ -439,7 +439,8 @@ public class MainActivity extends ActionBarActivity {
                 imgURI = Uri.parse(avatarURI);
                 bm = uriToBitmap(imgURI);
             } else {
-                bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+                //bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+                bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_profile);
             }
             FaceCropper mFaceCropper = new FaceCropper();
             bm = mFaceCropper.getCroppedImage(bm);

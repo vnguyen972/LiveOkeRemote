@@ -3,6 +3,7 @@ package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -80,7 +81,8 @@ public class FloatingButtonsHelper {
                             public void onPositive(MaterialDialog materialDialog) {
                                 if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
                                     User u = new User(input.getEditableText().toString());
-                                    Bitmap bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+                                    //Bitmap bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+                                    Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
                                     u.avatar =  new RoundImgDrawable(bm);
                                     context.friendsListHelper.adapter.friends.add(u);
                                     context.friendsList.add(u);
