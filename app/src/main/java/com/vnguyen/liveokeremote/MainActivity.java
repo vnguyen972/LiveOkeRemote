@@ -39,6 +39,9 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.androidquery.AQuery;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.nispok.snackbar.Snackbar;
@@ -118,6 +121,9 @@ public class MainActivity extends ActionBarActivity {
     public ViewPager mViewPager;
     public SongsListPageAdapter mSongsListPagerAdapter;
 
+    // Admob Add
+    InterstitialAd interstitialAd;
+
     public OrientationEventListener myOrientationEventListener;
     public String listingBy;
 
@@ -125,6 +131,28 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //-- Create AdView ---------------
+        AdView adView = (AdView)this.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("33D741218BB051C310916BD07B964A38")
+                .addTestDevice("FDD9A4945EEF8BB62A66E359961B4372")
+                .build();
+        adView.loadAd(adRequest);
+
+        // Create an ad.
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(
+                "ca-app-pub-5631251075075232/3478863754");
+        AdRequest adRequest2 = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("33D741218BB051C310916BD07B964A38")
+                .addTestDevice("FDD9A4945EEF8BB62A66E359961B4372")
+                .build();
+        interstitialAd.loadAd(adRequest2);
+        //---------------------------------------
+
         aq = new AQuery(getApplicationContext());
         app = (LiveOkeRemoteApplication) getApplication();
         aquiredPhoto = new AquiredPhoto();
@@ -449,6 +477,7 @@ public class MainActivity extends ActionBarActivity {
             }
             RoundImgDrawable img = new RoundImgDrawable(bm);
             mReservedCountImgView.setImageDrawable(img);
+            me.avatar = img;
             nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
         }
 
@@ -581,6 +610,15 @@ public class MainActivity extends ActionBarActivity {
             count += Integer.parseInt(s);
         }
         return count;
+    }
+
+    public void getNewAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+//		adRequest.addKeyword("Karaoke");
+//		adRequest.addKeyword("Karaoke4Pro");
+//		//adRequest.addTestDevice("FDD9A4945EEF8BB62A66E359961B4372");
+//		adRequest.addTestDevice("33D741218BB051C310916BD07B964A38");
+        interstitialAd.loadAd(adRequest);
     }
 
     public void updateMainDisplay() {

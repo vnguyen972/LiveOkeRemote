@@ -3,7 +3,10 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -23,10 +26,13 @@ import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
+import com.vnguyen.liveokeremote.helper.DrawableHelper;
 
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import cat.lafosca.facecropper.FaceCropper;
 
 public class RsvpListAdapter extends BaseSwipeAdapter {
 
@@ -127,8 +133,8 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
             public void onClick(View v) {
                 swipeLayout.toggle();
                 alertDialogHelper.popUpReservedListAction(rItems,
-                        rsvpNumber.getText().toString(),RsvpListAdapter.this,
-                        "Are you sure to move " + rsvpTitle.getText().toString() +  " to the Top?",
+                        rsvpNumber.getText().toString(), RsvpListAdapter.this,
+                        "Are you sure to move " + rsvpTitle.getText().toString() + " to the Top?",
                         "Move Reserved Song.", "tofront");
             }
         });

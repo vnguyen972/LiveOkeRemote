@@ -247,10 +247,14 @@ public class WebSocketHelper {
                         final Song song = context.db.findSongByID(songID);
                         if (song != null) {
                             final User u = new User(requester);
-                            for (User user : context.friendsList) {
-                                if (user.name.equals(u.name)) {
-                                    u.avatar = user.avatar;
-                                    break;
+                            if (u.name.equalsIgnoreCase(requester)) {
+                                u.avatar = context.me.avatar;
+                            } else {
+                                for (User user : context.friendsList) {
+                                    if (user.name.equals(u.name)) {
+                                        u.avatar = user.avatar;
+                                        break;
+                                    }
                                 }
                             }
                             AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {

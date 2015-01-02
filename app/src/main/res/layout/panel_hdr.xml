@@ -39,11 +39,12 @@
         </LinearLayout>
     </LinearLayout>
     <!-- HEADER -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center|top"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
         <TextView
             android:id="@+id/panel_header"
             android:layout_width="match_parent"
@@ -57,11 +58,22 @@
         <ListView
             android:id="@+id/rsvp_drawer"
             android:layout_width="fill_parent"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/panel_header"
             android:layout_gravity="start"
             android:choiceMode="singleChoice"
+            android:layout_above="@+id/adView"
             android:divider="@color/primary_material_light"
             android:dividerHeight="1dp"
-            />
-    </LinearLayout>
+        />
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            ads:adUnitId="ca-app-pub-5631251075075232/4732794155"
+            ads:adSize="BANNER"/>
+    </RelativeLayout>
 </LinearLayout>

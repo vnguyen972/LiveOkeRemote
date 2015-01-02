@@ -146,6 +146,19 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         Log.v(context.app.TAG, "cmd = " + cmd);
                                         context.webSocketHelper.sendMessage(cmd);
                                         swipeLayout.toggle();
+                                        if (context.interstitialAd.isLoaded()) {
+                                            context.interstitialAd.show();
+                                            // update the reserved count notification
+                                            //context.reservedCount++;
+                                            //context.notifCountButton.setText(String.valueOf(ma.reservedCount));
+                                        } else {
+                                            // Toast.makeText(listView.getContext(),
+                                            // "Ad not ready",
+                                            // Toast.LENGTH_SHORT).show();
+                                            Log.d(context.app.TAG,
+                                                    "Ad is not ready to display, getting new Ad...");
+                                            context.getNewAd();
+                                        }
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)

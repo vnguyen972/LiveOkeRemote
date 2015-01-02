@@ -48,4 +48,5 @@ dependencies {
     //compile 'com.github.traex.rippleeffect:library:1.2.3'
     compile files('libs/android-query.0.26.7.jar')
     compile files('libs/FaceCropper-library.jar')
+    compile 'com.google.android.gms:play-services:6.+'
 }
