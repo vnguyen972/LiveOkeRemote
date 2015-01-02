@@ -13,6 +13,9 @@ import com.vnguyen.liveokeremote.RoundImgDrawable;
 import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import cat.lafosca.facecropper.FaceCropper;
 
@@ -58,39 +61,54 @@ public class PreferencesHelper {
     public void addFriend(User friend) {
         int total = getPreferences().getInt("total_friends",0);
         int position = total;
-        getPreferences().edit().putString("friend_"+position,friend.name.trim()).apply();
+        Set<String> set = getPreferences().getStringSet("friends", new HashSet<String>());
+        set.add(friend.name);
+        getPreferences().edit().putStringSet("friends", set).apply();
         getPreferences().edit().putInt("total_friends", total+1).apply();
     }
 
     public void removeFriend(User friend, int position) {
-        getPreferences().edit().remove("friend_"+position).apply();
-        int total = getPreferences().getInt("total_friends",0);
-        total--;
-        getPreferences().edit().putInt("total_friends",total).apply();
+        Set<String> set = getPreferences().getStringSet("friends",new HashSet<String>());
+        if (!set.isEmpty()) {
+            for (Iterator<String> it = set.iterator(); it.hasNext(); ) {
+                String name = it.next();
+                if (name.equalsIgnoreCase(friend.name)) {
+                    it.remove();
+                    break;
+                }
+            }
+            getPreferences().edit().putStringSet("friends", set).apply();
+            getPreferences().edit().remove(friend.name + "_avatar").apply();
+            int total = getPreferences().getInt("total_friends", 0);
+            total--;
+            getPreferences().edit().putInt("total_friends", total).apply();
+        }
     }
 
     public ArrayList<User> retrieveFriendsList() {
         ArrayList<User> list = new ArrayList<>();
         int total = preferences.getInt("total_friends",0);
-        Log.v(context.app.TAG, "TOTAL FRIENDS = " + total);
-        for (int i = 0; i < total;i++) {
-            String name = preferences.getString("friend_"+i,"");
+        Set<String> set = preferences.getStringSet("friends", new HashSet<String>());
+        Log.v(context.app.TAG, "TOTAL IN FRIEND LIST = " + set.size());
+        for (Iterator<String> it = set.iterator();it.hasNext();) {
+            String name = it.next();
             Log.v(context.app.TAG,"userInfo = " + name);
-            if (!name.equals("")) {
+            if (name != null && !name.equals("")) {
                 User u = new User(name);
                 list.add(u);
             }
         }
-        Log.v(context.app.TAG,"TOTAL IN LIST = " + list.size());
+        Log.v(context.app.TAG,"TOTAL IN F.LIST = " + list.size());
         return list;
     }
 
     public ArrayList<User> retrieveFriends() {
         ArrayList<User> list = new ArrayList<>();
         int total = preferences.getInt("total_friends",0);
-        Log.v(context.app.TAG, "TOTAL FRIENDS = " + total);
-        for (int i = 0; i < total;i++) {
-            String name = preferences.getString("friend_"+i,"");
+        Set<String> set = preferences.getStringSet("friends", new HashSet<String>());
+        Log.v(context.app.TAG, "TOTAL FRIENDS = " + set.size());
+        for (Iterator<String> it = set.iterator();it.hasNext();) {
+            String name = it.next();
             Log.v(context.app.TAG,"userInfo = " + name);
             if (!name.equals("")) {
                 User u = new User(name);
@@ -111,8 +129,10 @@ public class PreferencesHelper {
                         bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
                     }
                     u.avatar =  new RoundImgDrawable(bm);
-                    list.add(u);
+                } else {
+                    Log.v(context.app.TAG, "bitmap is recycling..");
                 }
+                list.add(u);
             }
         }
         Log.v(context.app.TAG,"TOTAL IN LIST = " + list.size());

@@ -66,23 +66,28 @@ public class AlertDialogHelper {
         splashDialog = null;
     }
     public void popupProgress(String message) {
-        if (progressDialog == null) {
-            progressDialog = new MaterialDialog.Builder(context)
-                    .title("Please wait")
-                    .customView(R.layout.progress_dialog)
-                    .build();
-        }
+        progressDialog = new MaterialDialog.Builder(context)
+                .title("Please wait")
+                .customView(R.layout.progress_dialog)
+                .build();
         View customView = progressDialog.getCustomView();
         TextView tvMessage = (TextView)customView.findViewById(R.id.progress_message);
         tvMessage.setText(message);
         progressDialog.show();
     }
 
+    public void updateProgressText(String text) {
+        if (progressDialog != null) {
+            View customView = progressDialog.getCustomView();
+            TextView tvMessage = (TextView)customView.findViewById(R.id.progress_message);
+            tvMessage.setText(text);
+        }
+    }
+
     public void dismissProgress() {
         if (progressDialog != null) {
-            progressDialog.dismiss();
+            progressDialog.cancel();
         }
-        progressDialog = null;
     }
 
     public void popupHello() {

@@ -2,6 +2,7 @@ package com.vnguyen.liveokeremote.helper;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.RoundImgDrawable;
 import com.vnguyen.liveokeremote.data.User;
 
 public class FloatingButtonsHelper {
@@ -78,13 +80,13 @@ public class FloatingButtonsHelper {
                             public void onPositive(MaterialDialog materialDialog) {
                                 if (input.getEditableText().toString() != null && !input.getEditableText().toString().equals("")) {
                                     User u = new User(input.getEditableText().toString());
+                                    Bitmap bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+                                    u.avatar =  new RoundImgDrawable(bm);
                                     context.friendsListHelper.adapter.friends.add(u);
-                                    context.runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            context.friendsListHelper.adapter.notifyDataSetChanged();
-                                        }
-                                    });
+                                    context.friendsList.add(u);
+                                    context.friendsListHelper.adapter.notifyDataSetChanged();
                                     PreferencesHelper.getInstance(context).addFriend(u);
+                                    context.actionBarHelper.setSubTitle(context.friendsListHelper.adapter.friends.size() + " Friends.");
                                 }
                             }
                         }).show();
@@ -98,6 +100,7 @@ public class FloatingButtonsHelper {
             @Override
             public void onClick(View v) {
                 context.viewFlipper.showNext();
+                context.actionBarHelper.popSub();
                 context.navigationDrawerHelper.showFriendsList = false;
                 context.actionBarHelper.resetTitle();
             }

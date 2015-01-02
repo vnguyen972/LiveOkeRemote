@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.androidquery.util.Progress;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -106,45 +107,51 @@ public class NavigationDrawerHelper {
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(CN_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == FRIENDS_LIST ) {
+                    context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
+                    context.friendsListHelper.initFriendList(context.friendsList);
+                    if (context.viewFlipper.getDisplayedChild() == 0) {
+                        context.viewFlipper.showNext();
+                    }
+                    context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
                     //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
-                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                        AlertDialogHelper ah = new AlertDialogHelper(context);
-
-                        @Override
-                        protected void onPreExecute() {
-                            ah.popupProgress("Loading friends...");
-                        }
-
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            try {
-                                if (context.friendsList == null || context.friendsList.isEmpty()) {
-                                    context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-                                    context.friendsListHelper.initFriendList(context.friendsList);
-                                }
-                                context.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (context.viewFlipper.getDisplayedChild() == 0) {
-                                            context.viewFlipper.showNext();
-                                        }
-                                        context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
-                                        ah.popupProgress(context.friendsList.size() + " friends loaded.");
-                                    }
-                                });
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Void aVoid) {
-                            ah.dismissProgress();
-                        }
-                    };
-                    task.execute((Void[])null);
+//                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+//                        AlertDialogHelper ah = new AlertDialogHelper(context);
+//
+//                        @Override
+//                        protected void onPreExecute() {
+//                            ah.popupProgress("Loading friends...");
+//                        }
+//
+//                        @Override
+//                        protected Void doInBackground(Void... params) {
+//                            try {
+//                                if (context.friendsList == null || context.friendsList.isEmpty()) {
+//                                    context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
+//                                    context.friendsListHelper.initFriendList(context.friendsList);
+//                                }
+//                                context.runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        if (context.viewFlipper.getDisplayedChild() == 0) {
+//                                            context.viewFlipper.showNext();
+//                                        }
+//                                        context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
+//                                        ah.popupProgress(context.friendsList.size() + " friends loaded.");
+//                                    }
+//                                });
+//                                Thread.sleep(100);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                            return null;
+//                        }
+//
+//                        @Override
+//                        protected void onPostExecute(Void aVoid) {
+//                            ah.dismissProgress();
+//                        }
+//                    };
+//                    task.execute((Void[])null);
                     mDrawerList.setItemChecked(FRIENDS_LIST, false);
                 } else if (mDrawerList.getCheckedItemPosition() == UPDATE_SONGS_LIST) {
                     new MaterialDialog.Builder(context)
@@ -161,30 +168,32 @@ public class NavigationDrawerHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
+                                    final AlertDialogHelper adh = new AlertDialogHelper(context);
                                     if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                                            ProgressDialog pd;
-                                            AlertDialogHelper ah = new AlertDialogHelper(context);
-
                                             @Override
                                             protected void onPreExecute() {
+                                                context.webSocketHelper.doneGettingSongList = false;
+                                                context.webSocketHelper.gotTotalSongResponse = false;
                                                 context.webSocketHelper.sendMessage("getsonglist");
-                                                ah.popupProgress("Updating songs list...");
+                                                while (!context.webSocketHelper.gotTotalSongResponse) {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    // waits until got the total songs response
+                                                }
+                                                adh.popupProgress("Downloading " + context.totalSong + " songs...");
                                             }
 
                                             @Override
                                             protected Void doInBackground(Void... params) {
                                                 try {
-                                                    while (!context.webSocketHelper.gotTotalSongResponse) {
-                                                        Thread.sleep(1000);
-                                                        // waits until got the total songs response
-                                                    }
-                                                    ah.popupProgress("Downloading " + context.totalSong + " songs...");
                                                     while (!context.webSocketHelper.doneGettingSongList) {
                                                         Thread.sleep(1000);
                                                         // waits for all songs downloaded
                                                     }
-
                                                 } catch (InterruptedException e) {
                                                     e.printStackTrace();
                                                 }
@@ -194,13 +203,8 @@ public class NavigationDrawerHelper {
                                             @Override
                                             protected void onPostExecute(Void aVoid) {
                                                 context.getPagerTitles();
-                                                ah.dismissProgress();
-                                                context.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        context.updateMainDisplay();
-                                                    }
-                                                });
+                                                context.updateMainDisplay();
+                                                adh.dismissProgress();
                                             }
                                         };
                                         task.execute((Void[])null);

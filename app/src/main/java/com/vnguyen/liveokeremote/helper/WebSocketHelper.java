@@ -267,13 +267,8 @@ public class WebSocketHelper {
                                 protected void onPostExecute(Void aVoid) {
                                     final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
                                     rsvpList.add(rsvpItem);
-                                    context.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Log.v(context.app.TAG,"Refreshing rsvp list: " + rsvpList.size());
-                                            context.rsvpPanelHelper.refreshRsvpList(rsvpList);
-                                        }
-                                    });
+                                    Log.v(context.app.TAG,"Refreshing rsvp list: " + rsvpList.size());
+                                    context.rsvpPanelHelper.refreshRsvpList(rsvpList);
                                 }
                             };
                             task.execute((Void[])null);
@@ -289,6 +284,9 @@ public class WebSocketHelper {
         } else if (message.startsWith("Finish")) {
             // done receiving songs list
             try {
+                if (songs != null && !songs.isEmpty()) {
+                    songs.clear();
+                }
                 ExecutorService executor = Executors.newFixedThreadPool(2);
                 int cpus = Runtime.getRuntime().availableProcessors();
                 int maxThreads = cpus * 2;

@@ -51,6 +51,7 @@ import com.vnguyen.liveokeremote.data.WebSocketInfo;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.ActionBarHelper;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
+import com.vnguyen.liveokeremote.helper.BackupHelper;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
 import com.vnguyen.liveokeremote.helper.FriendsListHelper;
@@ -97,6 +98,7 @@ public class MainActivity extends ActionBarActivity {
     public DrawableHelper drawableHelper;
     public WebSocketHelper webSocketHelper;
     public NowPlayingHelper nowPlayingHelper;
+    public BackupHelper backupHelper;
     public SongListDataSource db;
     public String searchStr;
 
@@ -146,6 +148,10 @@ public class MainActivity extends ActionBarActivity {
         if (myName == null) {
             myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                     getResources().getString(R.string.myName));
+        }
+
+        if (backupHelper == null) {
+            backupHelper = new BackupHelper(MainActivity.this);
         }
         if (rsvpPanelHelper == null) {
             rsvpPanelHelper = new RsvpPanelHelper(MainActivity.this);
@@ -230,7 +236,7 @@ public class MainActivity extends ActionBarActivity {
             }
 
         };
-        task.execute((Void[])null);
+        task.execute((Void[]) null);
 
     }
 

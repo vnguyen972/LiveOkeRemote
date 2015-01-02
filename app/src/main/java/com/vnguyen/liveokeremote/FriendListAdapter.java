@@ -129,6 +129,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                                         break;
                                     }
                                 }
+                                swipeLayout.toggle();
                                 notifyDataSetChanged();
                             }
                         }).show();
