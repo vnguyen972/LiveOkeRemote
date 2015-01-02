@@ -262,6 +262,10 @@ public class SongListDataSource {
         }
     }
 
+    public void deleteFavorite(String asciiTitle) {
+        int rows = database.delete(SongListTable.FavoriteList.TABLE_NAME,"ascii_title = '" + asciiTitle + "'", null);
+    }
+
     public void unFavorite(long favID, long activeK7ConnectionID, String songID) {
         Log.d(LiveOkeRemoteApplication.TAG,"unFavorite: favID = " + favID + ",activeID = " + activeK7ConnectionID + ",songID = " + songID);
         int rows = database.delete(SongListTable.FavoriteSongConnection.TABLE_NAME,
@@ -394,7 +398,7 @@ public class SongListDataSource {
                     "or songid like '%"+searchStr+"%') limit 100 offset " + offset;
         } else if (field.equalsIgnoreCase("favorites")) {
             int offset = (Integer.parseInt(keys) * 100) - 100;
-            query = "select b.songid,a.title,a.ascii_title from favoriteslist a, favoritesongconnection b where a._id = b.favoriteID limit 100 offset " + offset;
+            query = "select * from favoriteslist limit 100 offset " + offset;
         } else if (field.equalsIgnoreCase("EN") ||
                 field.equalsIgnoreCase("VN") ||
                 field.equalsIgnoreCase("CN")) {

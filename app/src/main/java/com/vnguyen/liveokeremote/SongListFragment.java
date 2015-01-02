@@ -50,6 +50,7 @@ public class SongListFragment extends Fragment {
                     if (ma.listingBy.equalsIgnoreCase("title")) {
                         songsList = ma.db.getSongByKeys(ma.listingBy, SongHelper.translateKey(key),ma.searchStr);
                     } else if (ma.listingBy.equalsIgnoreCase("search") ||
+                            ma.listingBy.equalsIgnoreCase("favorites") ||
                             ma.listingBy.equalsIgnoreCase("VN") ||
                             ma.listingBy.equalsIgnoreCase("EN") ||
                             ma.listingBy.equalsIgnoreCase("CN")) {

@@ -42,17 +42,18 @@ public class NavigationDrawerHelper {
 
     public static final int HOME = 0;
     public static final int HEADER_1 = 1;
-    public static final int VN_SONGS = 2;
-    public static final int EN_SONGS = 3;
-    public static final int CN_SONGS = 4;
-    public static final int HEADER_2 = 5;
-    public static final int IP_ADDRESS = 6;
-    public static final int FRIENDS_LIST = 7;
-    public static final int UPDATE_SONGS_LIST = 8;
-    public static final int COMMENT_TO_SCREEN = 9;
-    public static final int YOUR_PHOTO = 10;
-    public static final int MASTER_CODE = 11;
-    public static final int HELP = 12;
+    public static final int FAVORITED_SONGS = 2;
+    public static final int VN_SONGS = 3;
+    public static final int EN_SONGS = 4;
+    public static final int CN_SONGS = 5;
+    public static final int HEADER_2 = 6;
+    public static final int IP_ADDRESS = 7;
+    public static final int FRIENDS_LIST = 8;
+    public static final int UPDATE_SONGS_LIST = 9;
+    public static final int COMMENT_TO_SCREEN = 10;
+    public static final int YOUR_PHOTO = 11;
+    public static final int MASTER_CODE = 12;
+    public static final int HELP = 13;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -84,6 +85,10 @@ public class NavigationDrawerHelper {
                     context.getPagerTitles();
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(HOME, false);
+                } else if (mDrawerList.getCheckedItemPosition() == FAVORITED_SONGS) {
+                    context.getPagerFavorites();
+                    context.updateMainDisplay();
+                    mDrawerList.setItemChecked(FAVORITED_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == VN_SONGS) {
                     context.getPagerLanguage("VN");
                     context.updateMainDisplay();
@@ -289,6 +294,13 @@ public class NavigationDrawerHelper {
                 case HEADER_1:
                     // Songs List header
                     iconDrawable = null;
+                    showCounter = false;
+                    break;
+                case FAVORITED_SONGS:
+                    IconicFontDrawable favIcon = new IconicFontDrawable(context.getApplicationContext());
+                    favIcon.setIcon("fa-heart");
+                    favIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = favIcon;
                     showCounter = false;
                     break;
                 case VN_SONGS:

@@ -541,6 +541,19 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void getPagerFavorites() {
+        try {
+            db.open();
+            listingBy = "favorites";
+            pagerTitles = db.getFavoriteKeysMap();
+        } catch (Exception e) {
+            Log.e(app.TAG, e.getLocalizedMessage(),e);
+        } finally {
+            db.close();
+        }
+    }
+
+
     public void getPagerLanguage(String language) {
         try {
             db.open();

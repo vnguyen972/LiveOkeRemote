@@ -16,10 +16,10 @@
     <string-array name="nav_menu_items">
         <item>Home</item>
         <item>Songs List</item>
+        <item>Favorited Songs</item>
         <item>Vietnamese Songs</item>
         <item>English Songs</item>
         <item>Chinese Songs</item>
-        <item>Favorited Songs</item>
         <item>Settings</item>
         <item>IP Address</item>
         <item>Friends List</item>
