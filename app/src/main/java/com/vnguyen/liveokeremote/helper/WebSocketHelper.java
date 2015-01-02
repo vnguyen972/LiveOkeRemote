@@ -247,12 +247,14 @@ public class WebSocketHelper {
                         final Song song = context.db.findSongByID(songID);
                         if (song != null) {
                             final User u = new User(requester);
-                            if (u.name.equalsIgnoreCase(requester)) {
+                            if (context.me.name.equalsIgnoreCase(requester)) {
                                 u.avatar = context.me.avatar;
                             } else {
                                 for (User user : context.friendsList) {
                                     if (user.name.equals(u.name)) {
-                                        u.avatar = user.avatar;
+                                        if (u.avatarURI != null && !u.avatarURI.equals("")) {
+                                            u.avatar = user.avatar;
+                                        }
                                         break;
                                     }
                                 }

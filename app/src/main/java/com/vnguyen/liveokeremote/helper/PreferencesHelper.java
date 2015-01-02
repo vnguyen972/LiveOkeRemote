@@ -120,20 +120,20 @@ public class PreferencesHelper {
                 if (avatarURI != null && !avatarURI.equals("")) {
                     Uri imgURI = Uri.parse(avatarURI);
                     _bm = context.uriToBitmap(imgURI);
+                    FaceCropper mFaceCropper = new FaceCropper();
+                    if (!_bm.isRecycled()) {
+                        bm = mFaceCropper.getCroppedImage(_bm);
+                        if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+                            bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+                        }
+                        u.avatar =  new RoundImgDrawable(bm);
+                    } else {
+                        Log.v(context.app.TAG, "bitmap is recycling..");
+                    }
                 } else {
                     //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
-                    _bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
-
-                }
-                FaceCropper mFaceCropper = new FaceCropper();
-                if (!_bm.isRecycled()) {
-                    bm = mFaceCropper.getCroppedImage(_bm);
-                    if (bm.getWidth() > 120 || bm.getHeight() > 120) {
-                        bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
-                    }
-                    u.avatar =  new RoundImgDrawable(bm);
-                } else {
-                    Log.v(context.app.TAG, "bitmap is recycling..");
+                    //_bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
+                    u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
                 }
                 list.add(u);
             }

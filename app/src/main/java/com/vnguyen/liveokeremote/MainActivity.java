@@ -312,6 +312,9 @@ public class MainActivity extends ActionBarActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Log.i(app.TAG,"SWITCHED ON");
+                    if (wsInfo == null) {
+                        wsInfo = new WebSocketInfo();
+                    }
                     if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
                         // if there's an IP presents
                         wsInfo.port = "8181";

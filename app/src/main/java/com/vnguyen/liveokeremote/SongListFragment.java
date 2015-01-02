@@ -13,6 +13,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.vnguyen.liveokeremote.data.Song;
+import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
@@ -45,16 +46,17 @@ public class SongListFragment extends Fragment {
 
             @Override
             protected Void doInBackground(Void... params) {
+                SongListDataSource db = new SongListDataSource(ma);
                 try {
-                    ma.db.open();
+                    db.open();
                     if (ma.listingBy.equalsIgnoreCase("title")) {
-                        songsList = ma.db.getSongByKeys(ma.listingBy, SongHelper.translateKey(key),ma.searchStr);
+                        songsList = db.getSongByKeys(ma.listingBy, SongHelper.translateKey(key),ma.searchStr);
                     } else if (ma.listingBy.equalsIgnoreCase("search") ||
                             ma.listingBy.equalsIgnoreCase("favorites") ||
                             ma.listingBy.equalsIgnoreCase("VN") ||
                             ma.listingBy.equalsIgnoreCase("EN") ||
                             ma.listingBy.equalsIgnoreCase("CN")) {
-                        songsList = ma.db.getSongByKeys(ma.listingBy,key, ma.searchStr);
+                        songsList = db.getSongByKeys(ma.listingBy,key, ma.searchStr);
                     }
                     Log.i(ma.app.TAG,"SongListFragment-listing by: " + ma.listingBy);
                     Log.i(ma.app.TAG,"Songs found: " + songsList.size());
@@ -68,7 +70,7 @@ public class SongListFragment extends Fragment {
                 } catch (Exception ex) {
                     Log.e(ma.app.TAG,ex.getMessage(),ex);
                 } finally {
-                    ma.db.close();
+                    db.close();
                 }
                 return null;
             }
