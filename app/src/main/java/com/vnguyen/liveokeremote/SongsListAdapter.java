@@ -158,9 +158,27 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             })
                             .show();
                 } else {
-                    // perform search here
-                    context.getPagerSearch(idNumber.getText().toString());
-                    context.updateMainDisplay();
+                    new MaterialDialog.Builder(context)
+                            .title("Search Favorite Song.")
+                            .content("Do you want to search this song on your songlist?")
+                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                            .positiveText("OK")
+                            .negativeText("CANCEL")
+                            .callback(new MaterialDialog.Callback() {
+
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
+                                }
+
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    // perform search here
+                                    context.getPagerSearch(idNumber.getText().toString());
+                                    context.actionBarHelper.resetTitle();
+                                    context.updateMainDisplay();
+                                }
+                            })
+                            .show();
                 }
             }
         });
@@ -204,31 +222,48 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             .negativeText("Cancel")
                             .show();
                 } else {
-                    // perform detete favorites here
-                    try {
-                        context.db.open();
-                        context.db.deleteFavorite(idNumber.getText().toString());
-                        for (Iterator<Song> it = songs.iterator();it.hasNext();) {
-                            Song song = it.next();
-                            if (song.convertedTitle.equalsIgnoreCase(idNumber.getText().toString())) {
-                                it.remove();
-                                notifyDataSetChanged();
-                                break;
-                            }
-                        }
-                        context.actionBarHelper.setSubTitle(songs.size() + " Songs.");
-                        SnackbarManager.show(Snackbar.with(context)
-                                .type(SnackbarType.MULTI_LINE)
-                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                .textColor(Color.WHITE)
-                                .color(Color.BLACK)
-                                .text("Favorite Item Removed."));
-                    } catch (Exception ex) {
-                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                    new MaterialDialog.Builder(context)
+                            .title("Delete Favorite Song.")
+                            .content("Do you want to delete this song from your favorite list?")
+                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                            .positiveText("OK")
+                            .negativeText("CANCEL")
+                            .callback(new MaterialDialog.Callback() {
 
-                    } finally {
-                        context.db.close();
-                    }
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
+                                }
+
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    // perform detete favorites here
+                                    try {
+                                        context.db.open();
+                                        context.db.deleteFavorite(idNumber.getText().toString());
+                                        for (Iterator<Song> it = songs.iterator();it.hasNext();) {
+                                            Song song = it.next();
+                                            if (song.convertedTitle.equalsIgnoreCase(idNumber.getText().toString())) {
+                                                it.remove();
+                                                notifyDataSetChanged();
+                                                break;
+                                            }
+                                        }
+                                        context.actionBarHelper.setSubTitle(songs.size() + " Songs.");
+                                        SnackbarManager.show(Snackbar.with(context)
+                                                .type(SnackbarType.MULTI_LINE)
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                .textColor(Color.WHITE)
+                                                .color(Color.BLACK)
+                                                .text("Favorite Item Removed."));
+                                    } catch (Exception ex) {
+                                        Log.e(context.app.TAG,ex.getMessage(),ex);
+
+                                    } finally {
+                                        context.db.close();
+                                    }
+                                }
+                            })
+                            .show();
                 }
             }
         });

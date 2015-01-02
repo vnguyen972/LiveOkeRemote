@@ -86,18 +86,22 @@ public class NavigationDrawerHelper {
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(HOME, false);
                 } else if (mDrawerList.getCheckedItemPosition() == FAVORITED_SONGS) {
+                    context.getSupportActionBar().setTitle("FAVORITED SONGS");
                     context.getPagerFavorites();
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(FAVORITED_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == VN_SONGS) {
+                    context.getSupportActionBar().setTitle("VIET SONGS");
                     context.getPagerLanguage("VN");
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(VN_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == EN_SONGS) {
+                    context.getSupportActionBar().setTitle("ENGLISH SONGS");
                     context.getPagerLanguage("EN");
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(EN_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == CN_SONGS) {
+                    context.getSupportActionBar().setTitle("CHINESE SONGS");
                     context.getPagerLanguage("CN");
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(CN_SONGS, false);

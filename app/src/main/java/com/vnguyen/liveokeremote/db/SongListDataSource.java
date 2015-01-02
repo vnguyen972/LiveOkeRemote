@@ -413,12 +413,18 @@ public class SongListDataSource {
         if (cursor != null) {
             //Log.d("K7","cursor size = " + cursor.getCount());
             while (cursor.moveToNext()) {
+                Song song = null;
                 if (field.equalsIgnoreCase("favorites")) {
-                    list.add(cursorToFavoriteSongDisplay(cursor));
+                    song = cursorToFavoriteSongDisplay(cursor);
+                    song.icon = (new DrawableHelper()).buildDrawable(song.title.substring(0, 1), "round");
+                    //list.add(cursorToFavoriteSongDisplay(cursor));
                 } else {
-                    Song song = cursorToSongDisplay(cursor);
+                    song = cursorToSongDisplay(cursor);
                     song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
                     //Log.d("K7","song: " + song.getTitle());
+                    //list.add(song);
+                }
+                if (song != null) {
                     list.add(song);
                 }
             }

@@ -411,9 +411,11 @@ public class MainActivity extends ActionBarActivity {
                     //mReservedCountImgView.setImageDrawable(DrawableHelper.getInstance().buildDrawable(mNowPlayingTxtView.getText().charAt(0) + "", "roundrect"));
                 } else {
                     mSlidingPanel.expandPanel();
+                    actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
                     if (webSocketHelper != null && !webSocketHelper.rsvpList.isEmpty()) {
-                        actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
                         actionBarHelper.pushSub(webSocketHelper.rsvpList.size() + " Songs.");
+                    } else {
+                        actionBarHelper.pushSub("0 Songs.");
                     }
                 }
             }
