@@ -129,6 +129,13 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                                         break;
                                     }
                                 }
+                                for (Iterator<User> it = context.friendsList.iterator();it.hasNext();) {
+                                    User u = it.next();
+                                    if (u.name.equalsIgnoreCase(frName.getText().toString())) {
+                                        it.remove();
+                                        break;
+                                    }
+                                }
                                 swipeLayout.toggle();
                                 notifyDataSetChanged();
                             }

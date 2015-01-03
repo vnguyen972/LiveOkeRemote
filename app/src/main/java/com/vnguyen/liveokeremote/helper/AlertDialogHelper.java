@@ -113,7 +113,7 @@ public class AlertDialogHelper {
                             context.me = new User(value);
                             Toast.makeText(context, "Hello "+ value, Toast.LENGTH_LONG).show();
                             context.nowPlayingHelper.popTitle();
-                            context.setupReservedPanel();
+                            context.loadExtra();
                         }
                     }
 

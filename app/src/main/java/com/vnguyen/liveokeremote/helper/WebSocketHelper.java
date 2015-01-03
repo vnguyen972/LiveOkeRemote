@@ -254,7 +254,8 @@ public class WebSocketHelper {
                                 if (context.friendsList != null) {
                                     for (User user : context.friendsList) {
                                         if (user.name.equals(u.name)) {
-                                            if (u.avatarURI != null && !u.avatarURI.equals("")) {
+                                            Log.v(context.app.TAG,"Found requester on friendlist!");
+                                            if (user.avatarURI != null && !user.avatarURI.equals("")) {
                                                 u.avatar = user.avatar;
                                             }
                                             break;

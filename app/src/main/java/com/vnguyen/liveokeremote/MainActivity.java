@@ -244,6 +244,10 @@ public class MainActivity extends ActionBarActivity {
 
 
         updateMainDisplay();
+        loadExtra();
+    }
+
+    public void loadExtra() {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             AlertDialogHelper ah = new AlertDialogHelper(MainActivity.this);
 

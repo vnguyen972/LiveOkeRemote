@@ -118,6 +118,7 @@ public class PreferencesHelper {
                 String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
                 Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
                 if (avatarURI != null && !avatarURI.equals("")) {
+                    u.avatarURI = avatarURI;
                     Uri imgURI = Uri.parse(avatarURI);
                     _bm = context.uriToBitmap(imgURI);
                     FaceCropper mFaceCropper = new FaceCropper();
