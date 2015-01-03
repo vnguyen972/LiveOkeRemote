@@ -18,6 +18,15 @@
         >
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/swapAudioBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/orange_200"
+            fab:fab_colorPressed="@color/orange_300"
+            fab:fab_addButtonColorNormal="@color/orange_700"
+            fab:fab_addButtonColorPressed="@color/orange_600"
+            />
+        <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/switchAudioTrackBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

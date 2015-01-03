@@ -127,6 +127,9 @@ public class FloatingButtonsHelper {
         prevBtnIcon.colorRes(R.color.orange_800);
         IconDrawable nextBtnIcon = new IconDrawable(context, Iconify.IconValue.md_skip_next);
         nextBtnIcon.sizeDp(40);
+        IconDrawable swapAudioBtnIcon = new IconDrawable(context, Iconify.IconValue.md_sync);
+        swapAudioBtnIcon.sizeDp(40);
+        swapAudioBtnIcon.colorRes(R.color.orange_800);
         nextBtnIcon.colorRes(R.color.orange_800);
         micOffBtnIcon.colorRes(R.color.orange_800);
 
@@ -247,6 +250,41 @@ public class FloatingButtonsHelper {
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
                                     context.webSocketHelper.sendMessage("toggleaudio");
+                                }
+                            })
+                            .show();
+
+                } else {
+                    SnackbarManager.show(Snackbar.with(context)
+                            .type(SnackbarType.MULTI_LINE)
+                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                            .textColor(Color.WHITE)
+                            .color(Color.RED)
+                            .text("ERROR: Not Connected"));
+                }
+            }
+        });
+        FloatingActionButton swapAudioButton = (FloatingActionButton) context.findViewById(R.id.swapAudioBtn);
+        swapAudioButton.setImageDrawable(swapAudioBtnIcon);
+        swapAudioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                    new MaterialDialog.Builder(context)
+                            .title("Are you sure?")
+                            .content("Do you want to swap the audio track?")
+                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                            .positiveText("OK")
+                            .negativeText("CANCEL")
+                            .callback(new MaterialDialog.Callback() {
+
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
+                                }
+
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    context.webSocketHelper.sendMessage("swap");
                                 }
                             })
                             .show();
