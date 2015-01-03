@@ -265,7 +265,6 @@ public class MainActivity extends ActionBarActivity {
 
         };
         task.execute((Void[]) null);
-
     }
 
     public void setupFriendsListPanel() {
@@ -274,16 +273,7 @@ public class MainActivity extends ActionBarActivity {
         }
         //friendsListHelper.initFriendList(app.generateTestFriends());
         if (friendsList == null || friendsList.isEmpty()) {
-            Log.v(app.TAG,friendsList+"-BEFORE");
-            HashMap<String, Object> savedValues = (HashMap<String,Object>)getLastCustomNonConfigurationInstance();
-            if (savedValues != null) {
-                friendsList = (ArrayList<User>) savedValues.get("friendsList");
-            }
-            if (friendsList == null) {
-                Log.v(app.TAG,"NULL from Retaining...");
-                friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
-            }
-            Log.v(app.TAG,friendsList+"-AFTER");
+            friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
         }
 
         Log.v(app.TAG,"setupFriendsListPanel is called!!!");
@@ -461,29 +451,34 @@ public class MainActivity extends ActionBarActivity {
 //        rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
         if (me != null) {
             // Display the Avatar Photo
-            Uri imgURI;
-            Bitmap bm;
-            String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
-                    getResources().getString(R.string.myAvatarURI));
-            Log.v(app.TAG, "Avatar from Pref. URI: " + avatarURI);
-            if (avatarURI != null && !avatarURI.equals("")) {
-                imgURI = Uri.parse(avatarURI);
-                bm = uriToBitmap(imgURI);
-            } else {
-                //bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_profile);
-            }
-            FaceCropper mFaceCropper = new FaceCropper();
-            bm = mFaceCropper.getCroppedImage(bm);
-            if (bm.getWidth() > 120 || bm.getHeight() > 120) {
-                bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
-            }
-            RoundImgDrawable img = new RoundImgDrawable(bm);
+            RoundImgDrawable img = loadMyAvatar();
             mReservedCountImgView.setImageDrawable(img);
             me.avatar = img;
             nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
         }
 
+    }
+
+    public RoundImgDrawable loadMyAvatar() {
+        Uri imgURI;
+        Bitmap bm;
+        String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+                getResources().getString(R.string.myAvatarURI));
+        Log.v(app.TAG, "Avatar from Pref. URI: " + avatarURI);
+        if (avatarURI != null && !avatarURI.equals("")) {
+            imgURI = Uri.parse(avatarURI);
+            bm = uriToBitmap(imgURI);
+        } else {
+            //bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
+            bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_profile);
+        }
+        FaceCropper mFaceCropper = new FaceCropper();
+        bm = mFaceCropper.getCroppedImage(bm);
+        if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+            bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+        }
+        RoundImgDrawable img = new RoundImgDrawable(bm);
+        return img;
     }
 
     public void updateNowPlaying(String title) {
@@ -519,6 +514,9 @@ public class MainActivity extends ActionBarActivity {
             RoundImgDrawable img = new RoundImgDrawable(bitmap);
             //mReservedCountImgView.setImageDrawable(img);
             aquiredPhoto.imgView.setImageDrawable(img);
+            if (aquiredPhoto.prefKey.equalsIgnoreCase("myAvatarURI")) {
+                me.avatar = loadMyAvatar();
+            }
         } else {
             Toast.makeText(this, "Unable to find file. Path =  " + path, Toast.LENGTH_LONG).show();
         }
@@ -527,14 +525,16 @@ public class MainActivity extends ActionBarActivity {
     public Bitmap uriToBitmap(Uri imgUri) {
         Bitmap bitmap = null;
         try {
+            BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+            bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
             if (imgUri != null) {
                 if (imgUri.toString().startsWith("content://com.google.android.apps.photo.contents")) {
                     InputStream is = getContentResolver().openInputStream(Uri.parse(imgUri.toString()));
-                    bitmap = BitmapFactory.decodeStream(is);
+                    bitmap = BitmapFactory.decodeStream(is,null,bitmapFatoryOptions);
                 } else {
                     ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(imgUri,"r");
                     FileDescriptor fd = pfd.getFileDescriptor();
-                    bitmap = BitmapFactory.decodeFileDescriptor(fd);
+                    bitmap = BitmapFactory.decodeFileDescriptor(fd,null,bitmapFatoryOptions);
                     pfd.close();
                     //bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imgUri);
                 }
@@ -545,20 +545,7 @@ public class MainActivity extends ActionBarActivity {
         return bitmap;
     }
 
-//    @Override
-//    public Object onRetainCustomNonConfigurationInstance() {
-//        Log.v(app.TAG,"Saving configurations...");
-//        HashMap<String, Object> savedValues = new HashMap<String, Object>();
-//        savedValues.put("friendsList", friendsList);
-//        savedValues.put("webSocketHelper", webSocketHelper);
-//        savedValues.put("rsvpPanelHelper", rsvpPanelHelper);
-//        return savedValues;
-//    }
-
     public void getPagerTitles() {
-//        pagerTitles.put("A","200");
-//        pagerTitles.put("B","100");
-//        pagerTitles.put("C","200");
         try {
             db.open();
             listingBy = "title";

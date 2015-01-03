@@ -155,6 +155,7 @@ public class WebSocketHelper {
     }
 
     public void sendMessage(String message) {
+
         mWebSocketClient.send(message);
     }
 
@@ -250,12 +251,14 @@ public class WebSocketHelper {
                             if (context.me.name.equalsIgnoreCase(requester)) {
                                 u.avatar = context.me.avatar;
                             } else {
-                                for (User user : context.friendsList) {
-                                    if (user.name.equals(u.name)) {
-                                        if (u.avatarURI != null && !u.avatarURI.equals("")) {
-                                            u.avatar = user.avatar;
+                                if (context.friendsList != null) {
+                                    for (User user : context.friendsList) {
+                                        if (user.name.equals(u.name)) {
+                                            if (u.avatarURI != null && !u.avatarURI.equals("")) {
+                                                u.avatar = user.avatar;
+                                            }
+                                            break;
                                         }
-                                        break;
                                     }
                                 }
                             }
@@ -273,7 +276,7 @@ public class WebSocketHelper {
                                 protected void onPostExecute(Void aVoid) {
                                     final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
                                     rsvpList.add(rsvpItem);
-                                    Log.v(context.app.TAG,"Refreshing rsvp list: " + rsvpList.size());
+                                    Log.v(context.app.TAG, "Refreshing rsvp list: " + rsvpList.size());
                                     context.rsvpPanelHelper.refreshRsvpList(rsvpList);
                                 }
                             };
@@ -286,6 +289,12 @@ public class WebSocketHelper {
                     }
                 }
             }
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    context.rsvpPanelHelper.refreshRsvpList(rsvpList);
+                }
+            });
             updatingRsvpList = false;
         } else if (message.startsWith("Finish")) {
             // done receiving songs list

@@ -107,51 +107,16 @@ public class NavigationDrawerHelper {
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(CN_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == FRIENDS_LIST ) {
-                    context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
-                    context.friendsListHelper.initFriendList(context.friendsList);
+                    if (context.friendsList != null) {
+                        context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
+                        context.friendsListHelper.initFriendList(context.friendsList);
+                    } else {
+                        context.actionBarHelper.pushSub("0 Friends.");
+                    }
                     if (context.viewFlipper.getDisplayedChild() == 0) {
                         context.viewFlipper.showNext();
                     }
                     context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
-                    //context.rsvpPanelHelper.refreshFriendsList(context.app.generateTestFriends());
-//                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-//                        AlertDialogHelper ah = new AlertDialogHelper(context);
-//
-//                        @Override
-//                        protected void onPreExecute() {
-//                            ah.popupProgress("Loading friends...");
-//                        }
-//
-//                        @Override
-//                        protected Void doInBackground(Void... params) {
-//                            try {
-//                                if (context.friendsList == null || context.friendsList.isEmpty()) {
-//                                    context.friendsList = PreferencesHelper.getInstance(context).retrieveFriends();
-//                                    context.friendsListHelper.initFriendList(context.friendsList);
-//                                }
-//                                context.runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        if (context.viewFlipper.getDisplayedChild() == 0) {
-//                                            context.viewFlipper.showNext();
-//                                        }
-//                                        context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
-//                                        ah.popupProgress(context.friendsList.size() + " friends loaded.");
-//                                    }
-//                                });
-//                                Thread.sleep(100);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                            return null;
-//                        }
-//
-//                        @Override
-//                        protected void onPostExecute(Void aVoid) {
-//                            ah.dismissProgress();
-//                        }
-//                    };
-//                    task.execute((Void[])null);
                     mDrawerList.setItemChecked(FRIENDS_LIST, false);
                 } else if (mDrawerList.getCheckedItemPosition() == UPDATE_SONGS_LIST) {
                     new MaterialDialog.Builder(context)
@@ -168,31 +133,50 @@ public class NavigationDrawerHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    final AlertDialogHelper adh = new AlertDialogHelper(context);
                                     if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                        final AlertDialogHelper adh = new AlertDialogHelper(context);
                                         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                                             @Override
                                             protected void onPreExecute() {
-                                                context.webSocketHelper.doneGettingSongList = false;
-                                                context.webSocketHelper.gotTotalSongResponse = false;
-                                                context.webSocketHelper.sendMessage("getsonglist");
-                                                while (!context.webSocketHelper.gotTotalSongResponse) {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e) {
-                                                        e.printStackTrace();
+                                                try {
+                                                    Log.v(context.app.TAG, "PRE-Exec: getsonglist");
+                                                    context.webSocketHelper.doneGettingSongList = false;
+                                                    Log.v(context.app.TAG, "PRE-Exec: set doneGettingSongList to false");
+                                                    context.webSocketHelper.gotTotalSongResponse = false;
+                                                    Log.v(context.app.TAG, "PRE-Exec: set gotTotalSongResponse to false");
+                                                    long startTime = System.currentTimeMillis();
+                                                    context.webSocketHelper.sendMessage("getsonglist");
+                                                    Log.v(context.app.TAG, "PRE-Exec: sending 'getsonglist' command...");
+                                                    while (!context.webSocketHelper.gotTotalSongResponse) {
+                                                        long currTime = System.currentTimeMillis();
+                                                        if (currTime - startTime > 10000) {
+                                                            break;
+                                                        }
+                                                        Log.v(context.app.TAG, "PRE-Exec: waiting for total song");
+                                                        try {
+                                                            Thread.sleep(1000);
+                                                        } catch (InterruptedException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        // waits until got the total songs response
                                                     }
-                                                    // waits until got the total songs response
+                                                    if (context.totalSong > 0) {
+                                                        adh.popupProgress("Downloading " + context.totalSong + " songs...");
+                                                    }
+                                                } catch (Throwable t) {
+                                                    t.printStackTrace();
                                                 }
-                                                adh.popupProgress("Downloading " + context.totalSong + " songs...");
                                             }
 
                                             @Override
                                             protected Void doInBackground(Void... params) {
                                                 try {
-                                                    while (!context.webSocketHelper.doneGettingSongList) {
-                                                        Thread.sleep(1000);
-                                                        // waits for all songs downloaded
+                                                    if (context.totalSong > 0) {
+                                                        Log.v(context.app.TAG, "Exec-BG: getsonglist");
+                                                        while (!context.webSocketHelper.doneGettingSongList) {
+                                                            Thread.sleep(1000);
+                                                            // waits for all songs downloaded
+                                                        }
                                                     }
                                                 } catch (InterruptedException e) {
                                                     e.printStackTrace();
@@ -202,11 +186,13 @@ public class NavigationDrawerHelper {
 
                                             @Override
                                             protected void onPostExecute(Void aVoid) {
+                                                Log.v(context.app.TAG,"POST-Exec: getsonglist");
                                                 context.getPagerTitles();
                                                 context.updateMainDisplay();
                                                 adh.dismissProgress();
                                             }
                                         };
+                                        Log.v(context.app.TAG,"Exec: getsonglist");
                                         task.execute((Void[])null);
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
