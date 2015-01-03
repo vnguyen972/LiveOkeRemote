@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,6 +92,7 @@ public class MainActivity extends ActionBarActivity {
 
     public Uri mImageCaptureUri;
     public AquiredPhoto aquiredPhoto;
+    private Drawable backupDrawable;
 
     // Helpers
     public NavigationDrawerHelper navigationDrawerHelper;
@@ -235,9 +237,8 @@ public class MainActivity extends ActionBarActivity {
 
         // setup sliding up panel layout
         mSlidingPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        mSlidingPanel.setEnabled(false); // disable swiping to slide
+        //mSlidingPanel.setEnabled(false); // disable swiping to slide
 
-        setupReservedPanel(); // setup reserved list panel
         floatingButtonsHelper.setupFriendsFloatingActionButtons();
         //setupFriendsListPanel();
 
@@ -253,14 +254,23 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             protected Void doInBackground(Void... params) {
+                if (me != null) {
+                    // Display the Avatar Photo
+                    me.avatar = loadMyAvatar();
+                }
                 setupFriendsListPanel();
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                setupReservedPanel(); // setup reserved list panel
                 ah.dismissSplash();
                 getPagerTitles();
+                if (me != null) {
+                    mReservedCountImgView.setImageDrawable(me.avatar);
+                    nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
+                }
             }
 
         };
@@ -421,6 +431,19 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void updateRsvpCounter(int count) {
+        if (count != 0) {
+            if (backupDrawable == null) {
+                backupDrawable = mReservedCountImgView.getDrawable();
+            }
+            mReservedCountImgView.setImageDrawable(drawableHelper.buildDrawable(count+"","round"));
+        } else {
+            if (backupDrawable != null) {
+                mReservedCountImgView.setImageDrawable(backupDrawable);
+            }
+        }
+    }
+
     public void setupReservedPanel() {
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
         mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/VPSLGAN.TTF"));
@@ -449,13 +472,13 @@ public class MainActivity extends ActionBarActivity {
         });
 //        Log.v(app.TAG,"Building the RSVP Panel");
 //        rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
-        if (me != null) {
-            // Display the Avatar Photo
-            RoundImgDrawable img = loadMyAvatar();
-            mReservedCountImgView.setImageDrawable(img);
-            me.avatar = img;
-            nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
-        }
+//        if (me != null) {
+//            // Display the Avatar Photo
+//            RoundImgDrawable img = loadMyAvatar();
+//            mReservedCountImgView.setImageDrawable(img);
+//            me.avatar = img;
+//            nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
+//        }
 
     }
 

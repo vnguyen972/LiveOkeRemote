@@ -23,6 +23,11 @@ public class RsvpPanelHelper {
     }
 
 
+    public void updateAdapter(ArrayList<ReservedListItem> items) {
+        if (rsvpAdapter != null) {
+            rsvpAdapter.reloadData(items);
+        }
+    }
     public void refreshRsvpList(ArrayList<ReservedListItem> items) {
         if (rsvpAdapter == null) {
             Log.v(context.app.TAG, "RSVP New Adapter");

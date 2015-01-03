@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
 >
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -23,9 +23,24 @@
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
             />
+        <TextView
+            android:id="@+id/rsvpCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/now_playing_image_view"
+            android:layout_alignTop="@+id/now_playing_image_view"
+            android:layout_alignRight="@+id/now_playing_image_view"
+            android:layout_alignBottom="@+id/now_playing_image_view"
+            android:layout_margin="1dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="35dp"
+            android:text=""
+            android:textColor="@android:color/holo_red_dark"/>
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/now_playing_image_view"
             android:gravity="start"
             android:orientation="horizontal">
             <TextView
@@ -37,7 +52,7 @@
                 android:textColor="@color/white"
                 />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
     <!-- HEADER -->
     <RelativeLayout
         android:layout_width="fill_parent"

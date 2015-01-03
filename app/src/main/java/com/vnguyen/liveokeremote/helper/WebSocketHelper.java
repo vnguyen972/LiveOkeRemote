@@ -262,25 +262,28 @@ public class WebSocketHelper {
                                     }
                                 }
                             }
-                            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-
-                                @Override
-                                protected Void doInBackground(Void... params) {
-                                    if (u.avatar == null) {
-                                        u.avatar = (new DrawableHelper()).buildDrawable(u.name.substring(0, 1), "round");
-                                    }
-                                    return null;
-                                }
-
-                                @Override
-                                protected void onPostExecute(Void aVoid) {
-                                    final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
-                                    rsvpList.add(rsvpItem);
-                                    Log.v(context.app.TAG, "Refreshing rsvp list: " + rsvpList.size());
-                                    context.rsvpPanelHelper.refreshRsvpList(rsvpList);
-                                }
-                            };
-                            task.execute((Void[])null);
+                            if (u.avatar == null) {
+                                u.avatar = (new DrawableHelper()).buildDrawable(u.name.substring(0, 1), "round");
+                            }
+                            final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
+                            rsvpList.add(rsvpItem);
+//                            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+//
+//                                @Override
+//                                protected Void doInBackground(Void... params) {
+//                                    if (u.avatar == null) {
+//                                        u.avatar = (new DrawableHelper()).buildDrawable(u.name.substring(0, 1), "round");
+//                                    }
+//                                    return null;
+//                                }
+//
+//                                @Override
+//                                protected void onPostExecute(Void aVoid) {
+//                                    final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
+//                                    rsvpList.add(rsvpItem);
+//                                }
+//                            };
+//                            task.execute((Void[])null);
                         }
                     } catch (Exception ex) {
                         Log.e(context.app.TAG,ex.getMessage(),ex);
@@ -293,6 +296,7 @@ public class WebSocketHelper {
                 @Override
                 public void run() {
                     context.rsvpPanelHelper.refreshRsvpList(rsvpList);
+                    context.updateRsvpCounter(rsvpList.size());
                 }
             });
             updatingRsvpList = false;

@@ -464,6 +464,7 @@ public class NavigationDrawerHelper {
                         (new AlertDialogHelper(context)).popupFileChooser(
                                 context.mReservedCountImgView,
                                 context.getResources().getString(R.string.myAvatarURI));
+                        mDrawerList.setItemChecked(YOUR_PHOTO, false);
                         break;
                     default:
                         // just close the nav bar
