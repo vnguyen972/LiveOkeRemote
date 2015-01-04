@@ -91,6 +91,10 @@ public class UDPBroadcastHelper {
                 c.close();
             } catch (SocketTimeoutException e) {
                 e.printStackTrace();
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

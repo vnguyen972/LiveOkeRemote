@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -134,6 +135,13 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        try {
+            ((TextView)findViewById(R.id.app_version_id)).setText(
+                    getPackageManager().getPackageInfo(getPackageName(),0).versionName
+            );
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(app.TAG,e.getMessage(),e);
+        }
         //-- Create AdView ---------------
         AdView adView = (AdView)this.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()

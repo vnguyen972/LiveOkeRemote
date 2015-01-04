@@ -132,6 +132,7 @@ public class WebSocketHelper {
                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                                 .textColor(Color.WHITE)
                                 .text("Disconnected!"));
+                        mWebSocketClient = null;
                         }
                 });
             }
@@ -151,6 +152,7 @@ public class WebSocketHelper {
                                 .text("ERROR: " + errMsg));
                     }
                 });
+                mWebSocketClient = null;
             }
         };
     }
