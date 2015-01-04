@@ -308,56 +308,13 @@ public class MainActivity extends ActionBarActivity {
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
         final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
-        if (webSocketHelper != null && webSocketHelper.isConnected()) {
-            switchButton.setChecked(true);
-        }
+        connect2WSocket();
         switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Log.i(app.TAG,"SWITCHED ON");
-                    if (wsInfo == null) {
-                        wsInfo = new WebSocketInfo();
-                    }
-                    if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
-                        // if there's an IP presents
-                        wsInfo.port = "8181";
-                        wsInfo.uri = "ws://" + wsInfo.ipAddress + ":" + wsInfo.port;
-                        Log.v(app.TAG,"URI = " + wsInfo.uri);
-                        if (webSocketHelper == null) {
-                            webSocketHelper = new WebSocketHelper(MainActivity.this);
-                        }
-                        webSocketHelper.connect();
-                    } else{
-                        // if not, we will search the network for it
-                        new Thread(new Runnable() {
-                            //WebSocketInfo _wsInfo;
-                            @Override
-                            public void run() {
-                                UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
-                                wsInfo = udpHelper.findServer();
-                                if (wsInfo != null) {
-                                    if (webSocketHelper == null) {
-                                        webSocketHelper = new WebSocketHelper(MainActivity.this);
-                                    }
-                                    webSocketHelper.connect();
-                                } else {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            switchButton.toggle();
-                                            SnackbarManager.show(Snackbar.with(MainActivity.this)
-                                                    .type(SnackbarType.MULTI_LINE)
-                                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                                    .textColor(Color.WHITE)
-                                                    .color(Color.RED)
-                                                    .text("ERROR: Unable to find LiveOke!"));
-                                        }
-                                    });
-                                }
-                            }
-                        }).start();
-                    }
+                    connect2WSocket();
                 } else {
                     if (webSocketHelper != null) {
                         webSocketHelper.disconnect();
@@ -420,6 +377,51 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    private void connect2WSocket() {
+        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+        if (wsInfo == null) {
+            wsInfo = new WebSocketInfo();
+        }
+        if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
+            // if there's an IP presents
+            wsInfo.port = "8181";
+            wsInfo.uri = "ws://" + wsInfo.ipAddress + ":" + wsInfo.port;
+            Log.v(app.TAG,"URI = " + wsInfo.uri);
+            if (webSocketHelper == null) {
+                webSocketHelper = new WebSocketHelper(MainActivity.this);
+            }
+            webSocketHelper.connect();
+        } else{
+            // if not, we will search the network for it
+            new Thread(new Runnable() {
+                //WebSocketInfo _wsInfo;
+                @Override
+                public void run() {
+                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
+                    wsInfo = udpHelper.findServer();
+                    if (wsInfo != null) {
+                        if (webSocketHelper == null) {
+                            webSocketHelper = new WebSocketHelper(MainActivity.this);
+                        }
+                        webSocketHelper.connect();
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                switchButton.toggle();
+                                SnackbarManager.show(Snackbar.with(MainActivity.this)
+                                        .type(SnackbarType.MULTI_LINE)
+                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                        .textColor(Color.WHITE)
+                                        .color(Color.RED)
+                                        .text("ERROR: Unable to find LiveOke!"));
+                            }
+                        });
+                    }
+                }
+            }).start();
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -450,8 +452,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void setupReservedPanel() {
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
-        mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/VPSLGAN.TTF"));
-        mNowPlayingTxtView.setTextSize(15);
+        mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Vegur-R_0500.otf"));
+        //mNowPlayingTxtView.setTextSize(20);
 
         mReservedCountImgView = (ImageView) findViewById(R.id.now_playing_image_view);
         mReservedCountImgView.setOnClickListener(new View.OnClickListener() {

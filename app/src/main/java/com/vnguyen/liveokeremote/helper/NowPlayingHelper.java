@@ -2,8 +2,10 @@ package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.text.Html;
+import android.widget.TextView;
 
 import com.vnguyen.liveokeremote.MainActivity;
+import com.vnguyen.liveokeremote.R;
 
 import java.util.Stack;
 
@@ -25,6 +27,9 @@ public class NowPlayingHelper {
     public void setTitle(String title) {
         if (!titleStack.isEmpty()) {
             titleStack.clear();
+        }
+        if (context.mNowPlayingTxtView == null ) {
+            context.mNowPlayingTxtView = (TextView) context.findViewById(R.id.now_playing_text_view);
         }
         context.mNowPlayingTxtView.setText(Html.fromHtml(title));
     }

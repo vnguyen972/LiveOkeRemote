@@ -74,6 +74,15 @@ public class WebSocketHelper {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 Log.i(context.app.TAG, "Websocket: Opened");
+                final SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+                if (!onOffSwitch.isChecked()) {
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onOffSwitch.toggle();
+                        }
+                    });
+                }
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
