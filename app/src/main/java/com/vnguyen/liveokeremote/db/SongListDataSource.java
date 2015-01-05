@@ -83,6 +83,10 @@ public class SongListDataSource {
     public boolean importDB(String dbPath) throws IOException {
         return dbHelper.importDatabase(dbPath);
     }
+
+    public void saveDB(String command) throws IOException {
+        dbHelper.saveDB2SD();
+    }
     public String getDBName() {
         return dbHelper.getDatabaseName();
     }

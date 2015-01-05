@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -40,6 +41,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.androidquery.AQuery;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -123,6 +126,7 @@ public class MainActivity extends ActionBarActivity {
     public MenuItem onOffSwitch;
     public ViewPager mViewPager;
     public SongsListPageAdapter mSongsListPagerAdapter;
+    public Menu mainMenu;
 
     // Admob Add
     InterstitialAd interstitialAd;
@@ -168,6 +172,15 @@ public class MainActivity extends ActionBarActivity {
         aquiredPhoto = new AquiredPhoto();
 
         db = new SongListDataSource(MainActivity.this);
+        try {
+            String path = Environment.getExternalStorageDirectory().getPath()+"/liveoke-remote/"+db.getDBName();
+            Log.d(app.TAG, "Importing the database (if a backup found): " + path);
+            boolean status = false;
+            status = db.importDB(path);
+            Log.d(app.TAG,"Done?: " + status);
+        } catch (IOException e) {
+            Log.e(app.TAG,e.getMessage(),e);
+        }
 
         pagerTitles = new ConcurrentHashMap<>();
         getPagerTitles();
@@ -313,6 +326,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        mainMenu = menu;
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
         final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
@@ -353,7 +367,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         //searchView.setMaxWidth(800);
         Log.v(app.TAG, searchView + "");
         if (searchView != null) {
@@ -375,6 +389,7 @@ public class MainActivity extends ActionBarActivity {
                     Log.v(app.TAG,"SEARCH FOR = " + query);
                     getPagerSearch(query);
                     updateMainDisplay();
+                    searchView.clearFocus();
                     return true;
                 }
             };
@@ -430,6 +445,37 @@ public class MainActivity extends ActionBarActivity {
             }).start();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        Log.v(app.TAG,"Back button pressed on device");
+        if (listingBy.equalsIgnoreCase("search")) {
+            MenuItem menuSearch = mainMenu.findItem(R.id.menu_search);
+            menuSearch.collapseActionView();
+            getPagerTitles();
+            updateMainDisplay();
+        } else {
+            new MaterialDialog.Builder(this)
+                    .title("Quit Application.")
+                    .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                    .content("Do you want to quit LiveOke Remote?")
+                    .positiveText("OK")
+                    .negativeText("CANCEL")
+                    .callback(new MaterialDialog.Callback() {
+
+                        @Override
+                        public void onNegative(MaterialDialog materialDialog) {
+                        }
+
+                        @Override
+                        public void onPositive(MaterialDialog materialDialog) {
+                            finish();
+                        }
+                    })
+                    .show();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will

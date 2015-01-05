@@ -3,6 +3,7 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.MainActivity;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 public class SongSQLiteHelper extends SQLiteOpenHelper {
 
@@ -97,6 +99,39 @@ public class SongSQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(FAVORITE_SONG_CONNECTION_DB_CREATE);
         database.execSQL(SQL_CREATE_FAVORITE_INDEX);
         database.execSQL(SQL_CREATE_INDEX);
+    }
+
+    public void saveDB2SD() throws IOException {
+        File sd = Environment.getExternalStorageDirectory();
+        File data = new File(Environment.getDataDirectory(),"data/"+ma.getPackageName());
+
+        if (sd.canWrite()) {
+            File databaseDir = new File(data,"databases");
+            if (!databaseDir.exists()) {
+                databaseDir.mkdir();
+            }
+            String currentDBPath = "songslist.db";
+            File sdDir = new File(sd,"liveoke-remote");
+            if (!sdDir.exists()) {
+                sdDir.mkdir();
+            }
+            String backupDBPath = "songslist.db";
+            File currentDB;
+            File backupDB;
+            Log.d(ma.app.TAG,"currentDBPath = " + databaseDir+ "/"+currentDBPath);
+            currentDB = new File(databaseDir, currentDBPath);
+            backupDB = new File(sdDir, backupDBPath);
+
+            if (currentDB.exists()) {
+                Log.d(ma.app.TAG, "Copying databases to SD card...");
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                Log.v(ma.app.TAG,"Done copying database.");
+            }
+        }
     }
 
     public boolean importDatabase(String dbPath) throws IOException {

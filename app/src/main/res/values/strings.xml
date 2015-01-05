@@ -20,12 +20,15 @@
         <item>Vietnamese Songs</item>
         <item>English Songs</item>
         <item>Chinese Songs</item>
-        <item>Settings</item>
-        <item>IP Address</item>
-        <item>Friends List</item>
-        <item>Update Songs List</item>
+        <item>Featured Commands</item>
         <item>Comment to Screen</item>
+        <item>Toggle Full Screen</item>
+        <item>Backup to SD</item>
+        <item>Update Songs List</item>
+        <item>Settings</item>
+        <item>Friends List</item>
         <item>Set your photo</item>
+        <item>IP Address</item>
         <item>MasterCode</item>
         <item>Help</item>
     </string-array>

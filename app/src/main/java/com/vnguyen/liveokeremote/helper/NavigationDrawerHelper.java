@@ -32,6 +32,7 @@ import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,6 +44,7 @@ public class NavigationDrawerHelper {
     public NavDrawerListAdapter navAdapter;
     private ConcurrentHashMap<String, String> dataMap;
 
+    // MUST match the order of the text on strings.xml (nav_menu_items)
     public static final int HOME = 0;
     public static final int HEADER_1 = 1;
     public static final int FAVORITED_SONGS = 2;
@@ -50,13 +52,16 @@ public class NavigationDrawerHelper {
     public static final int EN_SONGS = 4;
     public static final int CN_SONGS = 5;
     public static final int HEADER_2 = 6;
-    public static final int IP_ADDRESS = 7;
-    public static final int FRIENDS_LIST = 8;
-    public static final int UPDATE_SONGS_LIST = 9;
-    public static final int COMMENT_TO_SCREEN = 10;
-    public static final int YOUR_PHOTO = 11;
-    public static final int MASTER_CODE = 12;
-    public static final int HELP = 13;
+    public static final int COMMENT_TO_SCREEN = 7;
+    public static final int TOGGLE_FULL_SCREEN = 8;
+    public static final int BACKUP_TO_SD = 9;
+    public static final int UPDATE_SONGS_LIST = 10;
+    public static final int HEADER_3 = 11;
+    public static final int FRIENDS_LIST = 12;
+    public static final int YOUR_PHOTO = 13;
+    public static final int IP_ADDRESS = 14;
+    public static final int MASTER_CODE = 15;
+    public static final int HELP = 16;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -246,6 +251,37 @@ public class NavigationDrawerHelper {
                     (new AlertDialogHelper(context)).
                             popupMasterCode("Enter Server Master Code");
                     mDrawerList.setItemChecked(MASTER_CODE, false);
+                } else if (mDrawerList.getCheckedItemPosition() == TOGGLE_FULL_SCREEN) {
+                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                        context.webSocketHelper.sendMessage("togglefullscreen");
+                    } else {
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(Color.RED)
+                                .text("ERROR: Not Connected"));
+                    }
+                    mDrawerList.setItemChecked(TOGGLE_FULL_SCREEN, false);
+                } else if (mDrawerList.getCheckedItemPosition() == BACKUP_TO_SD) {
+                    try {
+                        context.db.saveDB("export");
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(Color.BLACK)
+                                .text("Successfully backup songslist.db to SD Card."));
+                    } catch (IOException e) {
+                        Log.e(context.app.TAG,e.getMessage(),e);
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(Color.RED)
+                                .text("ERROR: " + e.getMessage()));
+                    }
+                    mDrawerList.setItemChecked(BACKUP_TO_SD, false);
                 }
             }
 
@@ -288,6 +324,8 @@ public class NavigationDrawerHelper {
                     }
                     break;
                 case HEADER_1:
+                case HEADER_2:
+                case HEADER_3:
                     // Songs List header
                     iconDrawable = null;
                     showCounter = false;
@@ -348,11 +386,6 @@ public class NavigationDrawerHelper {
                         context.db.close();
                     }
                     break;
-                case HEADER_2:
-                    // Settings header
-                    iconDrawable = null;
-                    showCounter = false;
-                    break;
                 case IP_ADDRESS:
                     // IP Address
 //                    iconDrawable = new com.joanzapata.android.iconify.IconDrawable(getApplicationContext(),
@@ -389,6 +422,20 @@ public class NavigationDrawerHelper {
                     send2ScreenIcon.setIcon("gmd-insert-comment");
                     send2ScreenIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = send2ScreenIcon;
+                    showCounter = false;
+                    break;
+                case TOGGLE_FULL_SCREEN:
+                    IconicFontDrawable toggleScreenIcon = new IconicFontDrawable(context.getApplicationContext());
+                    toggleScreenIcon.setIcon("gmd-aspect-ratio");
+                    toggleScreenIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = toggleScreenIcon;
+                    showCounter = false;
+                    break;
+                case BACKUP_TO_SD:
+                    IconicFontDrawable backupSDIcon = new IconicFontDrawable(context.getApplicationContext());
+                    backupSDIcon.setIcon("gmd-archive");
+                    backupSDIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = backupSDIcon;
                     showCounter = false;
                     break;
                 case YOUR_PHOTO:
