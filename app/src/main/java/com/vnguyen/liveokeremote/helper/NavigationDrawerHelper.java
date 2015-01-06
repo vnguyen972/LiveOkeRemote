@@ -197,6 +197,11 @@ public class NavigationDrawerHelper {
                                                 context.getPagerTitles();
                                                 context.updateMainDisplay();
                                                 adh.dismissProgress();
+                                                try {
+                                                    context.db.saveDB();
+                                                } catch (IOException e) {
+                                                    Log.e(context.app.TAG,e.getMessage(),e);
+                                                }
                                             }
                                         };
                                         Log.v(context.app.TAG,"Exec: getsonglist");
@@ -265,7 +270,7 @@ public class NavigationDrawerHelper {
                     mDrawerList.setItemChecked(TOGGLE_FULL_SCREEN, false);
                 } else if (mDrawerList.getCheckedItemPosition() == BACKUP_TO_SD) {
                     try {
-                        context.db.saveDB("export");
+                        context.db.saveDB();
                         SnackbarManager.show(Snackbar.with(context)
                                 .type(SnackbarType.MULTI_LINE)
                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)

@@ -84,7 +84,7 @@ public class SongListDataSource {
         return dbHelper.importDatabase(dbPath);
     }
 
-    public void saveDB(String command) throws IOException {
+    public void saveDB() throws IOException {
         dbHelper.saveDB2SD();
     }
     public String getDBName() {
@@ -624,6 +624,7 @@ public class SongListDataSource {
     public ConcurrentHashMap<String, String> getLanguageKeysMapNumber(String language) throws Exception {
         //ConcurrentHashMap<String, String> map = new ConcurrentHashMap<String, String>();
         String query = "select count(*) from songslist where language='"+language+"'";
+        Log.v(LiveOkeRemoteApplication.TAG,"query = " + query);
         return queryTotalPages(query);
     }
 
