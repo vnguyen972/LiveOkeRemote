@@ -36,8 +36,8 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         this.context = (MainActivity) context;
         this.songs = new ArrayList<>(songs.size());
         this.songs.addAll(songs);
-        font = Typeface.createFromAsset(context.getAssets(),"fonts/Vegur-B_0500.otf");
-        font2 = Typeface.createFromAsset(context.getAssets(),"fonts/VPSLGAN.TTF");
+        //font = Typeface.createFromAsset(context.getAssets(),"fonts/Vegur-B_0500.otf");
+        //font2 = Typeface.createFromAsset(context.getAssets(),"fonts/VPSLGAN.TTF");
     }
 
     @Override
@@ -52,6 +52,12 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
         setupActionButtonsBelow(swipeLayout);
+//        View sv = swipeLayout.findViewById(R.id.surfaceView);
+//        if (position % 2 == 0) {
+//            sv.setBackgroundColor(Color.parseColor("#ffffff"));
+//        } else {
+//            sv.setBackgroundColor(Color.parseColor("#BCF7F0"));
+//        }
         return v;
     }
 
@@ -65,6 +71,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             holder.idTxtView = (TextView) view.findViewById(R.id.song_id);
             holder.titleTxtView = (TextView) view.findViewById(R.id.song_title);
             holder.singerTxtView = (TextView) view.findViewById(R.id.song_singer);
+            holder.position = position;
             view.setTag(holder);
         }
         holder.iconImgView.setImageDrawable(song.icon);
@@ -73,18 +80,12 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         } else {
             holder.idTxtView.setText(song.id);
         }
-        holder.titleTxtView.setTypeface(font);
-//        holder.titleTxtView.setTextSize(30);
+//        holder.titleTxtView.setTypeface(font);
+//        holder.titleTxtView.setTextSize(21);
         holder.titleTxtView.setText(song.title);
-        holder.singerTxtView.setTypeface(font2);
+//        holder.singerTxtView.setTypeface(font2);
 //        holder.singerTxtView.setTextSize(30);
         holder.singerTxtView.setText(song.singer);
-//        View sv = swipeLayout.findViewById(R.id.surfaceView);
-//        if (position % 2 == 0) {
-//            sv.setBackgroundColor(Color.parseColor("#ffffff"));
-//        } else {
-//            sv.setBackgroundColor(Color.parseColor("#BCF7F0"));
-//        }
     }
 
     @Override
@@ -105,6 +106,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
     public void setupActionButtonsBelow(final SwipeLayout swipeLayout) {
         ViewGroup vBottom = swipeLayout.getBottomView();
         ViewGroup vTop = swipeLayout.getSurfaceView();
+
         final TextView songTitle = (TextView) vTop.findViewById(R.id.song_title);
 
         final TextView idNumber = (TextView) vTop.findViewById(R.id.song_id);
@@ -347,6 +349,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             TextView idTxtView;
             TextView titleTxtView;
             TextView singerTxtView;
+            int position;
     }
 
 }

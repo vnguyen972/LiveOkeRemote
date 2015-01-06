@@ -506,7 +506,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void setupReservedPanel() {
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
-        mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Vegur-R_0500.otf"));
+        //mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Vegur-R_0500.otf"));
         //mNowPlayingTxtView.setTextSize(20);
 
         mReservedCountImgView = (ImageView) findViewById(R.id.now_playing_image_view);
