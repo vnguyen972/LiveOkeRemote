@@ -1,22 +1,94 @@
 package com.vnguyen.liveokeremote.helper;
 
 
+import android.content.Context;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
+import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.data.WebSocketInfo;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.nio.ByteOrder;
 import java.util.Enumeration;
 
 public class UDPBroadcastHelper {
+
+    private MainActivity context;
+
+    public UDPBroadcastHelper(Context context) {
+        this.context = (MainActivity) context;
+    }
+
+    public static String getMyIP(final Context mContext) {
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+
+        // Convert little-endian to big-endianif needed
+        if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
+            ipAddress = Integer.reverseBytes(ipAddress);
+        }
+
+        byte[] ipByteArray = BigInteger.valueOf(ipAddress).toByteArray();
+
+        String ipAddressString;
+        try {
+            ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
+        } catch (UnknownHostException ex) {
+            Log.e(LiveOkeRemoteApplication.TAG, "Unable to get host address:" + ex.getMessage(),ex);
+            ipAddressString = null;
+        }
+
+        return ipAddressString;
+    }
+
+    public InetAddress getBroadcastAddress() throws IOException {
+        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        DhcpInfo dhcp = wifi.getDhcpInfo();
+        // handle null somehow
+
+        int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
+        byte[] quads = new byte[4];
+        for (int k = 0; k < 4; k++)
+            quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
+        return InetAddress.getByAddress(quads);
+    }
+
+    public void broadcast(String message) {
+        DatagramSocket c = null;
+
+        try {
+            //Open a random port to send the package
+            c = new DatagramSocket();
+            c.setBroadcast(true);
+
+            byte[] sendData = message.getBytes();
+
+            InetAddress address = getBroadcastAddress();
+            Log.i(context.app.TAG,"*** About to broadcast to: " + address.getHostAddress());
+            DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,getBroadcastAddress(), UDPListenerService.BROADCAST_PORT);
+            c.send(sendPacket);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
 
     public WebSocketInfo findServer() {
         DatagramSocket c;

@@ -1,7 +1,11 @@
 package com.vnguyen.liveokeremote;
 
 import android.app.Application;
+import android.graphics.Color;
 
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;

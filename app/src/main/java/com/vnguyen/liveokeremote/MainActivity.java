@@ -2,19 +2,22 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -69,6 +72,7 @@ import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 import com.vnguyen.liveokeremote.helper.WebSocketHelper;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -76,7 +80,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cat.lafosca.facecropper.FaceCropper;
@@ -127,6 +130,11 @@ public class MainActivity extends ActionBarActivity {
     public ViewPager mViewPager;
     public SongsListPageAdapter mSongsListPagerAdapter;
     public Menu mainMenu;
+
+    public Intent udpListenerServiceIntent;
+    public ServiceConnection udpServiceConnection;
+    public UDPListenerService udpListenerService;
+    public BroadcastReceiver bReceiver;
 
     // Admob Add
     InterstitialAd interstitialAd;
@@ -266,6 +274,79 @@ public class MainActivity extends ActionBarActivity {
 
         updateMainDisplay();
         loadExtra();
+
+        bReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String senderIP = intent.getStringExtra("senderIP");
+                int senderPORT = intent.getIntExtra("senderPORT",0);
+                String senderMSG = intent.getStringExtra("message");
+                Log.v(LiveOkeRemoteApplication.TAG, "Received from: " + senderIP + ":" + senderPORT);
+                Log.v(LiveOkeRemoteApplication.TAG,"Received msg: " + senderMSG);
+
+                if (!senderIP.equals(UDPBroadcastHelper.getMyIP(context))) {
+                    if (senderMSG.startsWith("Hi:")) {
+                        String senderName = senderMSG.substring(3,senderMSG.length());
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(getResources().getColor(R.color.light_blue_200))
+                                .text(senderName + " is online!"));
+                    } else if (senderMSG.startsWith("Bye:")) {
+                        String senderName = senderMSG.substring(4,senderMSG.length());
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(getResources().getColor(R.color.light_blue_200))
+                                .text(senderName + " is offline!"));
+                    }
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UDPListenerService.UDP_BROADCAST);
+        registerReceiver(bReceiver, filter);
+
+        udpListenerServiceIntent = new Intent(this, UDPListenerService.class);
+        startService(udpListenerServiceIntent);
+
+        udpServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                UDPListenerService.MyLocalBinder binder = (UDPListenerService.MyLocalBinder) service;
+                udpListenerService = binder.getService();
+                Log.v(app.TAG,"Service bound!");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
+                        helper.broadcast("Hi:" + me.name);
+                    }
+                }).start();
+                //isBound = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                //isBound = flase;
+            }
+        };
+        bindService(udpListenerServiceIntent,udpServiceConnection,0);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(bReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
     }
 
     public void loadExtra() {
@@ -320,6 +401,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unbindService(udpServiceConnection);
+        stopService(udpListenerServiceIntent);
     }
 
     @Override
@@ -330,7 +413,7 @@ public class MainActivity extends ActionBarActivity {
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
         final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
-        connect2WSocket();
+        //connect2WSocket();
         switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -420,7 +503,7 @@ public class MainActivity extends ActionBarActivity {
                 //WebSocketInfo _wsInfo;
                 @Override
                 public void run() {
-                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
+                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper(MainActivity.this);
                     wsInfo = udpHelper.findServer();
                     if (wsInfo != null) {
                         if (webSocketHelper == null) {
@@ -469,6 +552,13 @@ public class MainActivity extends ActionBarActivity {
 
                         @Override
                         public void onPositive(MaterialDialog materialDialog) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
+                                    helper.broadcast("Bye:" + me.name);
+                                }
+                            }).start();
                             finish();
                         }
                     })
