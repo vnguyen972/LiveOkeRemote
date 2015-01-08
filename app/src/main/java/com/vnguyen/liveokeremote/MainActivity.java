@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,7 +29,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
@@ -37,7 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -330,7 +329,7 @@ public class MainActivity extends ActionBarActivity {
                         UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
                         LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
                                 getResources().getString(R.string.app_name), me.name);
-                        helper.broadcast((new Gson()).toJson(bcMsg));
+                        helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg));
                     }
                 }).start();
                 //isBound = true;
@@ -343,13 +342,13 @@ public class MainActivity extends ActionBarActivity {
         };
         bindService(udpListenerServiceIntent,udpServiceConnection,0);
 
-        liveOkeUDPClient = new LiveOkeUDPClient() {
+        liveOkeUDPClient = new LiveOkeUDPClient(MainActivity.this) {
             @Override
             public void onReceived(String message) {
                 Log.v(app.TAG,"RESPONSE: " + message);
             }
         };
-        //liveOkeClient.sendMessage("getsonglist");
+        //liveOkeUDPClient.sendMessage("WhoYouAre");
     }
 
     @Override
@@ -365,6 +364,7 @@ public class MainActivity extends ActionBarActivity {
         Log.v(app.TAG, "*** App RESUMING ***");
         registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
     }
+
 
     public void loadExtra() {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
@@ -429,22 +429,23 @@ public class MainActivity extends ActionBarActivity {
         mainMenu = menu;
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
-        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+
+//        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
         //connect2WSocket();
-        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.i(app.TAG,"SWITCHED ON");
-                    connect2WSocket();
-                } else {
-                    if (webSocketHelper != null) {
-                        webSocketHelper.disconnect();
-                    }
-                    Log.i(app.TAG, "SWITCHED OFF");
-                }
-            }
-        });
+//        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked) {
+//                    Log.i(app.TAG,"SWITCHED ON");
+//                    connect2WSocket();
+//                } else {
+//                    if (webSocketHelper != null) {
+//                        webSocketHelper.disconnect();
+//                    }
+//                    Log.i(app.TAG, "SWITCHED OFF");
+//                }
+//            }
+//        });
 
 
         IconDrawable searchIcon = new IconDrawable(getApplicationContext(), Iconify.IconValue.md_search);
@@ -501,7 +502,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void connect2WSocket() {
-        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+//        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
         if (wsInfo == null) {
             wsInfo = new LiveOkeSocketInfo();
         }
@@ -531,7 +532,7 @@ public class MainActivity extends ActionBarActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                switchButton.toggle();
+                                //switchButton.toggle();
                                 SnackbarManager.show(Snackbar.with(MainActivity.this)
                                         .type(SnackbarType.MULTI_LINE)
                                         .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
@@ -576,7 +577,7 @@ public class MainActivity extends ActionBarActivity {
                                     LiveOkeRemoteBroadcastMsg bcMsg =
                                             new LiveOkeRemoteBroadcastMsg("Bye",
                                                     getResources().getString(R.string.app_name),me.name);
-                                    helper.broadcast((new Gson()).toJson(bcMsg));
+                                    helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg));
                                 }
                             }).start();
                             finish();
@@ -616,7 +617,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void setupReservedPanel() {
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
-        //mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Vegur-R_0500.otf"));
+        mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/NotoSans/NotoSans-Regular.ttf"));
         //mNowPlayingTxtView.setTextSize(20);
 
         mReservedCountImgView = (ImageView) findViewById(R.id.now_playing_image_view);
@@ -640,15 +641,6 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
-//        Log.v(app.TAG,"Building the RSVP Panel");
-//        rsvpPanelHelper.refreshRsvpList(app.generateTestRsvpList());
-//        if (me != null) {
-//            // Display the Avatar Photo
-//            RoundImgDrawable img = loadMyAvatar();
-//            mReservedCountImgView.setImageDrawable(img);
-//            me.avatar = img;
-//            nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
-//        }
 
     }
 

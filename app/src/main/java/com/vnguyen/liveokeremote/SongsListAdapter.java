@@ -36,8 +36,8 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         this.context = (MainActivity) context;
         this.songs = new ArrayList<>(songs.size());
         this.songs.addAll(songs);
-        //font = Typeface.createFromAsset(context.getAssets(),"fonts/Vegur-B_0500.otf");
-        //font2 = Typeface.createFromAsset(context.getAssets(),"fonts/VPSLGAN.TTF");
+        font = Typeface.createFromAsset(context.getAssets(),"fonts/NotoSans/NotoSans-Bold.ttf");
+        font2 = Typeface.createFromAsset(context.getAssets(),"fonts/NotoSans/NotoSans-Italic.ttf");
     }
 
     @Override
@@ -80,10 +80,10 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         } else {
             holder.idTxtView.setText(song.id);
         }
-//        holder.titleTxtView.setTypeface(font);
+        holder.titleTxtView.setTypeface(font);
 //        holder.titleTxtView.setTextSize(21);
         holder.titleTxtView.setText(song.title);
-//        holder.singerTxtView.setTypeface(font2);
+        holder.singerTxtView.setTypeface(font2);
 //        holder.singerTxtView.setTextSize(30);
         holder.singerTxtView.setText(song.singer);
     }

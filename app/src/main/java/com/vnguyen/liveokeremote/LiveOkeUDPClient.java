@@ -1,8 +1,11 @@
 package com.vnguyen.liveokeremote;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.data.LiveOkeSocketInfo;
+import com.vnguyen.liveokeremote.helper.UDPHelper;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -11,16 +14,28 @@ import java.net.SocketTimeoutException;
 
 public abstract class LiveOkeUDPClient implements UDPClientListener {
     public LiveOkeSocketInfo liveOkeSocketInfo;
-
     private DatagramSocket cSocket;
+    private MainActivity context;
 
-    LiveOkeUDPClient() {
+    LiveOkeUDPClient(final Context context) {
+        this.context = (MainActivity) context;
         // hunt for LiveOke address here
         // but for now default it
         liveOkeSocketInfo = new LiveOkeSocketInfo();
-        liveOkeSocketInfo.ipAddress = "192.168.1.122";
         liveOkeSocketInfo.port = "8888";
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                (new UDPHelper(context)).findLiveOke(liveOkeSocketInfo);
+                return null;
+            }
 
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Log.v(LiveOkeRemoteApplication.TAG,"IP = " + liveOkeSocketInfo.ipAddress);
+            }
+        };
+        task.execute((Void[]) null);
     }
 
     public void sendMessage(final String sendMsg) {

@@ -65,7 +65,8 @@ public class UDPBroadcastHelper {
         return InetAddress.getByAddress(quads);
     }
 
-    public void broadcast(String message) {
+
+    public void broadcastToOtherSelves(String message) {
         DatagramSocket c = null;
 
         try {

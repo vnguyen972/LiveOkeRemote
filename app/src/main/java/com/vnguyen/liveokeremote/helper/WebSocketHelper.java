@@ -1,11 +1,7 @@
 package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -16,7 +12,6 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
-import com.vnguyen.liveokeremote.RoundImgDrawable;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
@@ -37,8 +32,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import cat.lafosca.facecropper.FaceCropper;
 
 public class WebSocketHelper {
     private WebSocketClient mWebSocketClient;
@@ -74,15 +67,15 @@ public class WebSocketHelper {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 Log.i(context.app.TAG, "Websocket: Opened");
-                final SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
-                if (!onOffSwitch.isChecked()) {
-                    context.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            onOffSwitch.toggle();
-                        }
-                    });
-                }
+//                final SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+//                if (!onOffSwitch.isChecked()) {
+//                    context.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            onOffSwitch.toggle();
+//                        }
+//                    });
+//                }
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -107,10 +100,10 @@ public class WebSocketHelper {
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
-                        if (onOffSwitch.isChecked()) {
-                            onOffSwitch.toggle();
-                        }
+//                        SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
+//                        if (onOffSwitch.isChecked()) {
+//                            onOffSwitch.toggle();
+//                        }
                         FloatingActionButton playButton = (FloatingActionButton) context.findViewById(R.id.playBtn);
                         if (playButton.getTag().equals("PAUSE")) {
                             final IconDrawable pauseBtnIcon = new IconDrawable(context, Iconify.IconValue.md_pause);
