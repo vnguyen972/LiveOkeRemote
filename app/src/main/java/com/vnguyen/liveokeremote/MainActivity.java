@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -326,10 +327,18 @@ public class MainActivity extends ActionBarActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
-                        LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
-                                getResources().getString(R.string.app_name), me.name);
-                        helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg));
+                        UDPBroadcastHelper helper = new UDPBroadcastHelper();
+                        if (me != null) {
+                            LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                                    getResources().getString(R.string.app_name), me.name);
+                            helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
+                            liveOkeUDPClient = new LiveOkeUDPClient(MainActivity.this) {
+                                @Override
+                                public void onReceived(String message) {
+                                    Log.v(app.TAG,"RESPONSE: " + message);
+                                }
+                            };
+                        }
                     }
                 }).start();
                 //isBound = true;
@@ -342,12 +351,6 @@ public class MainActivity extends ActionBarActivity {
         };
         bindService(udpListenerServiceIntent,udpServiceConnection,0);
 
-        liveOkeUDPClient = new LiveOkeUDPClient(MainActivity.this) {
-            @Override
-            public void onReceived(String message) {
-                Log.v(app.TAG,"RESPONSE: " + message);
-            }
-        };
         //liveOkeUDPClient.sendMessage("WhoYouAre");
     }
 
@@ -521,7 +524,7 @@ public class MainActivity extends ActionBarActivity {
                 //WebSocketInfo _wsInfo;
                 @Override
                 public void run() {
-                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper(MainActivity.this);
+                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
                     wsInfo = udpHelper.findServer();
                     if (wsInfo != null) {
                         if (webSocketHelper == null) {
@@ -549,7 +552,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        Log.v(app.TAG,"Back button pressed on device");
+        Log.v(app.TAG, "Back button pressed on device");
         if (listingBy.equalsIgnoreCase("search")) {
             MenuItem menuSearch = mainMenu.findItem(R.id.menu_search);
             menuSearch.collapseActionView();
@@ -573,11 +576,11 @@ public class MainActivity extends ActionBarActivity {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
+                                    UDPBroadcastHelper helper = new UDPBroadcastHelper();
                                     LiveOkeRemoteBroadcastMsg bcMsg =
                                             new LiveOkeRemoteBroadcastMsg("Bye",
                                                     getResources().getString(R.string.app_name),me.name);
-                                    helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg));
+                                    helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
                                 }
                             }).start();
                             finish();
@@ -607,7 +610,7 @@ public class MainActivity extends ActionBarActivity {
             if (backupDrawable == null) {
                 backupDrawable = mReservedCountImgView.getDrawable();
             }
-            mReservedCountImgView.setImageDrawable(drawableHelper.buildDrawable(count+"","round"));
+            mReservedCountImgView.setImageDrawable(drawableHelper.buildDrawable(count + "", "round"));
         } else {
             if (backupDrawable != null) {
                 mReservedCountImgView.setImageDrawable(backupDrawable);

@@ -1,12 +1,15 @@
 package com.vnguyen.liveokeremote.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
+import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -47,6 +50,21 @@ public class UDPListenerService extends Service {
         }
     }
 
+    public void sendMessage(String message) {
+        try {
+            byte[] sendData = message.getBytes();
+
+            InetAddress address = (new UDPBroadcastHelper()).getBroadcastAddress((WifiManager)getSystemService(Context.WIFI_SERVICE));
+            Log.i(LiveOkeRemoteApplication.TAG,"** --> About to broadcast to: " + address.getHostAddress());
+            DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,address, 8888);
+            socket.send(sendPacket);
+        } catch (Exception ex) {
+            Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
+        } finally {
+
+        }
+    }
+
     private void broadcastIntent(String senderIP, int senderPORT,String message) {
         Intent intent = new Intent(UDP_BROADCAST);
         intent.putExtra("senderIP", senderIP);
@@ -64,7 +82,7 @@ public class UDPListenerService extends Service {
                         listenAndWaitAndThrowIntent(broadcastIP);
                     }
                 } catch (Exception e) {
-                    Log.e(LiveOkeRemoteApplication.TAG, "no longer listening for UDP broadcasts cause of error " + e.getMessage(),e);
+                    Log.e(LiveOkeRemoteApplication.TAG, "no longer listening for UDP broadcasts cause of error " + e.getMessage());
                 }
             }
         });

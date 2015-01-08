@@ -27,8 +27,8 @@ public class UDPBroadcastHelper {
 
     private MainActivity context;
 
-    public UDPBroadcastHelper(Context context) {
-        this.context = (MainActivity) context;
+    public UDPBroadcastHelper() {
+
     }
 
     public static String getMyIP(final Context mContext) {
@@ -53,8 +53,8 @@ public class UDPBroadcastHelper {
         return ipAddressString;
     }
 
-    public InetAddress getBroadcastAddress() throws IOException {
-        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    public InetAddress getBroadcastAddress(WifiManager wifi) throws IOException {
+//        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         DhcpInfo dhcp = wifi.getDhcpInfo();
         // handle null somehow
 
@@ -66,7 +66,7 @@ public class UDPBroadcastHelper {
     }
 
 
-    public void broadcastToOtherSelves(String message) {
+    public void broadcastToOtherSelves(String message, WifiManager wifi) {
         DatagramSocket c = null;
 
         try {
@@ -76,10 +76,15 @@ public class UDPBroadcastHelper {
 
             byte[] sendData = message.getBytes();
 
-            InetAddress address = getBroadcastAddress();
-            Log.i(context.app.TAG,"*** About to broadcast to: " + address.getHostAddress());
-            DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,getBroadcastAddress(), UDPListenerService.BROADCAST_PORT);
-            c.send(sendPacket);
+            InetAddress address = getBroadcastAddress(wifi);
+            if (address != null) {
+                Log.i(LiveOkeRemoteApplication.TAG, "*** About to broadcast to: " + address.getHostAddress());
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, UDPListenerService.BROADCAST_PORT);
+                c.send(sendPacket);
+            } else {
+                // not on WIFI
+                Log.e(LiveOkeRemoteApplication.TAG,"*** Not on WIFI? Turn on and connect to WIFI then try again!");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());

@@ -1,6 +1,7 @@
 package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
@@ -28,7 +29,7 @@ public class UDPHelper {
 
             byte[] sendData = "WhoYouAre".getBytes();
 
-            InetAddress address = (new UDPBroadcastHelper(context)).getBroadcastAddress();
+            InetAddress address = (new UDPBroadcastHelper()).getBroadcastAddress((WifiManager)context.getSystemService(Context.WIFI_SERVICE));
             Log.i(context.app.TAG,"--> About to broadcast to: " + address.getHostAddress());
             DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,address, Integer.parseInt(info.port));
             c.send(sendPacket);

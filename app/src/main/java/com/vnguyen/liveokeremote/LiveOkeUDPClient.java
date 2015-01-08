@@ -23,19 +23,24 @@ public abstract class LiveOkeUDPClient implements UDPClientListener {
         // but for now default it
         liveOkeSocketInfo = new LiveOkeSocketInfo();
         liveOkeSocketInfo.port = "8888";
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                (new UDPHelper(context)).findLiveOke(liveOkeSocketInfo);
-                return null;
-            }
+        initClient();
+//        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+//            @Override
+//            protected Void doInBackground(Void... params) {
+//                (new UDPHelper(context)).findLiveOke(liveOkeSocketInfo);
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                Log.v(LiveOkeRemoteApplication.TAG,"IP = " + liveOkeSocketInfo.ipAddress);
+//            }
+//        };
+//        task.execute((Void[]) null);
+    }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                Log.v(LiveOkeRemoteApplication.TAG,"IP = " + liveOkeSocketInfo.ipAddress);
-            }
-        };
-        task.execute((Void[]) null);
+    private void initClient() {
+        context.udpListenerService.sendMessage("WhoYouAre");
     }
 
     public void sendMessage(final String sendMsg) {
