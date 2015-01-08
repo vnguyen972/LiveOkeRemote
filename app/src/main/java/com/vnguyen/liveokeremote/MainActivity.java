@@ -72,6 +72,7 @@ import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
+import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
 import com.vnguyen.liveokeremote.helper.WebSocketHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
@@ -112,6 +113,8 @@ public class MainActivity extends ActionBarActivity {
     public WebSocketHelper webSocketHelper;
     public NowPlayingHelper nowPlayingHelper;
     public BackupHelper backupHelper;
+    public UDPResponseHelper udpResponseHelper;
+
     public SongListDataSource db;
     public String searchStr;
 
@@ -275,45 +278,6 @@ public class MainActivity extends ActionBarActivity {
         updateMainDisplay();
         loadExtra();
 
-        bReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String senderIP = intent.getStringExtra("senderIP");
-                int senderPORT = intent.getIntExtra("senderPORT",0);
-                String senderMSG = intent.getStringExtra("message");
-                Log.v(LiveOkeRemoteApplication.TAG, "Received from: " + senderIP + ":" + senderPORT);
-                Log.v(LiveOkeRemoteApplication.TAG,"Received msg: " + senderMSG);
-                LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG,LiveOkeRemoteBroadcastMsg.class);
-                // if the message coming from this app
-                if (!msg.from.equalsIgnoreCase(getResources().getString(R.string.app_name))) {
-                    // is it really from another client with different IP?
-                    if (senderIP.equals(UDPBroadcastHelper.getMyIP(MainActivity.this))) {
-                        try {
-                            if (msg.greeting.equalsIgnoreCase("Hi")) {
-                                SnackbarManager.show(Snackbar.with(context)
-                                        .type(SnackbarType.MULTI_LINE)
-                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                        .textColor(Color.WHITE)
-                                        .color(getResources().getColor(R.color.indigo_500))
-                                        .text(msg.name + " is online!"));
-                            } else if (msg.greeting.equalsIgnoreCase("Bye")) {
-                                SnackbarManager.show(Snackbar.with(context)
-                                        .type(SnackbarType.MULTI_LINE)
-                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                        .textColor(Color.WHITE)
-                                        .color(getResources().getColor(R.color.indigo_500))
-                                        .text(msg.name + " is offline!"));
-                            }
-                        } catch (Exception e) {
-                            Log.e(app.TAG, e.getMessage(), e);
-                        }
-                    }
-                }
-            }
-        };
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(UDPListenerService.UDP_BROADCAST);
-        registerReceiver(bReceiver, filter);
 
         udpListenerServiceIntent = new Intent(this, UDPListenerService.class);
         startService(udpListenerServiceIntent);
@@ -334,10 +298,16 @@ public class MainActivity extends ActionBarActivity {
                             helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
                             liveOkeUDPClient = new LiveOkeUDPClient(MainActivity.this) {
                                 @Override
-                                public void onReceived(String message) {
-                                    Log.v(app.TAG,"RESPONSE: " + message);
+                                public void onReceive(Context context, Intent intent) {
+                                    if (udpResponseHelper == null) {
+                                        udpResponseHelper = new UDPResponseHelper(MainActivity.this);
+                                    }
+                                    udpResponseHelper.processResponseIntent(intent);
                                 }
                             };
+                            IntentFilter filter = new IntentFilter();
+                            filter.addAction(UDPListenerService.UDP_BROADCAST);
+                            registerReceiver(liveOkeUDPClient, filter);
                         }
                     }
                 }).start();
@@ -350,22 +320,26 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         bindService(udpListenerServiceIntent,udpServiceConnection,0);
-
-        //liveOkeUDPClient.sendMessage("WhoYouAre");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.v(app.TAG,"*** App PAUSING ***");
-        unregisterReceiver(bReceiver);
+        //unregisterReceiver(bReceiver);
+        try {
+            unregisterReceiver(liveOkeUDPClient);
+        } catch (IllegalArgumentException ex) {
+            // receiver isn't registered.
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.v(app.TAG, "*** App RESUMING ***");
-        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
+//        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
+        registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
     }
 
 

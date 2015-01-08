@@ -1,18 +1,17 @@
 package com.vnguyen.liveokeremote;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.data.LiveOkeSocketInfo;
-import com.vnguyen.liveokeremote.helper.UDPHelper;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
-public abstract class LiveOkeUDPClient implements UDPClientListener {
+public abstract class LiveOkeUDPClient extends BroadcastReceiver {
     public LiveOkeSocketInfo liveOkeSocketInfo;
     private DatagramSocket cSocket;
     private MainActivity context;
@@ -24,23 +23,14 @@ public abstract class LiveOkeUDPClient implements UDPClientListener {
         liveOkeSocketInfo = new LiveOkeSocketInfo();
         liveOkeSocketInfo.port = "8888";
         initClient();
-//        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                (new UDPHelper(context)).findLiveOke(liveOkeSocketInfo);
-//                return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                Log.v(LiveOkeRemoteApplication.TAG,"IP = " + liveOkeSocketInfo.ipAddress);
-//            }
-//        };
-//        task.execute((Void[]) null);
     }
 
     private void initClient() {
-        context.udpListenerService.sendMessage("WhoYouAre");
+        if (context.udpListenerService != null) {
+            // if udp listener service bound (we have access to it)
+            // then go look for LiveOke instance running on the network
+            context.udpListenerService.sendMessageBroadcast("WhoYouAre");
+        }
     }
 
     public void sendMessage(final String sendMsg) {
@@ -66,7 +56,7 @@ public abstract class LiveOkeUDPClient implements UDPClientListener {
                             DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
                             cSocket.receive(receivePacket);
                             response = new String(receivePacket.getData()).trim();
-                            onReceived(response);
+                            //onReceived(response);
                         }
                     }
                 } catch (SocketTimeoutException x) {

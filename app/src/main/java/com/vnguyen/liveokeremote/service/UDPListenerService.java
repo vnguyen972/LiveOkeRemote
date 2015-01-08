@@ -50,7 +50,7 @@ public class UDPListenerService extends Service {
         }
     }
 
-    public void sendMessage(String message) {
+    public void sendMessageBroadcast(String message) {
         try {
             byte[] sendData = message.getBytes();
 
@@ -104,7 +104,7 @@ public class UDPListenerService extends Service {
         int senderPORT = packet.getPort();
         String message = new String(packet.getData()).trim();
 
-        Log.e(LiveOkeRemoteApplication.TAG, "Got UDB broadcast from " + senderIP + ", message: " + message);
+        Log.e(LiveOkeRemoteApplication.TAG, "Got UDP broadcast from " + senderIP + ", message: " + message);
 
         broadcastIntent(senderIP, senderPORT, message);
         //socket.close();
