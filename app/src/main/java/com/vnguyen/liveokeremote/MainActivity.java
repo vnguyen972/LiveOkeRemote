@@ -34,7 +34,6 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -50,6 +49,7 @@ import com.androidquery.AQuery;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.gson.Gson;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
 import com.nispok.snackbar.Snackbar;
@@ -57,8 +57,9 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vnguyen.liveokeremote.data.AquiredPhoto;
+import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
+import com.vnguyen.liveokeremote.data.LiveOkeSocketInfo;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.data.WebSocketInfo;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.ActionBarHelper;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
@@ -118,8 +119,7 @@ public class MainActivity extends ActionBarActivity {
     public ViewFlipper viewFlipper;
 
     // Variables to hold values from POPUP dialogs in SETTINGS
-    public WebSocketInfo wsInfo;
-    public String comment2Send2Screen;
+    public LiveOkeSocketInfo wsInfo;
 
     // GUI Components
     public DrawerLayout mDrawerLayout;
@@ -135,11 +135,11 @@ public class MainActivity extends ActionBarActivity {
     public ServiceConnection udpServiceConnection;
     public UDPListenerService udpListenerService;
     public BroadcastReceiver bReceiver;
+    public LiveOkeUDPClient liveOkeUDPClient;
 
     // Admob Add
     InterstitialAd interstitialAd;
 
-    public OrientationEventListener myOrientationEventListener;
     public String listingBy;
 
     @Override
@@ -197,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
 
         // Load Shared Preference
         if (wsInfo == null) {
-            wsInfo = new WebSocketInfo();
+            wsInfo = new LiveOkeSocketInfo();
             wsInfo.ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                     getResources().getString(R.string.ip_adress));
             wsInfo.port = PreferencesHelper.getInstance(MainActivity.this).getPreference(
@@ -283,24 +283,30 @@ public class MainActivity extends ActionBarActivity {
                 String senderMSG = intent.getStringExtra("message");
                 Log.v(LiveOkeRemoteApplication.TAG, "Received from: " + senderIP + ":" + senderPORT);
                 Log.v(LiveOkeRemoteApplication.TAG,"Received msg: " + senderMSG);
-
-                if (!senderIP.equals(UDPBroadcastHelper.getMyIP(context))) {
-                    if (senderMSG.startsWith("Hi:")) {
-                        String senderName = senderMSG.substring(3,senderMSG.length());
-                        SnackbarManager.show(Snackbar.with(context)
-                                .type(SnackbarType.MULTI_LINE)
-                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                .textColor(Color.WHITE)
-                                .color(getResources().getColor(R.color.light_blue_200))
-                                .text(senderName + " is online!"));
-                    } else if (senderMSG.startsWith("Bye:")) {
-                        String senderName = senderMSG.substring(4,senderMSG.length());
-                        SnackbarManager.show(Snackbar.with(context)
-                                .type(SnackbarType.MULTI_LINE)
-                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                .textColor(Color.WHITE)
-                                .color(getResources().getColor(R.color.light_blue_200))
-                                .text(senderName + " is offline!"));
+                LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG,LiveOkeRemoteBroadcastMsg.class);
+                // if the message coming from this app
+                if (!msg.from.equalsIgnoreCase(getResources().getString(R.string.app_name))) {
+                    // is it really from another client with different IP?
+                    if (senderIP.equals(UDPBroadcastHelper.getMyIP(MainActivity.this))) {
+                        try {
+                            if (msg.greeting.equalsIgnoreCase("Hi")) {
+                                SnackbarManager.show(Snackbar.with(context)
+                                        .type(SnackbarType.MULTI_LINE)
+                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                        .textColor(Color.WHITE)
+                                        .color(getResources().getColor(R.color.indigo_500))
+                                        .text(msg.name + " is online!"));
+                            } else if (msg.greeting.equalsIgnoreCase("Bye")) {
+                                SnackbarManager.show(Snackbar.with(context)
+                                        .type(SnackbarType.MULTI_LINE)
+                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                        .textColor(Color.WHITE)
+                                        .color(getResources().getColor(R.color.indigo_500))
+                                        .text(msg.name + " is offline!"));
+                            }
+                        } catch (Exception e) {
+                            Log.e(app.TAG, e.getMessage(), e);
+                        }
                     }
                 }
             }
@@ -322,7 +328,9 @@ public class MainActivity extends ActionBarActivity {
                     @Override
                     public void run() {
                         UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
-                        helper.broadcast("Hi:" + me.name);
+                        LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                                getResources().getString(R.string.app_name), me.name);
+                        helper.broadcast((new Gson()).toJson(bcMsg));
                     }
                 }).start();
                 //isBound = true;
@@ -335,17 +343,26 @@ public class MainActivity extends ActionBarActivity {
         };
         bindService(udpListenerServiceIntent,udpServiceConnection,0);
 
+        liveOkeUDPClient = new LiveOkeUDPClient() {
+            @Override
+            public void onReceived(String message) {
+                Log.v(app.TAG,"RESPONSE: " + message);
+            }
+        };
+        //liveOkeClient.sendMessage("getsonglist");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.v(app.TAG,"*** App PAUSING ***");
         unregisterReceiver(bReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.v(app.TAG, "*** App RESUMING ***");
         registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
     }
 
@@ -486,7 +503,7 @@ public class MainActivity extends ActionBarActivity {
     private void connect2WSocket() {
         final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
         if (wsInfo == null) {
-            wsInfo = new WebSocketInfo();
+            wsInfo = new LiveOkeSocketInfo();
         }
         if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
             // if there's an IP presents
@@ -556,7 +573,10 @@ public class MainActivity extends ActionBarActivity {
                                 @Override
                                 public void run() {
                                     UDPBroadcastHelper helper = new UDPBroadcastHelper(MainActivity.this);
-                                    helper.broadcast("Bye:" + me.name);
+                                    LiveOkeRemoteBroadcastMsg bcMsg =
+                                            new LiveOkeRemoteBroadcastMsg("Bye",
+                                                    getResources().getString(R.string.app_name),me.name);
+                                    helper.broadcast((new Gson()).toJson(bcMsg));
                                 }
                             }).start();
                             finish();

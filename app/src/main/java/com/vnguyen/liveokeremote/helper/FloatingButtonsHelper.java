@@ -142,6 +142,7 @@ public class FloatingButtonsHelper {
                 if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                     if (playButton.getTag().equals("PLAY")) {
                         context.webSocketHelper.sendMessage("play");
+
                     } else {
                         context.webSocketHelper.sendMessage("pause");
                     }

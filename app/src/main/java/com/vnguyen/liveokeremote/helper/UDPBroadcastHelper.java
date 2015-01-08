@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
-import com.vnguyen.liveokeremote.data.WebSocketInfo;
+import com.vnguyen.liveokeremote.data.LiveOkeSocketInfo;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.IOException;
@@ -79,7 +79,6 @@ public class UDPBroadcastHelper {
             Log.i(context.app.TAG,"*** About to broadcast to: " + address.getHostAddress());
             DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,getBroadcastAddress(), UDPListenerService.BROADCAST_PORT);
             c.send(sendPacket);
-
         } catch (Exception ex) {
             ex.printStackTrace();
             Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());
@@ -90,9 +89,9 @@ public class UDPBroadcastHelper {
         }
     }
 
-    public WebSocketInfo findServer() {
+    public LiveOkeSocketInfo findServer() {
         DatagramSocket c;
-        WebSocketInfo wsInfo = null;
+        LiveOkeSocketInfo wsInfo = null;
 // Find the server using UDP broadcast
         try {
             //Open a random port to send the package
@@ -152,7 +151,7 @@ public class UDPBroadcastHelper {
                 if (message.startsWith("ws://")) {
                     //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
                     Log.v(LiveOkeRemoteApplication.TAG,"message = " + message);
-                    wsInfo = new WebSocketInfo();
+                    wsInfo = new LiveOkeSocketInfo();
                     wsInfo.uri = message.trim();
                     String address = receivePacket.getAddress().toString();
                     wsInfo.ipAddress = (address.startsWith("/") ? address.substring(1,address.length()) : address);
