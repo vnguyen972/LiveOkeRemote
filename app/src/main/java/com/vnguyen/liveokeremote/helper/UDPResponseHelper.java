@@ -4,7 +4,6 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -27,14 +26,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class UDPResponseHelper {
     private MainActivity context;
     private ArrayList<String> songRawDataList;
-    private SongListDataSource db;
 
     public UDPResponseHelper(Context context) {
         this.context = (MainActivity) context;
@@ -46,18 +43,10 @@ public class UDPResponseHelper {
         final String senderMSG = intent.getStringExtra("message");
         Log.v(LiveOkeRemoteApplication.TAG, "Received from: " + senderIP + ":" + senderPORT);
         Log.v(LiveOkeRemoteApplication.TAG, "Received msg: " + senderMSG);
-        // would this help?
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                   processMessage(senderIP, senderPORT, senderMSG);
-                return null;
-            }
-        };
-        task.execute((Void[])null);
+        processMessage(senderIP, senderMSG);
     }
 
-    public void processMessage(String senderIP, int senderPORT, String senderMSG) {
+    public void processMessage(String senderIP, String senderMSG) {
         if (senderMSG.startsWith("{")) {
             // Message is a JSON message
             final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
@@ -67,32 +56,22 @@ public class UDPResponseHelper {
                 if (!senderIP.equals(context.liveOkeUDPClient.getMyIP())) {
                     try {
                         if (msg.greeting.equalsIgnoreCase("Hi")) {
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    SnackbarManager.show(Snackbar.with(context)
-                                            .type(SnackbarType.MULTI_LINE)
-                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                            .textColor(Color.WHITE)
-                                            .color(context.getResources().getColor(R.color.indigo_500))
-                                            .text(msg.name + " is online!"));
-                                }
-                            });
+                            SnackbarManager.show(Snackbar.with(context)
+                                    .type(SnackbarType.MULTI_LINE)
+                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                    .textColor(Color.WHITE)
+                                    .color(context.getResources().getColor(R.color.indigo_500))
+                                    .text(msg.name + " is online!"));
                         } else if (msg.greeting.equalsIgnoreCase("Bye")) {
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    SnackbarManager.show(Snackbar.with(context)
-                                            .type(SnackbarType.MULTI_LINE)
-                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                            .textColor(Color.WHITE)
-                                            .color(context.getResources().getColor(R.color.indigo_500))
-                                            .text(msg.name + " is offline!"));
-                                }
-                            });
+                            SnackbarManager.show(Snackbar.with(context)
+                                    .type(SnackbarType.MULTI_LINE)
+                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                    .textColor(Color.WHITE)
+                                    .color(context.getResources().getColor(R.color.indigo_500))
+                                    .text(msg.name + " is offline!"));
                         }
                     } catch (Exception e) {
-                        Log.e(context.app.TAG, e.getMessage(), e);
+                        Log.e(LiveOkeRemoteApplication.TAG, e.getMessage(), e);
                     }
                 }
             }
@@ -109,7 +88,7 @@ public class UDPResponseHelper {
                 });
             } else if (senderMSG.equalsIgnoreCase("MasterCode:")) {
                 String code = senderMSG.substring(11, senderMSG.length());
-                if (code != null && !code.equalsIgnoreCase("")) {
+                if (!code.equalsIgnoreCase("")) {
                     context.serverMasterCode = senderMSG.substring(11, senderMSG.length());
                 }
             } else if (senderMSG.startsWith("Songlist:")) {
@@ -200,7 +179,7 @@ public class UDPResponseHelper {
                                     if (context.friendsList != null) {
                                         for (User user : context.friendsList) {
                                             if (user.name.equals(u.name)) {
-                                                Log.v(context.app.TAG,"Found requester on friendlist!");
+                                                Log.v(LiveOkeRemoteApplication.TAG,"Found requester on friendlist!");
                                                 if (user.avatarURI != null && !user.avatarURI.equals("")) {
                                                     u.avatar = user.avatar;
                                                 }
@@ -216,7 +195,7 @@ public class UDPResponseHelper {
                                 context.liveOkeUDPClient.rsvpList.add(rsvpItem);
                             }
                         } catch (Exception ex) {
-                            Log.e(context.app.TAG,ex.getMessage(),ex);
+                            Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
                         } finally {
                             context.db.close();
                         }
@@ -235,13 +214,13 @@ public class UDPResponseHelper {
                     if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
                         context.liveOkeUDPClient.songs.clear();
                     }
-                    ExecutorService executor = Executors.newFixedThreadPool(2);
+                    ExecutorService executor;
                     int cpus = Runtime.getRuntime().availableProcessors();
                     int maxThreads = cpus * 2;
                     maxThreads = (maxThreads > 0 ? maxThreads : 1);
-                    Log.d(context.app.TAG, "CPUs: " + cpus);
-                    Log.d(context.app.TAG, "Max Thread: " + maxThreads);
-                    Log.d(context.app.TAG,"Total Raw Songs: " + songRawDataList.size());
+                    Log.d(LiveOkeRemoteApplication.TAG, "CPUs: " + cpus);
+                    Log.d(LiveOkeRemoteApplication.TAG, "Max Thread: " + maxThreads);
+                    Log.d(LiveOkeRemoteApplication.TAG,"Total Raw Songs: " + songRawDataList.size());
                     executor = new ThreadPoolExecutor(
                             cpus, // core thread pool size
                             maxThreads, // maximum thread pool size
@@ -249,7 +228,7 @@ public class UDPResponseHelper {
                             TimeUnit.SECONDS,
                             new ArrayBlockingQueue<Runnable>(maxThreads, false),
                             new ThreadPoolExecutor.CallerRunsPolicy());
-                    CompletionService<Song> pool = new ExecutorCompletionService<Song>(executor);
+                    CompletionService<Song> pool = new ExecutorCompletionService<>(executor);
                     for (final String rawData : songRawDataList) {
                         pool.submit(new Callable<Song>() {
                             @Override
@@ -263,7 +242,7 @@ public class UDPResponseHelper {
                     for (int i = 0; i < mSize; i++) {
                         Song song = pool.take().get();
                         if (context.liveOkeUDPClient.songs == null) {
-                            context.liveOkeUDPClient.songs = new ArrayList<Song>();
+                            context.liveOkeUDPClient.songs = new ArrayList<>();
                         }
                         context.liveOkeUDPClient.songs.add(song);
                     }
@@ -286,14 +265,13 @@ public class UDPResponseHelper {
     }
     public void insertDBNow(ArrayList<Song> songsList) throws Exception {
         try {
-            db = new SongListDataSource(context);
+            SongListDataSource db = new SongListDataSource(context);
             db.open();
             db.getDbHelper().resetDB(db.getDatabase());
             db.insertAll(songsList);
             db.close();
-            db = null;
         } catch (Exception e) {
-            Log.e(context.app.TAG,e.getMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
             throw new Exception(e);
         }
     }

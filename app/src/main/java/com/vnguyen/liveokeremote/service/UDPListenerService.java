@@ -119,6 +119,7 @@ public class UDPListenerService extends Service {
         intent.putExtra("senderPORT", senderPORT);
         intent.putExtra("message", message);
         sendBroadcast(intent);
+        //sendOrderedBroadcast(intent,);
     }
 
     void startListenForUDPBroadcast() {
@@ -145,14 +146,14 @@ public class UDPListenerService extends Service {
         }
         //socket.setSoTimeout(1000);
         DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
-        Log.e(LiveOkeRemoteApplication.TAG, "Waiting for UDP broadcast");
+        //Log.e(LiveOkeRemoteApplication.TAG, "Waiting for UDP broadcast");
         socket.receive(packet);
 
         String senderIP = packet.getAddress().getHostAddress();
         int senderPORT = packet.getPort();
         String message = new String(packet.getData()).trim();
 
-        Log.v(LiveOkeRemoteApplication.TAG, "Got UDP broadcast from " + senderIP + ":" + senderPORT + ", message: " + message);
+        //Log.v(LiveOkeRemoteApplication.TAG, "Got UDP broadcast from " + senderIP + ":" + senderPORT + ", message: " + message);
 
         broadcastIntent(senderIP, senderPORT, message);
         //socket.close();
