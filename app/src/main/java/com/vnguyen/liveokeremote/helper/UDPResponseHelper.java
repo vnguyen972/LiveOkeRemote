@@ -4,6 +4,7 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -40,12 +41,20 @@ public class UDPResponseHelper {
     }
 
     public void processResponseIntent(Intent intent) {
-        String senderIP = intent.getStringExtra("senderIP");
-        int senderPORT = intent.getIntExtra("senderPORT", 0);
-        String senderMSG = intent.getStringExtra("message");
+        final String senderIP = intent.getStringExtra("senderIP");
+        final int senderPORT = intent.getIntExtra("senderPORT", 0);
+        final String senderMSG = intent.getStringExtra("message");
         Log.v(LiveOkeRemoteApplication.TAG, "Received from: " + senderIP + ":" + senderPORT);
         Log.v(LiveOkeRemoteApplication.TAG, "Received msg: " + senderMSG);
-        processMessage(senderIP, senderPORT, senderMSG);
+        // would this help?
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                   processMessage(senderIP, senderPORT, senderMSG);
+                return null;
+            }
+        };
+        task.execute((Void[])null);
     }
 
     public void processMessage(String senderIP, int senderPORT, String senderMSG) {
