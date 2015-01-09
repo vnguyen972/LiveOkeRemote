@@ -139,12 +139,18 @@ public class FloatingButtonsHelper {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-                    if (playButton.getTag().equals("PLAY")) {
-                        context.webSocketHelper.sendMessage("play");
-
+                if (context.liveOkeUDPClient != null) {
+                    if (context.liveOkeUDPClient.liveOkeIPAddress != null) {
+                        context.liveOkeUDPClient.sendMessage("play",
+                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                     } else {
-                        context.webSocketHelper.sendMessage("pause");
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(Color.RED)
+                                .text("ERROR: Not Connected"));
                     }
                 } else {
                     SnackbarManager.show(Snackbar.with(context)
@@ -154,6 +160,21 @@ public class FloatingButtonsHelper {
                             .color(Color.RED)
                             .text("ERROR: Not Connected"));
                 }
+//                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+//                    if (playButton.getTag().equals("PLAY")) {
+//                        context.webSocketHelper.sendMessage("play");
+//
+//                    } else {
+//                        context.webSocketHelper.sendMessage("pause");
+//                    }
+//                } else {
+//                    SnackbarManager.show(Snackbar.with(context)
+//                            .type(SnackbarType.MULTI_LINE)
+//                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+//                            .textColor(Color.WHITE)
+//                            .color(Color.RED)
+//                            .text("ERROR: Not Connected"));
+//                }
             }
         });
 
@@ -162,7 +183,8 @@ public class FloatingButtonsHelper {
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
                             .title("Are you sure?")
                             .content("Do you want to RESTART the song?")
@@ -177,7 +199,10 @@ public class FloatingButtonsHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    context.webSocketHelper.sendMessage("begine");
+                                    //context.webSocketHelper.sendMessage("begine");
+                                    context.liveOkeUDPClient.sendMessage("begine",
+                                            context.liveOkeUDPClient.liveOkeIPAddress,
+                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                 }
                             })
                             .show();
@@ -197,7 +222,8 @@ public class FloatingButtonsHelper {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
                             .title("Are you sure?")
                             .content("Do you want to SKIP to the next song?")
@@ -212,7 +238,10 @@ public class FloatingButtonsHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    context.webSocketHelper.sendMessage("next");
+                                    //context.webSocketHelper.sendMessage("next");
+                                    context.liveOkeUDPClient.sendMessage("next",
+                                            context.liveOkeUDPClient.liveOkeIPAddress,
+                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                     togglePlayBtn();
                                 }
                             })
@@ -235,7 +264,8 @@ public class FloatingButtonsHelper {
         switchAudioTrkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
                             .title("Are you sure?")
                             .content("Do you want to switch the audio track?")
@@ -250,7 +280,10 @@ public class FloatingButtonsHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    context.webSocketHelper.sendMessage("toggleaudio");
+                                    //context.webSocketHelper.sendMessage("toggleaudio");
+                                    context.liveOkeUDPClient.sendMessage("toggleaudio",
+                                            context.liveOkeUDPClient.liveOkeIPAddress,
+                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                 }
                             })
                             .show();
@@ -270,7 +303,8 @@ public class FloatingButtonsHelper {
         swapAudioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
                             .title("Are you sure?")
                             .content("Do you want to swap the audio track?")
@@ -285,7 +319,10 @@ public class FloatingButtonsHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    context.webSocketHelper.sendMessage("swap");
+                                    //context.webSocketHelper.sendMessage("swap");
+                                    context.liveOkeUDPClient.sendMessage("swap",
+                                            context.liveOkeUDPClient.liveOkeIPAddress,
+                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                 }
                             })
                             .show();

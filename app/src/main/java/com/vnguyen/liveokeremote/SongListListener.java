@@ -1,5 +1,5 @@
 package com.vnguyen.liveokeremote;
 
-public interface UDPClientListener {
+public interface SongListListener {
     public void onReceived(String message);
 }

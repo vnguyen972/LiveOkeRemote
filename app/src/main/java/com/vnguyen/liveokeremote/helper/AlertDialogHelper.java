@@ -66,10 +66,12 @@ public class AlertDialogHelper {
         splashDialog = null;
     }
     public void popupProgress(String message) {
-        progressDialog = new MaterialDialog.Builder(context)
-                .title("Please wait")
-                .customView(R.layout.progress_dialog)
-                .build();
+        if (progressDialog == null) {
+            progressDialog = new MaterialDialog.Builder(context)
+                    .title("Please wait")
+                    .customView(R.layout.progress_dialog)
+                    .build();
+        }
         View customView = progressDialog.getCustomView();
         TextView tvMessage = (TextView)customView.findViewById(R.id.progress_message);
         tvMessage.setText(message);
@@ -296,12 +298,16 @@ public class AlertDialogHelper {
                         for (Iterator<ReservedListItem> it = rItems.iterator(); it.hasNext(); ) {
                             ReservedListItem item = it.next();
                             if (item.number.equalsIgnoreCase(rsvpNumber)) {
-                                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                if (context.liveOkeUDPClient != null) {
                                     String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
                                     if (masterCode != null && !masterCode.equals("") && context.serverMasterCode != null &&
                                             !context.serverMasterCode.equals("") &&
                                             masterCode.equalsIgnoreCase(context.serverMasterCode)) {
-                                        context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
+                                        //context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
+                                        context.liveOkeUDPClient.sendMessage(wsCommand + "," + rsvpNumber,
+                                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                         if (wsCommand.equalsIgnoreCase("deleter")) {
                                             it.remove();
                                         }

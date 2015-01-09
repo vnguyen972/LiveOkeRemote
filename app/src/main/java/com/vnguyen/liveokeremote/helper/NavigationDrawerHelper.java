@@ -1,8 +1,6 @@
 package com.vnguyen.liveokeremote.helper;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -18,11 +16,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
-import com.androidquery.util.Progress;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -140,21 +136,39 @@ public class NavigationDrawerHelper {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    if (context.liveOkeUDPClient != null) {
                                         final AlertDialogHelper adh = new AlertDialogHelper(context);
                                         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                                             @Override
                                             protected void onPreExecute() {
                                                 try {
                                                     Log.v(context.app.TAG, "PRE-Exec: getsonglist");
-                                                    context.webSocketHelper.doneGettingSongList = false;
+                                                    //context.webSocketHelper.doneGettingSongList = false;
+                                                    context.liveOkeUDPClient.doneGettingSongList = false;
                                                     Log.v(context.app.TAG, "PRE-Exec: set doneGettingSongList to false");
-                                                    context.webSocketHelper.gotTotalSongResponse = false;
+                                                    //context.webSocketHelper.gotTotalSongResponse = false;
+                                                    context.liveOkeUDPClient.gotTotalSongResponse = false;
                                                     Log.v(context.app.TAG, "PRE-Exec: set gotTotalSongResponse to false");
+                                                    adh.popupProgress("Updating song list...");
+                                                } catch (Throwable t) {
+                                                    t.printStackTrace();
+                                                }
+                                            }
+
+                                            @Override
+                                            protected Void doInBackground(Void... params) {
+                                                try {
                                                     long startTime = System.currentTimeMillis();
-                                                    context.webSocketHelper.sendMessage("getsonglist");
+                                                    //context.webSocketHelper.sendMessage("getsonglist");
+//                                                    SongListWorker worker = new SongListWorker(context);
+//                                                    worker.getSongList();
+                                                    context.liveOkeUDPClient.sendMessage("getsonglist",
+                                                            context.liveOkeUDPClient.liveOkeIPAddress,
+                                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                                     Log.v(context.app.TAG, "PRE-Exec: sending 'getsonglist' command...");
-                                                    while (!context.webSocketHelper.gotTotalSongResponse) {
+                                                    //while (!context.webSocketHelper.gotTotalSongResponse) {
+                                                    while (!context.liveOkeUDPClient.gotTotalSongResponse) {
                                                         long currTime = System.currentTimeMillis();
                                                         if (currTime - startTime > 10000) {
                                                             break;
@@ -168,19 +182,17 @@ public class NavigationDrawerHelper {
                                                         // waits until got the total songs response
                                                     }
                                                     if (context.totalSong > 0) {
-                                                        adh.popupProgress("Downloading " + context.totalSong + " songs...");
+                                                        context.runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                adh.popupProgress("Downloading " + context.totalSong + " songs...");
+                                                            }
+                                                        });
                                                     }
-                                                } catch (Throwable t) {
-                                                    t.printStackTrace();
-                                                }
-                                            }
-
-                                            @Override
-                                            protected Void doInBackground(Void... params) {
-                                                try {
                                                     if (context.totalSong > 0) {
                                                         Log.v(context.app.TAG, "Exec-BG: getsonglist");
-                                                        while (!context.webSocketHelper.doneGettingSongList) {
+                                                        //while (!context.webSocketHelper.doneGettingSongList) {
+                                                        while (!context.liveOkeUDPClient.doneGettingSongList) {
                                                             Thread.sleep(1000);
                                                             // waits for all songs downloaded
                                                         }
@@ -237,8 +249,12 @@ public class NavigationDrawerHelper {
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
                                     String value = input.getEditableText().toString().trim();
-                                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-                                        context.webSocketHelper.sendMessage("msg," + value);
+                                    //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    if (context.liveOkeUDPClient != null) {
+                                        //context.webSocketHelper.sendMessage("msg," + value);
+                                        context.liveOkeUDPClient.sendMessage("msg," + value,
+                                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
@@ -257,8 +273,12 @@ public class NavigationDrawerHelper {
                             popupMasterCode("Enter Server Master Code");
                     mDrawerList.setItemChecked(MASTER_CODE, false);
                 } else if (mDrawerList.getCheckedItemPosition() == TOGGLE_FULL_SCREEN) {
-                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-                        context.webSocketHelper.sendMessage("togglefullscreen");
+                    //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                    if (context.liveOkeUDPClient != null) {
+                        //context.webSocketHelper.sendMessage("togglefullscreen");
+                        context.liveOkeUDPClient.sendMessage("togglefullscreen",
+                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                     } else {
                         SnackbarManager.show(Snackbar.with(context)
                                 .type(SnackbarType.MULTI_LINE)

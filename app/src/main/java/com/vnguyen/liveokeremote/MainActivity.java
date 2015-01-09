@@ -2,7 +2,6 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -19,6 +17,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
@@ -52,9 +51,6 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.gson.Gson;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.SnackbarManager;
-import com.nispok.snackbar.enums.SnackbarType;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vnguyen.liveokeremote.data.AquiredPhoto;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
@@ -73,7 +69,6 @@ import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
-import com.vnguyen.liveokeremote.helper.WebSocketHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.FileDescriptor;
@@ -110,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
     public ActionBarHelper actionBarHelper;
     public FriendsListHelper friendsListHelper;
     public DrawableHelper drawableHelper;
-    public WebSocketHelper webSocketHelper;
+//    public WebSocketHelper webSocketHelper;
     public NowPlayingHelper nowPlayingHelper;
     public BackupHelper backupHelper;
     public UDPResponseHelper udpResponseHelper;
@@ -136,14 +131,16 @@ public class MainActivity extends ActionBarActivity {
 
     public Intent udpListenerServiceIntent;
     public ServiceConnection udpServiceConnection;
-    public UDPListenerService udpListenerService;
-    public BroadcastReceiver bReceiver;
+    public LiveOkeSocketInfo liveOkeSocketInfo;
     public LiveOkeUDPClient liveOkeUDPClient;
 
     // Admob Add
     InterstitialAd interstitialAd;
 
     public String listingBy;
+
+    private Handler handler = new Handler();
+    private Runnable pingPong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +190,10 @@ public class MainActivity extends ActionBarActivity {
             Log.e(app.TAG,e.getMessage(),e);
         }
 
+        // Create socket info to hold LiveOke socket info with port defined in the Client
+        liveOkeSocketInfo = new LiveOkeSocketInfo();
+        liveOkeSocketInfo.port = LiveOkeUDPClient.LIVEOKE_UDP_PORT;
+
         pagerTitles = new ConcurrentHashMap<>();
         getPagerTitles();
 
@@ -203,8 +204,8 @@ public class MainActivity extends ActionBarActivity {
             wsInfo = new LiveOkeSocketInfo();
             wsInfo.ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                     getResources().getString(R.string.ip_adress));
-            wsInfo.port = PreferencesHelper.getInstance(MainActivity.this).getPreference(
-                    getResources().getString(R.string.port));
+//            wsInfo.port = PreferencesHelper.getInstance(MainActivity.this).getPreference(
+//                    getResources().getString(R.string.port));
             wsInfo.uri = "ws://"+wsInfo.ipAddress+":"+wsInfo.port;
         }
         if (myName == null) {
@@ -286,31 +287,26 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 UDPListenerService.MyLocalBinder binder = (UDPListenerService.MyLocalBinder) service;
-                udpListenerService = binder.getService();
+                UDPListenerService udpListenerService = binder.getService();
                 Log.v(app.TAG,"Service bound!");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        UDPBroadcastHelper helper = new UDPBroadcastHelper();
-                        if (me != null) {
-                            LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
-                                    getResources().getString(R.string.app_name), me.name);
-                            helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
-                            liveOkeUDPClient = new LiveOkeUDPClient(MainActivity.this) {
-                                @Override
-                                public void onReceive(Context context, Intent intent) {
-                                    if (udpResponseHelper == null) {
-                                        udpResponseHelper = new UDPResponseHelper(MainActivity.this);
-                                    }
-                                    udpResponseHelper.processResponseIntent(intent);
-                                }
-                            };
-                            IntentFilter filter = new IntentFilter();
-                            filter.addAction(UDPListenerService.UDP_BROADCAST);
-                            registerReceiver(liveOkeUDPClient, filter);
+                if (me != null) {
+                    liveOkeUDPClient = new LiveOkeUDPClient(udpListenerService,MainActivity.this) {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            if (udpResponseHelper == null) {
+                                udpResponseHelper = new UDPResponseHelper(MainActivity.this);
+                            }
+                            udpResponseHelper.processResponseIntent(intent);
                         }
-                    }
-                }).start();
+                    };
+                    IntentFilter filter = new IntentFilter();
+                    filter.addAction(UDPListenerService.UDP_BROADCAST);
+                    registerReceiver(liveOkeUDPClient, filter);
+                    // build a hello packet to broadcast to other clients like me!
+                    LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                            getResources().getString(R.string.app_name), me.name);
+                    liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null,UDPListenerService.BROADCAST_PORT);
+                }
                 //isBound = true;
             }
 
@@ -320,6 +316,21 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         bindService(udpListenerServiceIntent,udpServiceConnection,0);
+        pingPong = new Runnable() {
+            @Override
+            public void run() {
+                if (liveOkeUDPClient != null) {
+                    toggleOff();
+                    if (liveOkeUDPClient.pingCount > 5) {
+                        // after about 10 pings, reset the address
+                        liveOkeUDPClient.liveOkeIPAddress = null;
+                    }
+                    liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress,liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                    liveOkeUDPClient.pingCount++;
+                    handler.postDelayed(this, 5000);
+                }
+            }
+        };
     }
 
     @Override
@@ -332,6 +343,9 @@ public class MainActivity extends ActionBarActivity {
         } catch (IllegalArgumentException ex) {
             // receiver isn't registered.
         }
+        if (handler != null) {
+            handler.removeCallbacks(pingPong);
+        }
     }
 
     @Override
@@ -340,9 +354,19 @@ public class MainActivity extends ActionBarActivity {
         Log.v(app.TAG, "*** App RESUMING ***");
 //        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
+        handler.postDelayed(pingPong,5000);
     }
 
 
+    public void toggleOn() {
+        ImageView iv = (ImageView) onOffSwitch.getActionView().findViewById(R.id.network_status_indicator);
+        iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_radio_button_on_white_36dp));
+    }
+
+    public void toggleOff() {
+        ImageView iv = (ImageView) onOffSwitch.getActionView().findViewById(R.id.network_status_indicator);
+        iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_radio_button_off_white_36dp));
+    }
     public void loadExtra() {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             AlertDialogHelper ah = new AlertDialogHelper(MainActivity.this);
@@ -483,45 +507,45 @@ public class MainActivity extends ActionBarActivity {
         if (wsInfo == null) {
             wsInfo = new LiveOkeSocketInfo();
         }
-        if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
-            // if there's an IP presents
-            wsInfo.port = "8181";
-            wsInfo.uri = "ws://" + wsInfo.ipAddress + ":" + wsInfo.port;
-            Log.v(app.TAG,"URI = " + wsInfo.uri);
-            if (webSocketHelper == null) {
-                webSocketHelper = new WebSocketHelper(MainActivity.this);
-            }
-            webSocketHelper.connect();
-        } else{
-            // if not, we will search the network for it
-            new Thread(new Runnable() {
-                //WebSocketInfo _wsInfo;
-                @Override
-                public void run() {
-                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
-                    wsInfo = udpHelper.findServer();
-                    if (wsInfo != null) {
-                        if (webSocketHelper == null) {
-                            webSocketHelper = new WebSocketHelper(MainActivity.this);
-                        }
-                        webSocketHelper.connect();
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //switchButton.toggle();
-                                SnackbarManager.show(Snackbar.with(MainActivity.this)
-                                        .type(SnackbarType.MULTI_LINE)
-                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                        .textColor(Color.WHITE)
-                                        .color(Color.RED)
-                                        .text("ERROR: Unable to find LiveOke!"));
-                            }
-                        });
-                    }
-                }
-            }).start();
-        }
+//        if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
+//            // if there's an IP presents
+//            //wsInfo.port = "8181";
+//            wsInfo.uri = "ws://" + wsInfo.ipAddress + ":" + wsInfo.port;
+//            Log.v(app.TAG,"URI = " + wsInfo.uri);
+//            if (webSocketHelper == null) {
+//                webSocketHelper = new WebSocketHelper(MainActivity.this);
+//            }
+//            webSocketHelper.connect();
+//        } else{
+//            // if not, we will search the network for it
+//            new Thread(new Runnable() {
+//                //WebSocketInfo _wsInfo;
+//                @Override
+//                public void run() {
+//                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
+//                    wsInfo = udpHelper.findServer();
+//                    if (wsInfo != null) {
+//                        if (webSocketHelper == null) {
+//                            webSocketHelper = new WebSocketHelper(MainActivity.this);
+//                        }
+//                        webSocketHelper.connect();
+//                    } else {
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                //switchButton.toggle();
+//                                SnackbarManager.show(Snackbar.with(MainActivity.this)
+//                                        .type(SnackbarType.MULTI_LINE)
+//                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+//                                        .textColor(Color.WHITE)
+//                                        .color(Color.RED)
+//                                        .text("ERROR: Unable to find LiveOke!"));
+//                            }
+//                        });
+//                    }
+//                }
+//            }).start();
+//        }
     }
 
     @Override
@@ -610,8 +634,10 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     mSlidingPanel.expandPanel();
                     actionBarHelper.setTitle(getResources().getString(R.string.rsvp_title));
-                    if (webSocketHelper != null && !webSocketHelper.rsvpList.isEmpty()) {
-                        actionBarHelper.pushSub(webSocketHelper.rsvpList.size() + " Songs.");
+                    //if (webSocketHelper != null && !webSocketHelper.rsvpList.isEmpty()) {
+                    if (liveOkeUDPClient != null && liveOkeUDPClient.rsvpList.isEmpty()) {
+                        //actionBarHelper.pushSub(webSocketHelper.rsvpList.size() + " Songs.");
+                        actionBarHelper.pushSub(liveOkeUDPClient.rsvpList.size() + " Songs.");
                     } else {
                         actionBarHelper.pushSub("0 Songs.");
                     }
@@ -777,7 +803,7 @@ public class MainActivity extends ActionBarActivity {
         mSongsListPagerAdapter = new SongsListPageAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSongsListPagerAdapter);
         mSongsListPagerAdapter.notifyDataSetChanged();
-        actionBarHelper.setSubTitle(getTotalSongs()+" Songs.");
+        actionBarHelper.setSubTitle(getTotalSongs() + " Songs.");
     }
 
 

@@ -118,8 +118,10 @@ public class WebSocketHelper {
                                 }
                             });
                         }
-                        context.webSocketHelper.rsvpList.clear();
-                        context.rsvpPanelHelper.refreshRsvpList(context.webSocketHelper.rsvpList);
+                        //context.webSocketHelper.rsvpList.clear();
+                        context.liveOkeUDPClient.rsvpList.clear();
+                        //context.rsvpPanelHelper.refreshRsvpList(context.webSocketHelper.rsvpList);
+                        context.rsvpPanelHelper.refreshRsvpList(context.liveOkeUDPClient.rsvpList);
                         SnackbarManager.show(Snackbar.with(context)
                                 .type(SnackbarType.MULTI_LINE)
                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)

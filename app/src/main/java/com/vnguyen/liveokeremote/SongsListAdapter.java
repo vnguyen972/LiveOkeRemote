@@ -143,10 +143,14 @@ public class SongsListAdapter extends BaseSwipeAdapter {
 
                                 @Override
                                 public void onPositive(MaterialDialog materialDialog) {
-                                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    if (context.liveOkeUDPClient != null) {
                                         String cmd = "reserve," + idNumber.getText() + "," + context.me.name;
                                         Log.v(context.app.TAG, "cmd = " + cmd);
-                                        context.webSocketHelper.sendMessage(cmd);
+                                        //context.webSocketHelper.sendMessage(cmd);
+                                        context.liveOkeUDPClient.sendMessage(cmd,
+                                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                         swipeLayout.toggle();
                                         if (context.interstitialAd.isLoaded()) {
                                             context.interstitialAd.show();
@@ -214,8 +218,12 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                 @Override
                                 public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                                     Log.v(context.app.TAG, "Selected: " + charSequence);
-                                    if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-                                        context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
+                                    //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                    if (context.liveOkeUDPClient != null) {
+                                        //context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
+                                        context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() + "," + charSequence,
+                                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                         if (context.interstitialAd.isLoaded()) {
                                             context.interstitialAd.show();
                                             // update the reserved count notification

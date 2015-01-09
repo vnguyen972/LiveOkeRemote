@@ -4,6 +4,7 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
@@ -66,33 +67,40 @@ public class UDPBroadcastHelper {
     }
 
 
-    public void broadcastToOtherSelves(String message, WifiManager wifi) {
-        DatagramSocket c = null;
+    public void broadcastToOtherSelves(final String message, final WifiManager wifi) {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                DatagramSocket c = null;
 
-        try {
-            //Open a random port to send the package
-            c = new DatagramSocket();
-            c.setBroadcast(true);
+                try {
+                    //Open a random port to send the package
+                    c = new DatagramSocket();
+                    c.setBroadcast(true);
 
-            byte[] sendData = message.getBytes();
+                    byte[] sendData = message.getBytes();
 
-            InetAddress address = getBroadcastAddress(wifi);
-            if (address != null) {
-                Log.i(LiveOkeRemoteApplication.TAG, "*** About to broadcast to: " + address.getHostAddress());
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, UDPListenerService.BROADCAST_PORT);
-                c.send(sendPacket);
-            } else {
-                // not on WIFI
-                Log.e(LiveOkeRemoteApplication.TAG,"*** Not on WIFI? Turn on and connect to WIFI then try again!");
+                    InetAddress address = getBroadcastAddress(wifi);
+                    if (address != null) {
+                        Log.i(LiveOkeRemoteApplication.TAG, "*** About to broadcast to: " + address.getHostAddress());
+                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, UDPListenerService.BROADCAST_PORT);
+                        c.send(sendPacket);
+                    } else {
+                        // not on WIFI
+                        Log.e(LiveOkeRemoteApplication.TAG,"*** Not on WIFI? Turn on and connect to WIFI then try again!");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());
+                } finally {
+                    if (c != null) {
+                        c.close();
+                    }
+                }
+                return null;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
+        };
+        task.execute((Void[])null);
     }
 
     public LiveOkeSocketInfo findServer() {
@@ -161,7 +169,7 @@ public class UDPBroadcastHelper {
                     wsInfo.uri = message.trim();
                     String address = receivePacket.getAddress().toString();
                     wsInfo.ipAddress = (address.startsWith("/") ? address.substring(1,address.length()) : address);
-                    wsInfo.port = receivePacket.getPort()+"";
+                    //wsInfo.port = receivePacket.getPort()+"";
                 }
 
                 //Close the port!
