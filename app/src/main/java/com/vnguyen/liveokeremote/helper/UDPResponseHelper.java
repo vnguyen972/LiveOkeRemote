@@ -60,26 +60,36 @@ public class UDPResponseHelper {
     public void processMessage(String senderIP, int senderPORT, String senderMSG) {
         if (senderMSG.startsWith("{")) {
             // Message is a JSON message
-            LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
+            final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
             // if the message coming from this app
             if (msg.from.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
                 // is it really from another client with different IP?
                 if (!senderIP.equals(context.liveOkeUDPClient.getMyIP())) {
                     try {
                         if (msg.greeting.equalsIgnoreCase("Hi")) {
-                            SnackbarManager.show(Snackbar.with(context)
-                                    .type(SnackbarType.MULTI_LINE)
-                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                    .textColor(Color.WHITE)
-                                    .color(context.getResources().getColor(R.color.indigo_500))
-                                    .text(msg.name + " is online!"));
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    SnackbarManager.show(Snackbar.with(context)
+                                            .type(SnackbarType.MULTI_LINE)
+                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                            .textColor(Color.WHITE)
+                                            .color(context.getResources().getColor(R.color.indigo_500))
+                                            .text(msg.name + " is online!"));
+                                }
+                            });
                         } else if (msg.greeting.equalsIgnoreCase("Bye")) {
-                            SnackbarManager.show(Snackbar.with(context)
-                                    .type(SnackbarType.MULTI_LINE)
-                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                    .textColor(Color.WHITE)
-                                    .color(context.getResources().getColor(R.color.indigo_500))
-                                    .text(msg.name + " is offline!"));
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    SnackbarManager.show(Snackbar.with(context)
+                                            .type(SnackbarType.MULTI_LINE)
+                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                            .textColor(Color.WHITE)
+                                            .color(context.getResources().getColor(R.color.indigo_500))
+                                            .text(msg.name + " is offline!"));
+                                }
+                            });
                         }
                     } catch (Exception e) {
                         Log.e(context.app.TAG, e.getMessage(), e);
