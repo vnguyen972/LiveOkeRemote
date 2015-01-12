@@ -1,5 +1,6 @@
 package com.vnguyen.liveokeremote.helper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -109,16 +110,7 @@ public class NavigationDrawerHelper {
                     context.updateMainDisplay();
                     mDrawerList.setItemChecked(CN_SONGS, false);
                 } else if (mDrawerList.getCheckedItemPosition() == FRIENDS_LIST ) {
-                    if (context.friendsList != null) {
-                        context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
-                        context.friendsListHelper.initFriendList(context.friendsList);
-                    } else {
-                        context.actionBarHelper.pushSub("0 Friends.");
-                    }
-                    if (context.viewFlipper.getDisplayedChild() == 0) {
-                        context.viewFlipper.showNext();
-                    }
-                    context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
+                    context.friendsListHelper.displayFriendsListPanel();
                     mDrawerList.setItemChecked(FRIENDS_LIST, false);
                 } else if (mDrawerList.getCheckedItemPosition() == UPDATE_SONGS_LIST) {
                     new MaterialDialog.Builder(context)
@@ -531,9 +523,34 @@ public class NavigationDrawerHelper {
                                 context.mDrawerLayout.closeDrawers();
                             }
                         },10);
-                        (new AlertDialogHelper(context)).popupFileChooser(
-                                context.mReservedCountImgView,
-                                context.getResources().getString(R.string.myAvatarURI));
+                        CharSequence[] choices = {"Set new avatar","Reset to default"};
+                        new MaterialDialog.Builder(context)
+                                .title("Reserve for a friend")
+                                .items(choices)
+                                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                                    @SuppressLint("NewApi")
+                                    @Override
+                                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                        Log.v(context.app.TAG, "Selected: " + charSequence);
+                                        if (charSequence.toString().equalsIgnoreCase("Set new avatar")) {
+                                            (new AlertDialogHelper(context)).popupFileChooser(
+                                                    context.mReservedCountImgView,
+                                                    context.getResources().getString(R.string.myAvatarURI));
+                                        } else {
+                                            // reset to default avatar here
+                                            Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
+                                            BitmapDrawable bd = new BitmapDrawable(context.drawableHelper.getCroppedBitmap(bm));
+                                            context.mReservedCountImgView.setImageDrawable(bd);
+                                            context.me.avatar =  bd;
+                                            PreferencesHelper.getInstance(context).remoteMyAvatar();
+                                        }
+                                    }
+
+                                })
+                                .positiveText("Choose")
+                                .negativeText("Cancel")
+                                .show();
+
                         mDrawerList.setItemChecked(YOUR_PHOTO, false);
                         break;
                     default:

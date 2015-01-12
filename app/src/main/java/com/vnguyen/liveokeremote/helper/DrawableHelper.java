@@ -2,16 +2,28 @@ package com.vnguyen.liveokeremote.helper;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.FaceDetector;
 import android.os.Build;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
+import com.vnguyen.liveokeremote.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,6 +91,143 @@ public class DrawableHelper {
             img.setBackground(icon);
         } else {
             img.setBackgroundDrawable(icon);
+        }
+    }
+
+    public Bitmap detectFace(Bitmap bitmapOrg, int viewWidth, int viewHeight, Resources resources) {
+        FaceDetector myFaceDetect;
+        FaceDetector.Face[] myFace;
+        float myEyesDistance;
+        Bitmap resizedBitmap = null;
+        try {
+            Paint paint = new Paint();
+            paint.setFilterBitmap(true);
+//            bitmapOrg = BitmapFactory.decodeResource(
+//                    resources,
+//                    R.drawable.sachin_tendulkar_10102013);
+
+            int targetWidth = bitmapOrg.getWidth();
+            int targetHeight = bitmapOrg.getHeight();
+
+            Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+                    targetHeight, Bitmap.Config.ARGB_8888);
+
+            RectF rectf = new RectF(0, 0, viewWidth, viewHeight);
+
+            Canvas canvas = new Canvas(targetBitmap);
+            Path path = new Path();
+
+            path.addRect(rectf, Path.Direction.CW);
+            canvas.clipPath(path);
+
+            canvas.drawBitmap(
+                    bitmapOrg,
+                    new Rect(0, 0, bitmapOrg.getWidth(), bitmapOrg
+                            .getHeight()), new Rect(0, 0, targetWidth,
+                            targetHeight), paint);
+
+            Matrix matrix = new Matrix();
+            matrix.postScale(1f, 1f);
+
+//            BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+//            bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+//
+//            bitmapOrg = BitmapFactory.decodeResource(resources,
+//                    R.drawable.sachin_tendulkar_10102013,
+//                    bitmapFatoryOptions);
+
+            myFace = new FaceDetector.Face[5];
+            myFaceDetect = new FaceDetector(targetWidth, targetHeight,
+                    5);
+            int numberOfFaceDetected = myFaceDetect.findFaces(
+                    bitmapOrg, myFace);
+            Log.v(LiveOkeRemoteApplication.TAG, "Face detected: " + numberOfFaceDetected);
+            if (numberOfFaceDetected > 0) {
+                PointF myMidPoint = null;
+                FaceDetector.Face face = myFace[0];
+                myMidPoint = new PointF();
+                face.getMidPoint(myMidPoint);
+                myEyesDistance = face.eyesDistance() + 20;
+
+                if (myMidPoint.x + viewWidth > targetWidth) {
+                    while (myMidPoint.x + viewWidth > targetWidth) {
+                        myMidPoint.x--;
+                    }
+                }
+                if (myMidPoint.y + viewHeight > targetHeight) {
+                    while (myMidPoint.y + viewHeight > targetHeight) {
+                        myMidPoint.y--;
+                    }
+                }
+                resizedBitmap = Bitmap.createBitmap(bitmapOrg,
+                        (int) (myMidPoint.x - myEyesDistance),
+                        (int) (myMidPoint.y - myEyesDistance),
+                        viewWidth, viewHeight, matrix, true);
+            } else {
+                resizedBitmap = Bitmap.createBitmap(bitmapOrg, 0, 0,
+                        viewWidth, viewHeight, matrix, true);
+            }
+                /* convert Bitmap to resource */
+            // Bitmap resizedBitmap = Bitmap.createBitmap(targetBitmap,
+            // 0,
+            // 0, viewWidth, viewHeight, matrix, true);
+//            BitmapDrawable bd = new  BitmapDrawable(resizedBitmap);
+
+//            part2.setBackgroundDrawable(new BitmapDrawable(
+//                    getCroppedBitmap(bd.getBitmap())));
+
+        } catch (Exception e) {
+            System.out.println("Error1 : " + e.getMessage()
+                    + e.toString());
+        } finally {
+            return resizedBitmap;
+        }
+    }
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        // Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+        // bitmap.getHeight(), Config.ARGB_8888);
+        // Canvas canvas = new Canvas(output);
+        //
+        // final int color = 0xff424242;
+        // final Paint paint = new Paint();
+        // final Rect rect = new Rect(0, 0, bitmap.getWidth(),
+        // bitmap.getHeight());
+        //
+        // paint.setAntiAlias(true);
+        // canvas.drawARGB(0, 0, 0, 0);
+        // paint.setColor(color);
+        // // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        // canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+        // bitmap.getWidth() / 2, paint);
+        // paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+        // canvas.drawBitmap(bitmap, rect, rect, paint);
+        // // Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        // // return _bmp;
+        // return output;
+
+        if (bitmap != null) {
+            int targetWidth = bitmap.getWidth();
+            int targetHeight = bitmap.getHeight();
+            Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, targetHeight,
+                    Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(targetBitmap);
+            Path path = new Path();
+            path.addCircle(((float) targetWidth - 1) / 2,
+                    ((float) targetHeight - 1) / 2,
+                    (Math.min(((float) targetWidth), ((float) targetHeight)) / 2),
+                    Path.Direction.CCW);
+
+            canvas.clipPath(path);
+            Bitmap sourceBitmap = bitmap;
+            canvas.drawBitmap(sourceBitmap, new Rect(0, 0, sourceBitmap.getWidth(),
+                    sourceBitmap.getHeight()), new Rect(0, 0, targetWidth,
+                    targetHeight), null);
+            return targetBitmap;
+
+        } else {
+            return bitmap;
         }
     }
 }

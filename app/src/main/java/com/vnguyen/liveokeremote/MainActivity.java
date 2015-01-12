@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -388,12 +389,14 @@ public class MainActivity extends ActionBarActivity {
                 return null;
             }
 
+            @SuppressLint("NewApi")
             @Override
             protected void onPostExecute(Void aVoid) {
                 setupReservedPanel(); // setup reserved list panel
                 ah.dismissSplash();
                 getPagerTitles();
                 if (me != null) {
+                    //mReservedCountImgView.setImageDrawable(me.avatar);
                     mReservedCountImgView.setImageDrawable(me.avatar);
                     nowPlayingHelper.setTitle("Welcome <b>" + me.name + "</b><br>Select and Reserve a song to sing!");
                 }
@@ -649,7 +652,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    public RoundImgDrawable loadMyAvatar() {
+    public Drawable loadMyAvatar() {
         Uri imgURI;
         Bitmap bm;
         String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
@@ -658,17 +661,20 @@ public class MainActivity extends ActionBarActivity {
         if (avatarURI != null && !avatarURI.equals("")) {
             imgURI = Uri.parse(avatarURI);
             bm = uriToBitmap(imgURI);
+            bm = drawableHelper.detectFace(bm, 800, 800,getResources());
         } else {
             //bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
             bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_profile);
         }
-        FaceCropper mFaceCropper = new FaceCropper();
-        bm = mFaceCropper.getCroppedImage(bm);
-        if (bm.getWidth() > 120 || bm.getHeight() > 120) {
-            bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
-        }
-        RoundImgDrawable img = new RoundImgDrawable(bm);
-        return img;
+//        FaceCropper mFaceCropper = new FaceCropper();
+//        bm = mFaceCropper.getCroppedImage(bm);
+//        if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+//            bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+//        }
+//        RoundImgDrawable img = new RoundImgDrawable(bm);
+        //RoundImgDrawable img = new RoundImgDrawable(bitmap);
+        BitmapDrawable bd = new BitmapDrawable(drawableHelper.getCroppedBitmap(bm));
+        return bd;
     }
 
     public void updateNowPlaying(String title) {
@@ -696,16 +702,19 @@ public class MainActivity extends ActionBarActivity {
         PreferencesHelper.getInstance(MainActivity.this).setStringPreference(
                 aquiredPhoto.prefKey, aquiredPhoto.mImageCaptureUri.toString());
         if (bitmap != null) {
-            FaceCropper mFaceCropper = new FaceCropper();
-            bitmap = mFaceCropper.getCroppedImage(bitmap);
-            if (bitmap.getHeight() > 120 && bitmap.getWidth() > 120) {
-                bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
-            }
-            RoundImgDrawable img = new RoundImgDrawable(bitmap);
+//            FaceCropper mFaceCropper = new FaceCropper();
+//            bitmap = mFaceCropper.getCroppedImage(bitmap);
+//            if (bitmap.getHeight() > 120 && bitmap.getWidth() > 120) {
+//                bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
+//            }
+            bitmap = drawableHelper.detectFace(bitmap, 800, 800,getResources());
+            bitmap = drawableHelper.getCroppedBitmap(bitmap);
+            //RoundImgDrawable img = new RoundImgDrawable(bitmap);
             //mReservedCountImgView.setImageDrawable(img);
+            BitmapDrawable img = new BitmapDrawable(bitmap);
             aquiredPhoto.imgView.setImageDrawable(img);
             if (aquiredPhoto.prefKey.equalsIgnoreCase("myAvatarURI")) {
-                me.avatar = loadMyAvatar();
+                me.avatar = img;
             }
         } else {
             Toast.makeText(this, "Unable to find file. Path =  " + path, Toast.LENGTH_LONG).show();

@@ -59,4 +59,17 @@ public class FriendsListHelper {
         }
     }
 
+    public void displayFriendsListPanel() {
+        if (context.friendsList != null) {
+            context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
+            context.friendsListHelper.initFriendList(context.friendsList);
+        } else {
+            context.actionBarHelper.pushSub("0 Friends.");
+        }
+        if (context.viewFlipper.getDisplayedChild() == 0) {
+            context.viewFlipper.showNext();
+        }
+        context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
+    }
+
 }

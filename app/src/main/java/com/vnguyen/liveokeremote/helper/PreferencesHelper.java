@@ -46,6 +46,10 @@ public class PreferencesHelper {
         preferences.edit().putString(key, value).apply();
     }
 
+    public void remoteMyAvatar() {
+        preferences.edit().remove("myAvatarURI").apply();
+    }
+
     public SharedPreferences getPreferences() {
         return preferences;
     }

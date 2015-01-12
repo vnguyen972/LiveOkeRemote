@@ -211,53 +211,69 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                     for (int i = 0; i < frNames.length; i++) {
                         frNames[i] = friends.get(i).name;
                     }
-                    new MaterialDialog.Builder(context)
-                            .title("Reserve for a friend")
-                            .items(frNames)
-                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
-                                @Override
-                                public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                    Log.v(context.app.TAG, "Selected: " + charSequence);
-                                    //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-                                    if (context.liveOkeUDPClient != null) {
-                                        //context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
-                                        context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() + "," + charSequence,
-                                                context.liveOkeUDPClient.liveOkeIPAddress,
-                                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                                        if (context.interstitialAd.isLoaded()) {
-                                            context.interstitialAd.show();
-                                            // update the reserved count notification
-                                            //context.reservedCount++;
-                                            //context.notifCountButton.setText(String.valueOf(ma.reservedCount));
-                                        } else {
-                                            // Toast.makeText(listView.getContext(),
-                                            // "Ad not ready",
-                                            // Toast.LENGTH_SHORT).show();
-                                            Log.d(context.app.TAG,
-                                                    "Ad is not ready to display, getting new Ad...");
-                                            context.getNewAd();
-                                        }
+                    if (frNames.length > 0) {
+                        new MaterialDialog.Builder(context)
+                                .title("Reserve for a friend")
+                                .items(frNames)
+                                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                        Log.v(context.app.TAG, "Selected: " + charSequence);
+                                        //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                        if (context.liveOkeUDPClient != null) {
+                                            //context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
+                                            context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() + "," + charSequence,
+                                                    context.liveOkeUDPClient.liveOkeIPAddress,
+                                                    context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                                            if (context.interstitialAd.isLoaded()) {
+                                                context.interstitialAd.show();
+                                                // update the reserved count notification
+                                                //context.reservedCount++;
+                                                //context.notifCountButton.setText(String.valueOf(ma.reservedCount));
+                                            } else {
+                                                // Toast.makeText(listView.getContext(),
+                                                // "Ad not ready",
+                                                // Toast.LENGTH_SHORT).show();
+                                                Log.d(context.app.TAG,
+                                                        "Ad is not ready to display, getting new Ad...");
+                                                context.getNewAd();
+                                            }
 
-                                        SnackbarManager.show(Snackbar.with(context)
-                                                .type(SnackbarType.MULTI_LINE)
-                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                                .textColor(Color.WHITE)
-                                                .color(Color.BLACK)
-                                                .text("'" + songTitle.getText() + "' is reserved for " + charSequence));
-                                    } else {
-                                        SnackbarManager.show(Snackbar.with(context)
-                                                .type(SnackbarType.MULTI_LINE)
-                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                                .textColor(Color.WHITE)
-                                                .color(Color.RED)
-                                                .text("ERROR: Not Connected"));
+                                            SnackbarManager.show(Snackbar.with(context)
+                                                    .type(SnackbarType.MULTI_LINE)
+                                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                    .textColor(Color.WHITE)
+                                                    .color(Color.BLACK)
+                                                    .text("'" + songTitle.getText() + "' is reserved for " + charSequence));
+                                        } else {
+                                            SnackbarManager.show(Snackbar.with(context)
+                                                    .type(SnackbarType.MULTI_LINE)
+                                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                    .textColor(Color.WHITE)
+                                                    .color(Color.RED)
+                                                    .text("ERROR: Not Connected"));
+                                        }
+                                        swipeLayout.toggle();
                                     }
-                                    swipeLayout.toggle();
-                                }
-                            })
-                            .positiveText("Choose")
-                            .negativeText("Cancel")
-                            .show();
+                                })
+                                .positiveText("Choose")
+                                .negativeText("Cancel")
+                                .show();
+                    } else {
+                        // no friends yet
+                        new MaterialDialog.Builder(context)
+                                .title("No Friends Yet")
+                                .content("Add new friend?")
+                                .callback(new MaterialDialog.SimpleCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog materialDialog) {
+                                        context.friendsListHelper.displayFriendsListPanel();
+                                    }
+                                })
+                                .positiveText("OK")
+                                .negativeText("Cancel")
+                                .show();
+                    }
                 } else {
                     new MaterialDialog.Builder(context)
                             .title("Delete Favorite Song.")
