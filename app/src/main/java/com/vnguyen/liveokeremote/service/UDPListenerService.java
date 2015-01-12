@@ -25,7 +25,9 @@ public class UDPListenerService extends Service {
     private DatagramSocket socket;
     private final IBinder myBinder = new MyLocalBinder();
     private InetAddress broadcastIP;
-    Thread UDPBroadcastThread;
+
+    private Thread UDPBroadcastThread;
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -118,8 +120,8 @@ public class UDPListenerService extends Service {
         intent.putExtra("senderIP", senderIP);
         intent.putExtra("senderPORT", senderPORT);
         intent.putExtra("message", message);
-        sendBroadcast(intent);
-        //sendOrderedBroadcast(intent,);
+        //sendBroadcast(intent);
+        sendOrderedBroadcast(intent,null);
     }
 
     void startListenForUDPBroadcast() {
@@ -139,7 +141,7 @@ public class UDPListenerService extends Service {
     }
 
     private void listenAndWaitAndThrowIntent(InetAddress broadcastIP) throws Exception {
-        byte[] recvBuf = new byte[10000];
+        byte[] recvBuf = new byte[590];
         if (socket == null || socket.isClosed()) {
             socket = new DatagramSocket(BROADCAST_PORT, broadcastIP);
             socket.setBroadcast(true);
@@ -149,12 +151,12 @@ public class UDPListenerService extends Service {
         //Log.e(LiveOkeRemoteApplication.TAG, "Waiting for UDP broadcast");
         socket.receive(packet);
 
-        String senderIP = packet.getAddress().getHostAddress();
-        int senderPORT = packet.getPort();
-        String message = new String(packet.getData()).trim();
+        final String senderIP = packet.getAddress().getHostAddress();
+        final int senderPORT = packet.getPort();
+        byte[] data = packet.getData();
+        final String message = new String(data,0,data.length).trim();
 
         //Log.v(LiveOkeRemoteApplication.TAG, "Got UDP broadcast from " + senderIP + ":" + senderPORT + ", message: " + message);
-
         broadcastIntent(senderIP, senderPORT, message);
         //socket.close();
     }

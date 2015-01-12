@@ -10,6 +10,7 @@ import com.malinskiy.materialicons.Iconify;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
+import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
@@ -29,7 +30,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +66,7 @@ public class WebSocketHelper {
         mWebSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                Log.i(context.app.TAG, "Websocket: Opened");
+                Log.i(LiveOkeRemoteApplication.TAG, "Websocket: Opened");
 //                final SwitchCompat onOffSwitch = (SwitchCompat) context.onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
 //                if (!onOffSwitch.isChecked()) {
 //                    context.runOnUiThread(new Runnable() {
@@ -90,13 +90,13 @@ public class WebSocketHelper {
 
             @Override
             public void onMessage(String message) {
-                Log.i(context.app.TAG,"Websocket: Message - " + message);
+                Log.i(LiveOkeRemoteApplication.TAG,"Websocket: Message - " + message);
                 processMessage(message);
             }
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                Log.i(context.app.TAG,"Websocket: Closed " + reason);
+                Log.i(LiveOkeRemoteApplication.TAG,"Websocket: Closed " + reason);
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -135,7 +135,7 @@ public class WebSocketHelper {
             @Override
             public void onError(Exception ex) {
                 final String errMsg = ex.getMessage();
-                Log.i(context.app.TAG,"Websocket: Error " + ex.getMessage());
+                Log.i(LiveOkeRemoteApplication.TAG,"Websocket: Error " + ex.getMessage());
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -172,7 +172,7 @@ public class WebSocketHelper {
     private void processMessage(final String message) {
         if (message.startsWith("MasterCode:")) {
             String code = message.substring(11, message.length());
-            if (code != null && !code.equalsIgnoreCase("")) {
+            if (!code.equalsIgnoreCase("")) {
                 context.serverMasterCode = message.substring(11, message.length());
             }
         } else if (message.startsWith("Songlist:")) {
@@ -260,7 +260,7 @@ public class WebSocketHelper {
                                 if (context.friendsList != null) {
                                     for (User user : context.friendsList) {
                                         if (user.name.equals(u.name)) {
-                                            Log.v(context.app.TAG,"Found requester on friendlist!");
+                                            Log.v(LiveOkeRemoteApplication.TAG,"Found requester on friendlist!");
                                             if (user.avatarURI != null && !user.avatarURI.equals("")) {
                                                 u.avatar = user.avatar;
                                             }
@@ -293,7 +293,7 @@ public class WebSocketHelper {
 //                            task.execute((Void[])null);
                         }
                     } catch (Exception ex) {
-                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                        Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
                     } finally {
                         context.db.close();
                     }
@@ -313,12 +313,12 @@ public class WebSocketHelper {
                 if (songs != null && !songs.isEmpty()) {
                     songs.clear();
                 }
-                ExecutorService executor = Executors.newFixedThreadPool(2);
+                ExecutorService executor;
                 int cpus = Runtime.getRuntime().availableProcessors();
                 int maxThreads = cpus * 2;
                 maxThreads = (maxThreads > 0 ? maxThreads : 1);
-                Log.d(context.app.TAG, "CPUs: " + cpus);
-                Log.d(context.app.TAG, "Max Thread: " + maxThreads);
+                Log.d(LiveOkeRemoteApplication.TAG, "CPUs: " + cpus);
+                Log.d(LiveOkeRemoteApplication.TAG, "Max Thread: " + maxThreads);
                 executor = new ThreadPoolExecutor(
                         cpus, // core thread pool size
                         maxThreads, // maximum thread pool size
@@ -326,7 +326,7 @@ public class WebSocketHelper {
                         TimeUnit.SECONDS,
                         new ArrayBlockingQueue<Runnable>(maxThreads, false),
                         new ThreadPoolExecutor.CallerRunsPolicy());
-                CompletionService<Song> pool = new ExecutorCompletionService<Song>(executor);
+                CompletionService<Song> pool = new ExecutorCompletionService<>(executor);
                 for (final String rawData : songRawDataList) {
                     pool.submit(new Callable<Song>() {
                         @Override
@@ -340,7 +340,7 @@ public class WebSocketHelper {
                 for (int i = 0; i < mSize; i++) {
                     Song song = pool.take().get();
                     if (songs == null) {
-                        songs = new ArrayList<Song>();
+                        songs = new ArrayList<>();
                     }
                     songs.add(song);
                 }
@@ -369,7 +369,7 @@ public class WebSocketHelper {
             db.close();
             db = null;
         } catch (Exception e) {
-            Log.e(context.app.TAG,e.getMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
             throw new Exception(e);
         }
     }

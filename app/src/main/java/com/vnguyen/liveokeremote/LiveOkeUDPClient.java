@@ -33,6 +33,7 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
     LiveOkeUDPClient(UDPListenerService udpListenerService,Context context) {
         this.context = (MainActivity) context;
         this.udpListenerService = udpListenerService;
+        doneGettingSongList = true;
         rsvpList = new ArrayList<>();
         initClient();
     }

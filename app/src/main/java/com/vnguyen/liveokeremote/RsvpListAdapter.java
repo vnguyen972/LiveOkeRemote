@@ -3,10 +3,6 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -14,25 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.SnackbarManager;
-import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
-import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
-import com.vnguyen.liveokeremote.helper.DrawableHelper;
-
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import cat.lafosca.facecropper.FaceCropper;
 
 public class RsvpListAdapter extends BaseSwipeAdapter {
 

@@ -8,7 +8,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,6 +22,8 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
+import com.vnguyen.liveokeremote.LiveOkeUDPClient;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
@@ -30,7 +31,6 @@ import com.vnguyen.liveokeremote.data.NavDrawerItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class NavigationDrawerHelper {
 
@@ -38,7 +38,6 @@ public class NavigationDrawerHelper {
     public boolean showFriendsList;
     private Handler mHandler = new Handler();
     public NavDrawerListAdapter navAdapter;
-    private ConcurrentHashMap<String, String> dataMap;
 
     // MUST match the order of the text on strings.xml (nav_menu_items)
     public static final int HOME = 0;
@@ -143,13 +142,13 @@ public class NavigationDrawerHelper {
                                             @Override
                                             protected void onPreExecute() {
                                                 try {
-                                                    Log.v(context.app.TAG, "PRE-Exec: getsonglist");
+                                                    Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: getsonglist");
                                                     //context.webSocketHelper.doneGettingSongList = false;
                                                     context.liveOkeUDPClient.doneGettingSongList = false;
-                                                    Log.v(context.app.TAG, "PRE-Exec: set doneGettingSongList to false");
+                                                    Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: set doneGettingSongList to false");
                                                     //context.webSocketHelper.gotTotalSongResponse = false;
                                                     context.liveOkeUDPClient.gotTotalSongResponse = false;
-                                                    Log.v(context.app.TAG, "PRE-Exec: set gotTotalSongResponse to false");
+                                                    Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: set gotTotalSongResponse to false");
                                                     adh.popupProgress("Updating song list...");
                                                 } catch (Throwable t) {
                                                     t.printStackTrace();
@@ -166,14 +165,14 @@ public class NavigationDrawerHelper {
                                                     context.liveOkeUDPClient.sendMessage("getsonglist",
                                                             context.liveOkeUDPClient.liveOkeIPAddress,
                                                             context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                                                    Log.v(context.app.TAG, "PRE-Exec: sending 'getsonglist' command...");
+                                                    Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: sending 'getsonglist' command...");
                                                     //while (!context.webSocketHelper.gotTotalSongResponse) {
                                                     while (!context.liveOkeUDPClient.gotTotalSongResponse) {
                                                         long currTime = System.currentTimeMillis();
                                                         if (currTime - startTime > 10000) {
                                                             break;
                                                         }
-                                                        Log.v(context.app.TAG, "PRE-Exec: waiting for total song");
+                                                        Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: waiting for total song");
                                                         try {
                                                             Thread.sleep(1000);
                                                         } catch (InterruptedException e) {
@@ -190,7 +189,7 @@ public class NavigationDrawerHelper {
                                                         });
                                                     }
                                                     if (context.totalSong > 0) {
-                                                        Log.v(context.app.TAG, "Exec-BG: getsonglist");
+                                                        Log.v(LiveOkeRemoteApplication.TAG, "Exec-BG: getsonglist");
                                                         //while (!context.webSocketHelper.doneGettingSongList) {
                                                         while (!context.liveOkeUDPClient.doneGettingSongList) {
                                                             Thread.sleep(1000);
@@ -205,18 +204,18 @@ public class NavigationDrawerHelper {
 
                                             @Override
                                             protected void onPostExecute(Void aVoid) {
-                                                Log.v(context.app.TAG,"POST-Exec: getsonglist");
+                                                Log.v(LiveOkeRemoteApplication.TAG,"POST-Exec: getsonglist");
                                                 context.getPagerTitles();
                                                 context.updateMainDisplay();
                                                 adh.dismissProgress();
                                                 try {
                                                     context.db.saveDB();
                                                 } catch (IOException e) {
-                                                    Log.e(context.app.TAG,e.getMessage(),e);
+                                                    Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
                                                 }
                                             }
                                         };
-                                        Log.v(context.app.TAG,"Exec: getsonglist");
+                                        Log.v(LiveOkeRemoteApplication.TAG,"Exec: getsonglist");
                                         task.execute((Void[])null);
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
@@ -254,7 +253,7 @@ public class NavigationDrawerHelper {
                                         //context.webSocketHelper.sendMessage("msg," + value);
                                         context.liveOkeUDPClient.sendMessage("msg," + value,
                                                 context.liveOkeUDPClient.liveOkeIPAddress,
-                                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                                                LiveOkeUDPClient.LIVEOKE_UDP_PORT);
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
@@ -278,7 +277,7 @@ public class NavigationDrawerHelper {
                         //context.webSocketHelper.sendMessage("togglefullscreen");
                         context.liveOkeUDPClient.sendMessage("togglefullscreen",
                                 context.liveOkeUDPClient.liveOkeIPAddress,
-                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                                LiveOkeUDPClient.LIVEOKE_UDP_PORT);
                     } else {
                         SnackbarManager.show(Snackbar.with(context)
                                 .type(SnackbarType.MULTI_LINE)
@@ -298,7 +297,7 @@ public class NavigationDrawerHelper {
                                 .color(Color.BLACK)
                                 .text("Successfully backup songslist.db to SD Card."));
                     } catch (IOException e) {
-                        Log.e(context.app.TAG,e.getMessage(),e);
+                        Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
                         SnackbarManager.show(Snackbar.with(context)
                                 .type(SnackbarType.MULTI_LINE)
                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
@@ -322,8 +321,8 @@ public class NavigationDrawerHelper {
 
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<>();
 
-        Drawable iconDrawable = null;
-        boolean showCounter = false;
+        Drawable iconDrawable;
+        boolean showCounter;
         String navCounter = "0";
         for (int i = 0; i < navMenuTitles.length;i++) {
             String title = null;
@@ -341,9 +340,9 @@ public class NavigationDrawerHelper {
                         context.db.open();
                         int count = context.db.getSongTotalNum();
                         navCounter = ""+count;
-                        Log.v(context.app.TAG,"count = " + count);
+                        Log.v(LiveOkeRemoteApplication.TAG,"count = " + count);
                     } catch (Exception ex) {
-                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                        Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
                     } finally {
                         context.db.close();
                     }
@@ -371,9 +370,9 @@ public class NavigationDrawerHelper {
                         context.db.open();
                         int count = context.db.getTotalLanguage("VN");
                         navCounter = ""+count;
-                        Log.v(context.app.TAG,"count = " + count);
+                        Log.v(LiveOkeRemoteApplication.TAG,"count = " + count);
                     } catch (Exception ex) {
-                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                        Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
                     } finally {
                         context.db.close();
                     }
@@ -388,9 +387,9 @@ public class NavigationDrawerHelper {
                         context.db.open();
                         int count = context.db.getTotalLanguage("EN");
                         navCounter = ""+count;
-                        Log.v(context.app.TAG,"count = " + count);
+                        Log.v(LiveOkeRemoteApplication.TAG,"count = " + count);
                     } catch (Exception ex) {
-                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                        Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
                     } finally {
                         context.db.close();
                     }
@@ -404,9 +403,9 @@ public class NavigationDrawerHelper {
                         context.db.open();
                         int count = context.db.getTotalLanguage("CN");
                         navCounter = ""+count;
-                        Log.v(context.app.TAG,"count = " + count);
+                        Log.v(LiveOkeRemoteApplication.TAG,"count = " + count);
                     } catch (Exception ex) {
-                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                        Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
                     } finally {
                         context.db.close();
                     }
@@ -502,11 +501,8 @@ public class NavigationDrawerHelper {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 view.setSelected(true);
-                Log.v(context.app.TAG, "Position = " + position);
+                Log.v(LiveOkeRemoteApplication.TAG, "Position = " + position);
                 final NavDrawerListAdapter adapter = (NavDrawerListAdapter) mDrawerList.getAdapter();
-                NavDrawerListAdapter.NavViewHolder holder = (NavDrawerListAdapter.NavViewHolder) view.getTag();
-                FragmentManager manager;
-                android.support.v4.app.FragmentTransaction transaction;
                 switch (position) {
                     case HOME:
                         // Home

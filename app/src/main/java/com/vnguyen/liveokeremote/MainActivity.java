@@ -320,15 +320,17 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void run() {
                 if (liveOkeUDPClient != null) {
-                    toggleOff();
-                    if (liveOkeUDPClient.pingCount > 5) {
-                        // after about 10 pings, reset the address
-                        liveOkeUDPClient.liveOkeIPAddress = null;
+                    if (liveOkeUDPClient.doneGettingSongList) {
+                        toggleOff();
+                        if (liveOkeUDPClient.pingCount > 5) {
+                            // after about 10 pings without pong, reset the address
+                            liveOkeUDPClient.liveOkeIPAddress = null;
+                        }
+                        liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress, liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                        liveOkeUDPClient.pingCount++;
                     }
-                    liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress,liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                    liveOkeUDPClient.pingCount++;
-                    handler.postDelayed(this, 5000);
                 }
+                handler.postDelayed(this, 10000);
             }
         };
     }
@@ -354,7 +356,7 @@ public class MainActivity extends ActionBarActivity {
         Log.v(app.TAG, "*** App RESUMING ***");
 //        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
-        handler.postDelayed(pingPong,5000);
+        handler.postDelayed(pingPong, 10000);
     }
 
 
