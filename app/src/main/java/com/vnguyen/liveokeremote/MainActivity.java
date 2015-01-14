@@ -187,6 +187,46 @@ public class MainActivity extends ActionBarActivity {
             Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
         }
 
+        udpListenerServiceIntent = new Intent(this, UDPListenerService.class);
+        startService(udpListenerServiceIntent);
+
+        udpServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                UDPListenerService.MyLocalBinder binder = (UDPListenerService.MyLocalBinder) service;
+                UDPListenerService udpListenerService = binder.getService();
+                Log.v(LiveOkeRemoteApplication.TAG,"Service bound!");
+                liveOkeUDPClient = new LiveOkeUDPClient(udpListenerService,MainActivity.this) {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        if (udpResponseHelper == null) {
+                            udpResponseHelper = new UDPResponseHelper(MainActivity.this);
+                        }
+                        udpResponseHelper.processResponseIntent(intent);
+                    }
+                };
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(UDPListenerService.UDP_BROADCAST);
+                registerReceiver(liveOkeUDPClient, filter);
+                if (me != null) {
+                    // build a hello packet to broadcast to other clients like me!
+                    LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                            getResources().getString(R.string.app_name), me.name);
+                    if (liveOkeUDPClient != null) {
+                        liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+                    }
+                }
+                //isBound = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                //isBound = flase;
+            }
+        };
+        bindService(udpListenerServiceIntent,udpServiceConnection,0);
+
+
         // Create socket info to hold LiveOke socket info with port defined in the Client
         liveOkeSocketInfo = new LiveOkeSocketInfo();
         liveOkeSocketInfo.port = LiveOkeUDPClient.LIVEOKE_UDP_PORT;
@@ -278,44 +318,6 @@ public class MainActivity extends ActionBarActivity {
         loadExtra();
 
 
-        udpListenerServiceIntent = new Intent(this, UDPListenerService.class);
-        startService(udpListenerServiceIntent);
-
-        udpServiceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                UDPListenerService.MyLocalBinder binder = (UDPListenerService.MyLocalBinder) service;
-                UDPListenerService udpListenerService = binder.getService();
-                Log.v(LiveOkeRemoteApplication.TAG,"Service bound!");
-                if (me != null) {
-                    liveOkeUDPClient = new LiveOkeUDPClient(udpListenerService,MainActivity.this) {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            if (udpResponseHelper == null) {
-                                udpResponseHelper = new UDPResponseHelper(MainActivity.this);
-                            }
-                            udpResponseHelper.processResponseIntent(intent);
-                        }
-                    };
-                    IntentFilter filter = new IntentFilter();
-                    filter.addAction(UDPListenerService.UDP_BROADCAST);
-                    registerReceiver(liveOkeUDPClient, filter);
-                    // build a hello packet to broadcast to other clients like me!
-                    LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
-                            getResources().getString(R.string.app_name), me.name);
-                    if (liveOkeUDPClient != null) {
-                        liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
-                    }
-                }
-                //isBound = true;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                //isBound = flase;
-            }
-        };
-        bindService(udpListenerServiceIntent,udpServiceConnection,0);
         pingPong = new Runnable() {
             @Override
             public void run() {
@@ -356,6 +358,9 @@ public class MainActivity extends ActionBarActivity {
         Log.v(LiveOkeRemoteApplication.TAG, "*** App RESUMING ***");
 //        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
+        if (liveOkeUDPClient != null) {
+            liveOkeUDPClient.initClient();
+        }
         handler.postDelayed(pingPong, 10000);
     }
 

@@ -37,7 +37,7 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
         initClient();
     }
 
-    private void initClient() {
+    public void initClient() {
         if (udpListenerService != null) {
             // if udp listener service bound (we have access to it)
             // then go look for LiveOke instance running on the network
