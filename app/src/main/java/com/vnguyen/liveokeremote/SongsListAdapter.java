@@ -28,9 +28,9 @@ import java.util.Iterator;
 public class SongsListAdapter extends BaseSwipeAdapter {
     private MainActivity context;
     private ArrayList<Song> songs;
-    private SwipeLayout swipeLayout;
     private Typeface font;
     private Typeface font2;
+    private SwipeLayout swipeLayout;
 
     public SongsListAdapter(Context context, ArrayList<Song> songs) {
         this.context = (MainActivity) context;
@@ -52,19 +52,13 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
         setupActionButtonsBelow(swipeLayout);
-//        View sv = swipeLayout.findViewById(R.id.surfaceView);
-//        if (position % 2 == 0) {
-//            sv.setBackgroundColor(Color.parseColor("#ffffff"));
-//        } else {
-//            sv.setBackgroundColor(Color.parseColor("#BCF7F0"));
-//        }
         return v;
     }
 
     @Override
     public void fillValues(int position, View view) {
         SongListViewHolder holder = (SongListViewHolder) view.getTag();
-        Song song = songs.get(position);
+        final Song song = songs.get(position);
         if (holder == null) {
             holder = new SongListViewHolder();
             holder.iconImgView = (ImageView) view.findViewById(R.id.songs_icon);
@@ -75,6 +69,12 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             view.setTag(holder);
         }
         holder.iconImgView.setImageDrawable(song.icon);
+        holder.iconImgView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.v(LiveOkeRemoteApplication.TAG,"CLICK ON SONG: " + song.title);
+            }
+        });
         if (context.listingBy.equalsIgnoreCase("favorites")) {
             holder.idTxtView.setText(song.convertedTitle);
         } else {

@@ -41,7 +41,7 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
         if (udpListenerService != null) {
             // if udp listener service bound (we have access to it)
             // then go look for LiveOke instance running on the network
-            udpListenerService.sendMessage("WhoYouAre", null, LiveOkeUDPClient.LIVEOKE_UDP_PORT);
+            udpListenerService.sendMessage("WhoYouAre", liveOkeIPAddress, LiveOkeUDPClient.LIVEOKE_UDP_PORT);
         }
     }
 
