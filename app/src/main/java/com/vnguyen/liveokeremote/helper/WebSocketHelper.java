@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class WebSocketHelper {
     private WebSocketClient mWebSocketClient;
     private MainActivity context;

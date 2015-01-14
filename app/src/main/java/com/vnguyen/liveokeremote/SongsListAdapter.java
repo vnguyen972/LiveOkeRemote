@@ -226,6 +226,11 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                                     context.liveOkeUDPClient.liveOkeIPAddress,
                                                     context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                             if (context.interstitialAd.isLoaded()) {
+                                                try {
+                                                    Thread.sleep(500);
+                                                } catch (InterruptedException e) {
+
+                                                }
                                                 context.interstitialAd.show();
                                                 // update the reserved count notification
                                                 //context.reservedCount++;

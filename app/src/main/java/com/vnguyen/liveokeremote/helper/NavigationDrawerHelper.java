@@ -28,6 +28,7 @@ import com.vnguyen.liveokeremote.LiveOkeUDPClient;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
+import com.vnguyen.liveokeremote.SongListRetriever;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 
 import java.io.IOException;
@@ -152,11 +153,11 @@ public class NavigationDrawerHelper {
                                                 try {
                                                     long startTime = System.currentTimeMillis();
                                                     //context.webSocketHelper.sendMessage("getsonglist");
-//                                                    SongListWorker worker = new SongListWorker(context);
-//                                                    worker.getSongList();
-                                                    context.liveOkeUDPClient.sendMessage("getsonglist",
-                                                            context.liveOkeUDPClient.liveOkeIPAddress,
-                                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+//                                                    context.liveOkeUDPClient.sendMessage("getsonglist",
+//                                                            context.liveOkeUDPClient.liveOkeIPAddress,
+//                                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                                                    SongListRetriever slRetriever = new SongListRetriever(context);
+                                                    slRetriever.getSongList();
                                                     Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: sending 'getsonglist' command...");
                                                     //while (!context.webSocketHelper.gotTotalSongResponse) {
                                                     while (!context.liveOkeUDPClient.gotTotalSongResponse) {

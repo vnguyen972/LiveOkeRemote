@@ -24,11 +24,10 @@ import java.util.Iterator;
 public class FriendListAdapter extends BaseSwipeAdapter {
     private MainActivity context;
     public ArrayList<User> friends;
-    private SwipeLayout swipeLayout;
 
     public FriendListAdapter(Context context, ArrayList<User> list) {
         this.context = (MainActivity) context;
-        Log.v(this.context.app.TAG, "New Adapter!");
+        Log.v(LiveOkeRemoteApplication.TAG, "New Adapter!");
         friends = new ArrayList<>();
         friends.addAll(list);
     }
@@ -46,7 +45,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
     @Override
     public View generateView(int position, ViewGroup viewGroup) {
         View v = LayoutInflater.from(context).inflate(R.layout.friends_list_item, null);
-        swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
+        SwipeLayout swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
         setupActionButtonsBelow(swipeLayout);

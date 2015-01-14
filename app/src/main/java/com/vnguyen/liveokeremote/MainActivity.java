@@ -14,7 +14,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -79,8 +78,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
-
-import cat.lafosca.facecropper.FaceCropper;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -153,7 +150,7 @@ public class MainActivity extends ActionBarActivity {
                     getPackageManager().getPackageInfo(getPackageName(),0).versionName
             );
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(app.TAG,e.getMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
         }
         //-- Create AdView ---------------
         AdView adView = (AdView)this.findViewById(R.id.adView);
@@ -183,12 +180,12 @@ public class MainActivity extends ActionBarActivity {
         db = new SongListDataSource(MainActivity.this);
         try {
             String path = Environment.getExternalStorageDirectory().getPath()+"/liveoke-remote/"+db.getDBName();
-            Log.d(app.TAG, "Importing the database (if a backup found): " + path);
+            Log.d(LiveOkeRemoteApplication.TAG, "Importing the database (if a backup found): " + path);
             boolean status = false;
             status = db.importDB(path);
-            Log.d(app.TAG,"Done?: " + status);
+            Log.d(LiveOkeRemoteApplication.TAG,"Done?: " + status);
         } catch (IOException e) {
-            Log.e(app.TAG,e.getMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
         }
 
         // Create socket info to hold LiveOke socket info with port defined in the Client
@@ -209,6 +206,7 @@ public class MainActivity extends ActionBarActivity {
 //                    getResources().getString(R.string.port));
             wsInfo.uri = "ws://"+wsInfo.ipAddress+":"+wsInfo.port;
         }
+
         if (myName == null) {
             myName = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                     getResources().getString(R.string.myName));
@@ -289,7 +287,7 @@ public class MainActivity extends ActionBarActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 UDPListenerService.MyLocalBinder binder = (UDPListenerService.MyLocalBinder) service;
                 UDPListenerService udpListenerService = binder.getService();
-                Log.v(app.TAG,"Service bound!");
+                Log.v(LiveOkeRemoteApplication.TAG,"Service bound!");
                 if (me != null) {
                     liveOkeUDPClient = new LiveOkeUDPClient(udpListenerService,MainActivity.this) {
                         @Override
@@ -306,7 +304,9 @@ public class MainActivity extends ActionBarActivity {
                     // build a hello packet to broadcast to other clients like me!
                     LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
                             getResources().getString(R.string.app_name), me.name);
-                    liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null,UDPListenerService.BROADCAST_PORT);
+                    if (liveOkeUDPClient != null) {
+                        liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+                    }
                 }
                 //isBound = true;
             }
@@ -327,7 +327,7 @@ public class MainActivity extends ActionBarActivity {
                             // after about 10 pings without pong, reset the address
                             liveOkeUDPClient.liveOkeIPAddress = null;
                         }
-                        liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress, liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                        liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress, LiveOkeUDPClient.LIVEOKE_UDP_PORT);
                         liveOkeUDPClient.pingCount++;
                     }
                 }
@@ -339,7 +339,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.v(app.TAG,"*** App PAUSING ***");
+        Log.v(LiveOkeRemoteApplication.TAG,"*** App PAUSING ***");
         //unregisterReceiver(bReceiver);
         try {
             unregisterReceiver(liveOkeUDPClient);
@@ -354,7 +354,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v(app.TAG, "*** App RESUMING ***");
+        Log.v(LiveOkeRemoteApplication.TAG, "*** App RESUMING ***");
 //        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         handler.postDelayed(pingPong, 10000);
@@ -415,7 +415,7 @@ public class MainActivity extends ActionBarActivity {
             friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
         }
 
-        Log.v(app.TAG,"setupFriendsListPanel is called!!!");
+        Log.v(LiveOkeRemoteApplication.TAG,"setupFriendsListPanel is called!!!");
         friendsListHelper.initFriendList(friendsList);
 //        ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
@@ -476,7 +476,7 @@ public class MainActivity extends ActionBarActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         //searchView.setMaxWidth(800);
-        Log.v(app.TAG, searchView + "");
+        Log.v(LiveOkeRemoteApplication.TAG, searchView + "");
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
             searchView.setIconifiedByDefault(true);
@@ -493,7 +493,7 @@ public class MainActivity extends ActionBarActivity {
                 {
                     // this is your adapter that will be filtered
                     //adapter.getFilter().filter(query);
-                    Log.v(app.TAG,"SEARCH FOR = " + query);
+                    Log.v(LiveOkeRemoteApplication.TAG,"SEARCH FOR = " + query);
                     getPagerSearch(query);
                     updateMainDisplay();
                     searchView.clearFocus();
@@ -582,8 +582,11 @@ public class MainActivity extends ActionBarActivity {
                                     UDPBroadcastHelper helper = new UDPBroadcastHelper();
                                     LiveOkeRemoteBroadcastMsg bcMsg =
                                             new LiveOkeRemoteBroadcastMsg("Bye",
-                                                    getResources().getString(R.string.app_name),me.name);
-                                    helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
+                                                    getResources().getString(R.string.app_name), me.name);
+                                    //helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
+                                    if (liveOkeUDPClient != null) {
+                                        liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+                                    }
                                 }
                             }).start();
                             finish();

@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public abstract class LiveOkeUDPClient extends BroadcastReceiver {
     public static int LIVEOKE_UDP_PORT = 8888;
 
-
     private MainActivity context;
     private UDPListenerService udpListenerService;
     public String liveOkeIPAddress;
@@ -39,31 +38,17 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
     }
 
     private void initClient() {
-//        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Void... params) {
-                if (udpListenerService != null) {
-                    // if udp listener service bound (we have access to it)
-                    // then go look for LiveOke instance running on the network
-                    udpListenerService.sendMessage("WhoYouAre", null, LiveOkeUDPClient.LIVEOKE_UDP_PORT);
-                }
-//                return null;
-//            }
-//        };
-//        task.execute((Void[])null);
+        if (udpListenerService != null) {
+            // if udp listener service bound (we have access to it)
+            // then go look for LiveOke instance running on the network
+            udpListenerService.sendMessage("WhoYouAre", null, LiveOkeUDPClient.LIVEOKE_UDP_PORT);
+        }
     }
 
     public void sendMessage(final String sendMsg, final String ipAddress, final int port) {
-//        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Void... params) {
-                if (udpListenerService != null) {
-                    udpListenerService.sendMessage(sendMsg, ipAddress, port);
-                }
-//                return null;
-//            }
-//        };
-//        task.execute((Void[])null);
+        if (udpListenerService != null) {
+            udpListenerService.sendMessage(sendMsg, ipAddress, port);
+        }
     }
 
     public String getMyIP() {

@@ -72,7 +72,6 @@ public class UDPBroadcastHelper {
             @Override
             protected Void doInBackground(Void... params) {
                 DatagramSocket c = null;
-
                 try {
                     //Open a random port to send the package
                     c = new DatagramSocket();

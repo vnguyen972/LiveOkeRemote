@@ -266,27 +266,27 @@ public class FloatingButtonsHelper {
             public void onClick(View v) {
                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                 if (context.liveOkeUDPClient != null) {
-                    new MaterialDialog.Builder(context)
-                            .title("Are you sure?")
-                            .content("Do you want to switch the audio track?")
-                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
-                            .positiveText("OK")
-                            .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
-
-                                @Override
-                                public void onNegative(MaterialDialog materialDialog) {
-                                }
-
-                                @Override
-                                public void onPositive(MaterialDialog materialDialog) {
+//                    new MaterialDialog.Builder(context)
+//                            .title("Are you sure?")
+//                            .content("Do you want to switch the audio track?")
+//                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+//                            .positiveText("OK")
+//                            .negativeText("CANCEL")
+//                            .callback(new MaterialDialog.Callback() {
+//
+//                                @Override
+//                                public void onNegative(MaterialDialog materialDialog) {
+//                                }
+//
+//                                @Override
+//                                public void onPositive(MaterialDialog materialDialog) {
                                     //context.webSocketHelper.sendMessage("toggleaudio");
                                     context.liveOkeUDPClient.sendMessage("toggleaudio",
                                             context.liveOkeUDPClient.liveOkeIPAddress,
                                             context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                                }
-                            })
-                            .show();
+//                                }
+//                            })
+//                            .show();
 
                 } else {
                     SnackbarManager.show(Snackbar.with(context)

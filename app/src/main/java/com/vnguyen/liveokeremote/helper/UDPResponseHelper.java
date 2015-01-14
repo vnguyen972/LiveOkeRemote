@@ -17,21 +17,11 @@ import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.db.SongListDataSource;
 
-import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class UDPResponseHelper {
     private MainActivity context;
-    private ArrayList<String> songRawDataList;
 
     public UDPResponseHelper(Context context) {
         this.context = (MainActivity) context;
@@ -41,7 +31,6 @@ public class UDPResponseHelper {
         final String senderIP = intent.getStringExtra("senderIP");
         final int senderPORT = intent.getIntExtra("senderPORT", 0);
         final String senderMSG = intent.getStringExtra("message");
-//        Log.v(LiveOkeRemoteApplication.TAG, "Received from: " + senderIP + ":" + senderPORT);
         Log.v(LiveOkeRemoteApplication.TAG, "Received msg: " + senderMSG);
         processMessage(senderIP, senderMSG);
     }
@@ -79,12 +68,7 @@ public class UDPResponseHelper {
             } else {
                 // Process LiveOke Msg here
                 context.liveOkeUDPClient.liveOkeIPAddress = senderIP;
-                if (senderMSG.startsWith("totalsong:")) {
-                    context.totalSong = Integer.parseInt(senderMSG.substring(10, senderMSG.length()));
-                    songRawDataList = new ArrayList<>();
-                    context.liveOkeUDPClient.gotTotalSongResponse = true;
-                    context.liveOkeUDPClient.doneGettingSongList = false;
-                } else if (senderMSG.equalsIgnoreCase("Pong")) {
+                if (senderMSG.equalsIgnoreCase("Pong")) {
                     context.liveOkeUDPClient.pingCount = 0;
                     context.runOnUiThread(new Runnable() {
                         @Override
@@ -92,15 +76,12 @@ public class UDPResponseHelper {
                             context.toggleOn();
                         }
                     });
-                } else
-                if (senderMSG.equalsIgnoreCase("MasterCode:")) {
+                } else if (senderMSG.startsWith("MasterCode:")) {
                     String code = senderMSG.substring(11, senderMSG.length());
+                    Log.d(LiveOkeRemoteApplication.TAG,"Server Master Code = " + code);
                     if (!code.equalsIgnoreCase("")) {
                         context.serverMasterCode = senderMSG.substring(11, senderMSG.length());
                     }
-                } else if (senderMSG.startsWith("Songlist:")) {
-                    String songData = senderMSG.substring(9, senderMSG.length());
-                    songRawDataList.add(songData);
                 } else if (senderMSG.startsWith("Track:")) {
                     String nextTrack = senderMSG.substring(6, senderMSG.length());
                     if (nextTrack.equalsIgnoreCase("Karaoke")) {
@@ -134,7 +115,7 @@ public class UDPResponseHelper {
                             }
                         }
                     });
-                } else if (senderMSG.equalsIgnoreCase("Quit")) {
+                } else if (senderMSG.startsWith("Quit")) {
                     // reset address in case when LiveOke is back on it has a new address
                     // then we can retrieve it
                     context.liveOkeUDPClient.liveOkeIPAddress = null;
@@ -211,73 +192,7 @@ public class UDPResponseHelper {
                             context.updateRsvpCounter(context.liveOkeUDPClient.rsvpList.size());
                         }
                     });
-                } else if (senderMSG.startsWith("Finish")) {
-                    // done receiving songs list
-                    try {
-                        if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
-                            context.liveOkeUDPClient.songs.clear();
-                        }
-                        ExecutorService executor;
-                        int cpus = Runtime.getRuntime().availableProcessors();
-                        int maxThreads = cpus * 2;
-                        maxThreads = (maxThreads > 0 ? maxThreads : 1);
-                        Log.d(LiveOkeRemoteApplication.TAG, "CPUs: " + cpus);
-                        Log.d(LiveOkeRemoteApplication.TAG, "Max Thread: " + maxThreads);
-                        Log.d(LiveOkeRemoteApplication.TAG, "Total Raw Songs: " + songRawDataList.size());
-                        executor = new ThreadPoolExecutor(
-                                cpus, // core thread pool size
-                                maxThreads, // maximum thread pool size
-                                40, // time to wait before resizing pool
-                                TimeUnit.SECONDS,
-                                new ArrayBlockingQueue<Runnable>(maxThreads, false),
-                                new ThreadPoolExecutor.CallerRunsPolicy());
-                        CompletionService<Song> pool = new ExecutorCompletionService<>(executor);
-                        if (context.liveOkeUDPClient.songs != null) {
-                            context.liveOkeUDPClient.songs.clear();
-                        }
-                        for (final String rawData : songRawDataList) {
-                            pool.submit(new Callable<Song>() {
-                                @Override
-                                public Song call() throws Exception {
-                                    return SongHelper.buildSong(rawData);
-                                }
-                            });
-                        }
-                        // process the result from the threads
-                        int mSize = songRawDataList.size();
-                        for (int i = 0; i < mSize; i++) {
-                            Song song = pool.take().get();
-                            if (context.liveOkeUDPClient.songs == null) {
-                                context.liveOkeUDPClient.songs = new ArrayList<>();
-                            }
-                            context.liveOkeUDPClient.songs.add(song);
-                        }
-                        executor.shutdown();
-                        while (!executor.isTerminated()) {
-                        }
-                        songRawDataList = null;
-                        if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
-                            insertDBNow(context.liveOkeUDPClient.songs);
-                        }
-                        executor = null;
-                        pool = null;
-                        context.liveOkeUDPClient.doneGettingSongList = true;
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
                 }
             }
-    }
-    public void insertDBNow(ArrayList<Song> songsList) throws Exception {
-        try {
-            SongListDataSource db = new SongListDataSource(context);
-            db.open();
-            db.getDbHelper().resetDB(db.getDatabase());
-            db.insertAll(songsList);
-            db.close();
-        } catch (Exception e) {
-            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
-            throw new Exception(e);
-        }
     }
 }

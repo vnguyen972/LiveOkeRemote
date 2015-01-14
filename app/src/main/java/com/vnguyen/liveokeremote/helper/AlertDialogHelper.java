@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -21,6 +22,7 @@ import com.afollestad.materialdialogs.Theme;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
+import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
@@ -28,7 +30,6 @@ import com.vnguyen.liveokeremote.RsvpListAdapter;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
-
 
 import java.io.File;
 import java.util.ArrayList;
@@ -301,6 +302,8 @@ public class AlertDialogHelper {
                                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                 if (context.liveOkeUDPClient != null) {
                                     String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
+                                    Log.d(LiveOkeRemoteApplication.TAG,"masterCode = '" + masterCode + "'");
+                                    Log.d(LiveOkeRemoteApplication.TAG,"masterCodeSERVER = '" + context.serverMasterCode + "'");
                                     if (masterCode != null && !masterCode.equals("") && context.serverMasterCode != null &&
                                             !context.serverMasterCode.equals("") &&
                                             masterCode.equalsIgnoreCase(context.serverMasterCode)) {
