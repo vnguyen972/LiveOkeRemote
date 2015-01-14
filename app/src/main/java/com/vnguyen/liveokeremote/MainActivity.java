@@ -67,7 +67,6 @@ import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
 import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
-import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
@@ -555,7 +554,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        Log.v(app.TAG, "Back button pressed on device");
+        Log.v(LiveOkeRemoteApplication.TAG, "Back button pressed on device");
         if (listingBy.equalsIgnoreCase("search")) {
             MenuItem menuSearch = mainMenu.findItem(R.id.menu_search);
             menuSearch.collapseActionView();
@@ -579,7 +578,6 @@ public class MainActivity extends ActionBarActivity {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    UDPBroadcastHelper helper = new UDPBroadcastHelper();
                                     LiveOkeRemoteBroadcastMsg bcMsg =
                                             new LiveOkeRemoteBroadcastMsg("Bye",
                                                     getResources().getString(R.string.app_name), me.name);
@@ -660,7 +658,7 @@ public class MainActivity extends ActionBarActivity {
         Bitmap bm;
         String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                 getResources().getString(R.string.myAvatarURI));
-        Log.v(app.TAG, "Avatar from Pref. URI: " + avatarURI);
+        Log.v(LiveOkeRemoteApplication.TAG, "Avatar from Pref. URI: " + avatarURI);
         if (avatarURI != null && !avatarURI.equals("")) {
             imgURI = Uri.parse(avatarURI);
             bm = uriToBitmap(imgURI);
@@ -699,8 +697,8 @@ public class MainActivity extends ActionBarActivity {
             getContentResolver().takePersistableUriPermission(aquiredPhoto.mImageCaptureUri, takeFlags);
         }
         bitmap = uriToBitmap(aquiredPhoto.mImageCaptureUri);
-        Log.v(app.TAG, "URL + " + aquiredPhoto.mImageCaptureUri.toString());
-        Log.v(app.TAG,"Path = " + path);
+        Log.v(LiveOkeRemoteApplication.TAG, "URL + " + aquiredPhoto.mImageCaptureUri.toString());
+        Log.v(LiveOkeRemoteApplication.TAG,"Path = " + path);
         // Save to SharedPreference
         PreferencesHelper.getInstance(MainActivity.this).setStringPreference(
                 aquiredPhoto.prefKey, aquiredPhoto.mImageCaptureUri.toString());
@@ -753,7 +751,7 @@ public class MainActivity extends ActionBarActivity {
             listingBy = "title";
             pagerTitles = db.getTitleKeysMap();
         } catch (Exception ex) {
-            Log.e(app.TAG,ex.getMessage(),ex);
+            Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
         } finally {
             db.close();
         }
@@ -765,7 +763,7 @@ public class MainActivity extends ActionBarActivity {
             this.searchStr = searchStr;
             pagerTitles = db.getNewSearchKeysMap(searchStr);
         } catch (Exception e) {
-            Log.e(app.TAG,e.getLocalizedMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG,e.getLocalizedMessage(),e);
         } finally {
             db.close();
         }
@@ -777,7 +775,7 @@ public class MainActivity extends ActionBarActivity {
             listingBy = "favorites";
             pagerTitles = db.getFavoriteKeysMap();
         } catch (Exception e) {
-            Log.e(app.TAG, e.getLocalizedMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG, e.getLocalizedMessage(),e);
         } finally {
             db.close();
         }
@@ -790,7 +788,7 @@ public class MainActivity extends ActionBarActivity {
             listingBy = language;
             pagerTitles = db.getLanguageKeysMapNumber(language);
         } catch (Exception e) {
-            Log.e(app.TAG, e.getLocalizedMessage(),e);
+            Log.e(LiveOkeRemoteApplication.TAG, e.getLocalizedMessage(),e);
         } finally {
             db.close();
         }
