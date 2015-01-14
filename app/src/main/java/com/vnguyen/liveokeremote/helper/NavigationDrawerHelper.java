@@ -32,7 +32,10 @@ import com.vnguyen.liveokeremote.SongListRetriever;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class NavigationDrawerHelper {
 
@@ -130,6 +133,7 @@ public class NavigationDrawerHelper {
                                 public void onPositive(MaterialDialog materialDialog) {
                                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     if (context.liveOkeUDPClient != null) {
+                                        final long startTime = System.currentTimeMillis();
                                         final AlertDialogHelper adh = new AlertDialogHelper(context);
                                         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                                             @Override
@@ -151,7 +155,6 @@ public class NavigationDrawerHelper {
                                             @Override
                                             protected Void doInBackground(Void... params) {
                                                 try {
-                                                    long startTime = System.currentTimeMillis();
                                                     //context.webSocketHelper.sendMessage("getsonglist");
 //                                                    context.liveOkeUDPClient.sendMessage("getsonglist",
 //                                                            context.liveOkeUDPClient.liveOkeIPAddress,
@@ -198,9 +201,19 @@ public class NavigationDrawerHelper {
                                             @Override
                                             protected void onPostExecute(Void aVoid) {
                                                 Log.v(LiveOkeRemoteApplication.TAG,"POST-Exec: getsonglist");
+                                                long endTime = System.currentTimeMillis();
+                                                long total = endTime - startTime;
+                                                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                                                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                                                 context.getPagerTitles();
                                                 context.updateMainDisplay();
                                                 adh.dismissProgress();
+                                                SnackbarManager.show(Snackbar.with(context)
+                                                        .type(SnackbarType.MULTI_LINE)
+                                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                        .textColor(Color.WHITE)
+                                                        .color(Color.BLACK)
+                                                        .text(context.totalSong + " songs loaded in " + dateFormat.format(new Date(total))));
                                                 try {
                                                     context.db.saveDB();
                                                 } catch (IOException e) {

@@ -82,6 +82,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         printStream.flush();
                         // clear out the outputstream array
                         byteArrayOutputStream.reset();
+                        int i = 0;
                         while (!response.startsWith("Finish")) {
                             bytesRead = inputStream.read(buffer);
                             //System.out.println("bytesread = " + bytesRead);
@@ -91,7 +92,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             byteArrayOutputStream.reset();
                             printStream.print("getsong");
                             printStream.flush();
-                            //System.out.println("RESPONSE = " + response);
+                            Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i++);
                             onReceived(response);
                         }
                         //System.out.println("RESPONSE = " + response);
@@ -108,7 +109,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             try {
                                 Log.v(LiveOkeRemoteApplication.TAG, "Closing the socket...");
                                 //socket.shutdownInput();
-                                socket.shutdownOutput();
+                                //socket.shutdownOutput();
                                 socket.close();
                                 byteArrayOutputStream.close();
                                 inputStream.close();
