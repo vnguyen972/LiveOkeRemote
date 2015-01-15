@@ -842,8 +842,10 @@ public class SongListDataSource {
         song.convertedSinger = cursor.getString(4);
         song.songPath = cursor.getString(5);
         song.type = cursor.getString(6);
-        song.author = cursor.getString(7);
-        song.producer = cursor.getString(8);
+        String author = cursor.getString(7);
+        song.author = (author != null && !author.equals("") ? author : "?Unknown");
+        String producer = cursor.getString(8);
+        song.producer = (producer != null && !producer.equals("") ? producer : "?Unknown");
         return song;
     }
 

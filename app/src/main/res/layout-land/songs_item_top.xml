@@ -6,115 +6,7 @@
     android:orientation="horizontal"
     >
     <!--What you want to show in SurfaceView-->
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TableRow android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/songs_icon"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_gravity="center_vertical" />
-            <RelativeLayout android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    android:id="@+id/song_id"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:visibility="gone"/>
-                <TextView
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/song_title"
-                    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                    android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                    android:textColor="@android:color/black"
-                    android:singleLine="true"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:selectAllOnFocus="true"
-                    android:text="Title goes here"
-                    android:gravity="top"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="5dp" />
-
-            </RelativeLayout>
-                    <TextView
-                        android:layout_width="150dp"
-                        android:layout_height="fill_parent"
-                        android:id="@+id/song_singer"
-                        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                        android:textColor="@android:color/black"
-                        android:singleLine="true"
-                        android:textSize="20sp"
-                        android:gravity="center_vertical|top"
-                        android:clickable="false"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:selectAllOnFocus="true"
-                        android:text="Singer"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="false"
-                        android:layout_alignBottom="@+id/song_title"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginRight="5dp" />
-                    <TextView
-                        android:layout_width="150dp"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/song_author"
-                        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                        android:textColor="@android:color/black"
-                        android:singleLine="true"
-                        android:textSize="20sp"
-                        android:gravity="center_vertical|top"
-                        android:clickable="false"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:selectAllOnFocus="true"
-                        android:text="Author"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginRight="5dp" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/song_producer"
-                        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                        android:textColor="@android:color/black"
-                        android:singleLine="true"
-                        android:textSize="20sp"
-                        android:gravity="center_vertical|top"
-                        android:clickable="false"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:selectAllOnFocus="true"
-                        android:text="Producer"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="false"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginRight="1dp" />
-        </TableRow>
-    </TableLayout>
-    <!--RelativeLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -136,8 +28,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_gravity="center_vertical" />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/song_icon_layout"
             android:layout_toEndOf="@+id/song_icon_layout"
@@ -166,11 +58,11 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_margin="10dp"/>
+                android:layout_marginTop="10dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:id="@+id/song_singer"
+                android:id="@+id/song_singer_land"
                 android:minHeight="?android:attr/listPreferredItemHeightSmall"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
                 android:textColor="@android:color/black"
@@ -181,49 +73,11 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:selectAllOnFocus="true"
-                android:text="Singer"
+                android:text="Singer name goes here"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_margin="10dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/song_producer"
-                android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                android:textColor="@android:color/black"
-                android:singleLine="true"
-                android:textSize="20sp"
-                android:gravity="center_vertical|top"
-                android:clickable="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:selectAllOnFocus="true"
-                android:text="Producer"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_margin="10dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/song_author"
-                android:minHeight="?android:attr/listPreferredItemHeightSmall"
-                android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                android:textColor="@android:color/black"
-                android:singleLine="true"
-                android:textSize="20sp"
-                android:gravity="center_vertical|top"
-                android:clickable="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:selectAllOnFocus="true"
-                android:text="Author"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_margin="10dp" />
-        </LinearLayout>
-    </RelativeLayout-->
+                android:layout_marginTop="35dp" />
+        </RelativeLayout>
+    </RelativeLayout>
 </LinearLayout>

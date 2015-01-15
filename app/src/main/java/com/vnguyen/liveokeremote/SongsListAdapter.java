@@ -59,12 +59,19 @@ public class SongsListAdapter extends BaseSwipeAdapter {
     public void fillValues(int position, View view) {
         SongListViewHolder holder = (SongListViewHolder) view.getTag();
         final Song song = songs.get(position);
+        TextView smallLandscape = null;
         if (holder == null) {
             holder = new SongListViewHolder();
             holder.iconImgView = (ImageView) view.findViewById(R.id.songs_icon);
             holder.idTxtView = (TextView) view.findViewById(R.id.song_id);
             holder.titleTxtView = (TextView) view.findViewById(R.id.song_title);
-            holder.singerTxtView = (TextView) view.findViewById(R.id.song_singer);
+            TextView tv = (TextView) view.findViewById(R.id.song_singer);
+            if (tv != null) {
+                holder.singerTxtView = tv;
+            } else {
+                smallLandscape = (TextView) view.findViewById(R.id.song_singer_land);
+                holder.singerTxtView = smallLandscape;
+            }
             holder.authorTxtView = (TextView) view.findViewById(R.id.song_author);
             holder.producerTxtView = (TextView) view.findViewById(R.id.song_producer);
             holder.position = position;
@@ -107,16 +114,12 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             holder.producerTxtView.setText(song.producer);
         }
         if (context.app.landscapeOriented) {
-//            String text = song.singer;
-//            if (song.author != null && !song.author.equals("")) {
-//                text += " - " + song.author;
-//            }
-//            if (song.producer != null && !song.producer.equals("")) {
-//                text += " - " + song.producer;
-//            }
-//            holder.singerTxtView.setText(text);
-//        } else {
-//        holder.singerTxtView.setTextSize(30);
+            if (smallLandscape == null) {
+                holder.singerTxtView.setText(song.singer);
+            } else {
+                holder.singerTxtView.setText(song.singer + " - " + song.author + " - " + song.producer);
+            }
+        } else {
             holder.singerTxtView.setText(song.singer);
         }
     }
