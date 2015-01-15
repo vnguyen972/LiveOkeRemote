@@ -65,6 +65,8 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             holder.idTxtView = (TextView) view.findViewById(R.id.song_id);
             holder.titleTxtView = (TextView) view.findViewById(R.id.song_title);
             holder.singerTxtView = (TextView) view.findViewById(R.id.song_singer);
+            holder.authorTxtView = (TextView) view.findViewById(R.id.song_author);
+            holder.producerTxtView = (TextView) view.findViewById(R.id.song_producer);
             holder.position = position;
             view.setTag(holder);
         }
@@ -98,16 +100,22 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         holder.titleTxtView.setText(song.title);
         holder.singerTxtView.setTypeface(font2);
 //        Log.v(LiveOkeRemoteApplication.TAG,"oriented: " + context.app.landscapeOriented);
+        if (holder.authorTxtView != null) {
+            holder.authorTxtView.setText(song.author);
+        }
+        if (holder.producerTxtView != null) {
+            holder.producerTxtView.setText(song.producer);
+        }
         if (context.app.landscapeOriented) {
-            String text = song.singer;
-            if (song.author != null && !song.author.equals("")) {
-                text += " - " + song.author;
-            }
-            if (song.producer != null && !song.producer.equals("")) {
-                text += " - " + song.producer;
-            }
-            holder.singerTxtView.setText(text);
-        } else {
+//            String text = song.singer;
+//            if (song.author != null && !song.author.equals("")) {
+//                text += " - " + song.author;
+//            }
+//            if (song.producer != null && !song.producer.equals("")) {
+//                text += " - " + song.producer;
+//            }
+//            holder.singerTxtView.setText(text);
+//        } else {
 //        holder.singerTxtView.setTextSize(30);
             holder.singerTxtView.setText(song.singer);
         }
