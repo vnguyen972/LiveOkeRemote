@@ -267,7 +267,7 @@ public class NavigationDrawerHelper {
                                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                                                 .textColor(Color.WHITE)
                                                 .color(Color.RED)
-                                                .text("ERROR: Not Connected"));
+                                                .text("ERROR: Not Connected to UDPClient Service"));
                                     }
                                 }
                             })

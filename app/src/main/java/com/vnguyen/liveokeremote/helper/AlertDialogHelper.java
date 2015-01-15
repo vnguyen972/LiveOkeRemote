@@ -320,7 +320,7 @@ public class AlertDialogHelper {
                                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                                                 .textColor(Color.WHITE)
                                                 .color(Color.RED)
-                                                .text("ERROR: You do not have enough privileges to complete this action."));
+                                                .text("No Permission: Only the HOST has access to this action."));
                                     }
                                 }
                                 break;

@@ -140,41 +140,17 @@ public class FloatingButtonsHelper {
             @Override
             public void onClick(View v) {
                 if (context.liveOkeUDPClient != null) {
-                    if (context.liveOkeUDPClient.liveOkeIPAddress != null) {
-                        context.liveOkeUDPClient.sendMessage("play",
-                                context.liveOkeUDPClient.liveOkeIPAddress,
-                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                    } else {
-                        SnackbarManager.show(Snackbar.with(context)
-                                .type(SnackbarType.MULTI_LINE)
-                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                .textColor(Color.WHITE)
-                                .color(Color.RED)
-                                .text("ERROR: Not Connected"));
-                    }
+                    context.liveOkeUDPClient.sendMessage("play",
+                            context.liveOkeUDPClient.liveOkeIPAddress,
+                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                 } else {
                     SnackbarManager.show(Snackbar.with(context)
                             .type(SnackbarType.MULTI_LINE)
                             .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                             .textColor(Color.WHITE)
                             .color(Color.RED)
-                            .text("ERROR: Not Connected"));
+                            .text("ERROR: Unable to connect to UDPClient Service!"));
                 }
-//                if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
-//                    if (playButton.getTag().equals("PLAY")) {
-//                        context.webSocketHelper.sendMessage("play");
-//
-//                    } else {
-//                        context.webSocketHelper.sendMessage("pause");
-//                    }
-//                } else {
-//                    SnackbarManager.show(Snackbar.with(context)
-//                            .type(SnackbarType.MULTI_LINE)
-//                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-//                            .textColor(Color.WHITE)
-//                            .color(Color.RED)
-//                            .text("ERROR: Not Connected"));
-//                }
             }
         });
 
@@ -186,8 +162,8 @@ public class FloatingButtonsHelper {
                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                 if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
-                            .title("Are you sure?")
-                            .content("Do you want to RESTART the song?")
+                            .title("RESTART THIS SONG?")
+                            .content("Make sure everyone is OK before continue...")
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
@@ -213,7 +189,7 @@ public class FloatingButtonsHelper {
                             .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                             .textColor(Color.WHITE)
                             .color(Color.RED)
-                            .text("ERROR: Not Connected"));
+                            .text("ERROR: Not Connected to UDPClient Service"));
                 }
             }
         });
@@ -225,8 +201,8 @@ public class FloatingButtonsHelper {
                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                 if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
-                            .title("Are you sure?")
-                            .content("Do you want to SKIP to the next song?")
+                            .title("SKIP THIS SONG?")
+                            .content("Make sure everyone is OK before continue...")
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
@@ -253,7 +229,7 @@ public class FloatingButtonsHelper {
                             .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                             .textColor(Color.WHITE)
                             .color(Color.RED)
-                            .text("ERROR: Not Connected"));
+                            .text("ERROR: Not Connected to UDPClient Service"));
                 }
             }
         });
@@ -266,27 +242,9 @@ public class FloatingButtonsHelper {
             public void onClick(View v) {
                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                 if (context.liveOkeUDPClient != null) {
-//                    new MaterialDialog.Builder(context)
-//                            .title("Are you sure?")
-//                            .content("Do you want to switch the audio track?")
-//                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
-//                            .positiveText("OK")
-//                            .negativeText("CANCEL")
-//                            .callback(new MaterialDialog.Callback() {
-//
-//                                @Override
-//                                public void onNegative(MaterialDialog materialDialog) {
-//                                }
-//
-//                                @Override
-//                                public void onPositive(MaterialDialog materialDialog) {
-                                    //context.webSocketHelper.sendMessage("toggleaudio");
-                                    context.liveOkeUDPClient.sendMessage("toggleaudio",
-                                            context.liveOkeUDPClient.liveOkeIPAddress,
-                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-//                                }
-//                            })
-//                            .show();
+                        context.liveOkeUDPClient.sendMessage("toggleaudio",
+                                context.liveOkeUDPClient.liveOkeIPAddress,
+                                context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
 
                 } else {
                     SnackbarManager.show(Snackbar.with(context)
@@ -294,7 +252,7 @@ public class FloatingButtonsHelper {
                             .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                             .textColor(Color.WHITE)
                             .color(Color.RED)
-                            .text("ERROR: Not Connected"));
+                            .text("ERROR: Not Connected to UDPClient Service"));
                 }
             }
         });
@@ -306,8 +264,8 @@ public class FloatingButtonsHelper {
                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                 if (context.liveOkeUDPClient != null) {
                     new MaterialDialog.Builder(context)
-                            .title("Are you sure?")
-                            .content("Do you want to swap the audio track?")
+                            .title("MARK THIS AUDIO TRACK SWAPPED?")
+                            .content("This will ensure next time the song plays the right audio track.")
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
@@ -333,7 +291,7 @@ public class FloatingButtonsHelper {
                             .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                             .textColor(Color.WHITE)
                             .color(Color.RED)
-                            .text("ERROR: Not Connected"));
+                            .text("ERROR: Not Connected to UDPClient Service"));
                 }
             }
         });
