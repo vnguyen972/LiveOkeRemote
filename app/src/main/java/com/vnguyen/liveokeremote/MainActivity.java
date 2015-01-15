@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -362,6 +363,11 @@ public class MainActivity extends ActionBarActivity {
         if (liveOkeUDPClient != null) {
             liveOkeUDPClient.initClient();
         }
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            app.landscapeOriented = true;
+        } else {
+            app.landscapeOriented = false;
+        }
         handler.postDelayed(pingPong, 10000);
     }
 
@@ -441,24 +447,6 @@ public class MainActivity extends ActionBarActivity {
         onOffSwitch = menu.findItem(R.id.on_off_switch);
         onOffSwitch.setActionView(R.layout.on_off_switch);
 
-//        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
-        //connect2WSocket();
-//        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    Log.i(app.TAG,"SWITCHED ON");
-//                    connect2WSocket();
-//                } else {
-//                    if (webSocketHelper != null) {
-//                        webSocketHelper.disconnect();
-//                    }
-//                    Log.i(app.TAG, "SWITCHED OFF");
-//                }
-//            }
-//        });
-
-
         IconDrawable searchIcon = new IconDrawable(getApplicationContext(), Iconify.IconValue.md_search);
         searchIcon.sizeDp(30);
         searchIcon.colorRes(R.color.white);
@@ -510,52 +498,6 @@ public class MainActivity extends ActionBarActivity {
 
 
         return true;
-    }
-
-    private void connect2WSocket() {
-//        final SwitchCompat switchButton = (SwitchCompat) onOffSwitch.getActionView().findViewById(R.id.switchForActionBar);
-        if (wsInfo == null) {
-            wsInfo = new LiveOkeSocketInfo();
-        }
-//        if (wsInfo.ipAddress != null && !wsInfo.ipAddress.equals("")) {
-//            // if there's an IP presents
-//            //wsInfo.port = "8181";
-//            wsInfo.uri = "ws://" + wsInfo.ipAddress + ":" + wsInfo.port;
-//            Log.v(app.TAG,"URI = " + wsInfo.uri);
-//            if (webSocketHelper == null) {
-//                webSocketHelper = new WebSocketHelper(MainActivity.this);
-//            }
-//            webSocketHelper.connect();
-//        } else{
-//            // if not, we will search the network for it
-//            new Thread(new Runnable() {
-//                //WebSocketInfo _wsInfo;
-//                @Override
-//                public void run() {
-//                    UDPBroadcastHelper udpHelper = new UDPBroadcastHelper();
-//                    wsInfo = udpHelper.findServer();
-//                    if (wsInfo != null) {
-//                        if (webSocketHelper == null) {
-//                            webSocketHelper = new WebSocketHelper(MainActivity.this);
-//                        }
-//                        webSocketHelper.connect();
-//                    } else {
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                //switchButton.toggle();
-//                                SnackbarManager.show(Snackbar.with(MainActivity.this)
-//                                        .type(SnackbarType.MULTI_LINE)
-//                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-//                                        .textColor(Color.WHITE)
-//                                        .color(Color.RED)
-//                                        .text("ERROR: Unable to find LiveOke!"));
-//                            }
-//                        });
-//                    }
-//                }
-//            }).start();
-//        }
     }
 
     @Override
@@ -613,20 +555,6 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
-//        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
-//        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-//            Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
-//        }
-        getPagerTitles();
-        updateMainDisplay();
     }
 
     public void updateRsvpCounter(int count) {

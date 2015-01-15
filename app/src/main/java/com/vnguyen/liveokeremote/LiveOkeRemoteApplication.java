@@ -15,6 +15,7 @@ public class LiveOkeRemoteApplication extends Application {
 
     private ArrayList<ReservedListItem> rsvpList;
     public String songInitialIconBy = "Singer";
+    public boolean landscapeOriented = false;
 
     public LiveOkeRemoteApplication() {
     }
