@@ -400,9 +400,9 @@ public class SongListDataSource {
             int offset = (Integer.parseInt(keys) * 100) - 100;
             query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where " +
                     "(upper(ascii_singer) like upper('%"+ searchStr +"%') or upper(ascii_title) like upper('%"+searchStr+"%') " +
-                    "or upper(quick_title) like upper('%"+ searchStr +"%') or upper(quick_singer) like upper('%"+searchStr+"%') " +
+                    "or upper(quick_title) like upper('"+ searchStr +"') or upper(quick_singer) like upper('%"+searchStr+"%') " +
                     "or upper(ascii_author) like upper('%"+ searchStr +"%') or upper(ascii_producer) like upper('%"+ searchStr +"%') " +
-                    "or songid like '%"+searchStr+"%') limit 100 offset " + offset;
+                    "or songid like '%"+searchStr+"%') order by ascii_title limit 100 offset " + offset;
         } else if (field.equalsIgnoreCase("favorites")) {
             int offset = (Integer.parseInt(keys) * 100) - 100;
             query = "select * from favoriteslist limit 100 offset " + offset;
@@ -538,7 +538,7 @@ public class SongListDataSource {
         ConcurrentHashMap<String, String> map = new ConcurrentHashMap<String, String>();
         String query = "select count(*) from songslist where " +
                 "(upper(ascii_singer) like upper('%"+searchStr+"%') or upper(ascii_title) like upper('%"+
-                searchStr+"%') or upper(ascii_author) like upper('%"+ searchStr +"%') or upper(quick_title) like upper('%" + searchStr + "%') " +
+                searchStr+"%') or upper(ascii_author) like upper('%"+ searchStr +"%') or upper(quick_title) like upper('" + searchStr + "') " +
                 "or upper(quick_singer) like upper('%" + searchStr + "%') or upper(ascii_producer) like upper('%"+ searchStr +"%') " +
                 "or songId like '%"+searchStr+"%' )";
         Log.d(LiveOkeRemoteApplication.TAG, "Search Query = " + query);
