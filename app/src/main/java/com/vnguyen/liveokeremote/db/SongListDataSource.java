@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
+import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
@@ -23,6 +24,7 @@ public class SongListDataSource {
     private SQLiteDatabase database;
 
     private SongSQLiteHelper dbHelper;
+    private MainActivity context;
 
     public SongSQLiteHelper getDbHelper() {
         return dbHelper;
@@ -70,6 +72,7 @@ public class SongListDataSource {
 
     public SongListDataSource(Context context) {
         dbHelper = new SongSQLiteHelper(context);
+        this.context = (MainActivity) context;
     }
 
     public void open() throws SQLException {
@@ -395,7 +398,7 @@ public class SongListDataSource {
         String query = "";
         if (field.equalsIgnoreCase("search")) {
             int offset = (Integer.parseInt(keys) * 100) - 100;
-            query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type from songslist where " +
+            query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where " +
                     "(upper(ascii_singer) like upper('%"+ searchStr +"%') or upper(ascii_title) like upper('%"+searchStr+"%') " +
                     "or upper(quick_title) like upper('%"+ searchStr +"%') or upper(quick_singer) like upper('%"+searchStr+"%') " +
                     "or upper(ascii_author) like upper('%"+ searchStr +"%') or upper(ascii_producer) like upper('%"+ searchStr +"%') " +
@@ -408,9 +411,9 @@ public class SongListDataSource {
                 field.equalsIgnoreCase("CN")) {
             int offset = (Integer.parseInt(keys) * 100) - 100;
             //query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type from songslist where upper(substr(title,1,1)) in " + keys + " and language='"+field+"'";// order by ascii_title asc";
-            query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type from songslist where language='"+field+"' limit 100 offset " + offset;
+            query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where language='"+field+"' limit 100 offset " + offset;
         } else {
-            query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type from songslist where upper(substr("+field+",1,1)) in " + keys;// + " order by ascii_title asc";
+            query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where upper(substr("+field+",1,1)) in " + keys;// + " order by ascii_title asc";
         }
         Log.d(LiveOkeRemoteApplication.TAG,"Query = " + query);
         Cursor cursor = database.rawQuery(query, null);
@@ -424,7 +427,23 @@ public class SongListDataSource {
                     //list.add(cursorToFavoriteSongDisplay(cursor));
                 } else {
                     song = cursorToSongDisplay(cursor);
-                    song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
+                    if (context.app.songInitialIconBy.equalsIgnoreCase("Title")) {
+                        song.icon = (new DrawableHelper()).buildDrawable(song.title.substring(0, 1), "round");
+                    } else if (context.app.songInitialIconBy.equalsIgnoreCase("Singer")) {
+                        song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
+                    } else if (context.app.songInitialIconBy.equalsIgnoreCase("Author")) {
+                        if (song.author != null && !song.author.equals("")) {
+                            song.icon = (new DrawableHelper()).buildDrawable(song.author.substring(0, 1), "round");
+                        } else {
+                            song.icon = (new DrawableHelper()).buildDrawable("?Unknown".substring(0, 1), "round");
+                        }
+                    } else if (context.app.songInitialIconBy.equalsIgnoreCase("Producer")) {
+                        if (song.producer != null && !song.producer.equals("")) {
+                            song.icon = (new DrawableHelper()).buildDrawable(song.producer.substring(0, 1), "round");
+                        } else {
+                            song.icon = (new DrawableHelper()).buildDrawable("?Unknown".substring(0, 1), "round");
+                        }
+                    }
                     //Log.d("K7","song: " + song.getTitle());
                     //list.add(song);
                 }
@@ -823,6 +842,8 @@ public class SongListDataSource {
         song.convertedSinger = cursor.getString(4);
         song.songPath = cursor.getString(5);
         song.type = cursor.getString(6);
+        song.author = cursor.getString(7);
+        song.producer = cursor.getString(8);
         return song;
     }
 

@@ -61,7 +61,8 @@ public class NavigationDrawerHelper {
     public static final int YOUR_PHOTO = 13;
     public static final int IP_ADDRESS = 14;
     public static final int MASTER_CODE = 15;
-    public static final int HELP = 16;
+    public static final int SONG_INITIAL_ICON_BY = 16;
+    public static final int HELP = 17;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -277,6 +278,25 @@ public class NavigationDrawerHelper {
                     (new AlertDialogHelper(context)).
                             popupMasterCode("Enter Server Master Code");
                     mDrawerList.setItemChecked(MASTER_CODE, false);
+                } else if (mDrawerList.getCheckedItemPosition() == SONG_INITIAL_ICON_BY) {
+                    CharSequence[] options = {"Title", "Singer", "Author", "Producer"};
+                    new MaterialDialog.Builder(context)
+                            .title("Display Song Initial Icon By")
+                            .items(options)
+                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                    Log.v(context.app.TAG, "Selected: " + charSequence);
+                                    context.app.songInitialIconBy = charSequence+"";
+                                    context.getPagerTitles();
+                                    context.updateMainDisplay();
+                                }
+                            })
+                            .positiveText("Choose")
+                            .negativeText("Cancel")
+                            .show();
+
+                    mDrawerList.setItemChecked(SONG_INITIAL_ICON_BY, false);
                 } else if (mDrawerList.getCheckedItemPosition() == TOGGLE_FULL_SCREEN) {
                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                     if (context.liveOkeUDPClient != null) {
@@ -482,6 +502,13 @@ public class NavigationDrawerHelper {
                     lockIcon.setIcon("gmd-lock");
                     lockIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = lockIcon;
+                    showCounter = false;
+                    break;
+                case SONG_INITIAL_ICON_BY:
+                    IconicFontDrawable songIcon = new IconicFontDrawable(context.getApplicationContext());
+                    songIcon.setIcon("gmd-palette");
+                    songIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = songIcon;
                     showCounter = false;
                     break;
                 case HELP:

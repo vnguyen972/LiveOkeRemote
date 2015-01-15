@@ -65,6 +65,8 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             holder.idTxtView = (TextView) view.findViewById(R.id.song_id);
             holder.titleTxtView = (TextView) view.findViewById(R.id.song_title);
             holder.singerTxtView = (TextView) view.findViewById(R.id.song_singer);
+            holder.producerTxtView = (TextView) view.findViewById(R.id.song_producer);
+            holder.authorTxtView = (TextView) view.findViewById(R.id.song_author);
             holder.position = position;
             view.setTag(holder);
         }
@@ -73,6 +75,19 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             @Override
             public void onClick(View v) {
                 Log.v(LiveOkeRemoteApplication.TAG,"CLICK ON SONG: " + song.title);
+                try {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            context.liveOkeUDPClient.sendMessage("getlyric,"+song.id,
+                                    context.liveOkeUDPClient.liveOkeIPAddress,
+                                    context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                        }
+                    }).start();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         if (context.listingBy.equalsIgnoreCase("favorites")) {
@@ -84,6 +99,13 @@ public class SongsListAdapter extends BaseSwipeAdapter {
 //        holder.titleTxtView.setTextSize(21);
         holder.titleTxtView.setText(song.title);
         holder.singerTxtView.setTypeface(font2);
+        if (holder.producerTxtView != null) {
+            holder.producerTxtView.setText(song.producer);
+        }
+        if (holder.authorTxtView != null) {
+            //Log.v(LiveOkeRemoteApplication.TAG,"GOT AUTHOR: " + song.author);
+            holder.authorTxtView.setText(song.author);
+        }
 //        holder.singerTxtView.setTextSize(30);
         holder.singerTxtView.setText(song.singer);
     }
@@ -378,6 +400,8 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             TextView idTxtView;
             TextView titleTxtView;
             TextView singerTxtView;
+            TextView producerTxtView;
+            TextView authorTxtView;
             int position;
     }
 
