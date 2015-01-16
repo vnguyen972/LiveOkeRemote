@@ -1,5 +1,6 @@
 package com.vnguyen.liveokeremote;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -35,9 +36,13 @@ public class SongListFragment extends Fragment {
         Collections.sort(sortedKeys);
         final String key = sortedKeys.get(getArguments().getInt(ARG_SECTION_NUMBER));
         Log.v(ma.app.TAG, "SongListFragment.key = " + key);
-        new Thread(new Runnable() {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
-            public void run() {
+            protected void onPreExecute() {
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
                 SongListDataSource db = new SongListDataSource(ma);
                 try {
                     db.open();
@@ -58,50 +63,15 @@ public class SongListFragment extends Fragment {
                 } finally {
                     db.close();
                 }
-                ma.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        songListView.setAdapter(adapter);
-                    }
-                });
+                return null;
             }
-        }).start();
-//        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-//            @Override
-//            protected void onPreExecute() {
-//            }
-//
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                SongListDataSource db = new SongListDataSource(ma);
-//                try {
-//                    db.open();
-//                    if (ma.listingBy.equalsIgnoreCase("title")) {
-//                        songsList = db.getSongByKeys(ma.listingBy, SongHelper.translateKey(key),ma.searchStr);
-//                    } else if (ma.listingBy.equalsIgnoreCase("search") ||
-//                            ma.listingBy.equalsIgnoreCase("favorites") ||
-//                            ma.listingBy.equalsIgnoreCase("VN") ||
-//                            ma.listingBy.equalsIgnoreCase("EN") ||
-//                            ma.listingBy.equalsIgnoreCase("CN")) {
-//                        songsList = db.getSongByKeys(ma.listingBy,key, ma.searchStr);
-//                    }
-//                    Log.i(ma.app.TAG,"SongListFragment-listing by: " + ma.listingBy);
-//                    Log.i(ma.app.TAG,"Songs found: " + songsList.size());
-//                    adapter = new SongsListAdapter(ma, songsList);
-//                } catch (Exception ex) {
-//                    Log.e(ma.app.TAG,ex.getMessage(),ex);
-//                } finally {
-//                    db.close();
-//                }
-//                return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//               songListView.setAdapter(adapter);
-//            }
-//        };
-//        task.execute((Void[])null);
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+               songListView.setAdapter(adapter);
+            }
+        };
+        task.execute((Void[])null);
         songListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
