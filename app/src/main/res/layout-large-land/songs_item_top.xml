@@ -9,7 +9,7 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:stretchColumns="1,2,3,4">
+        android:stretchColumns="1">
         <TableRow android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
@@ -23,15 +23,13 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_gravity="center_vertical" />
-            <RelativeLayout android:layout_width="match_parent"
-                android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/song_id"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:visibility="gone"/>
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dip"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:id="@+id/song_title"
@@ -39,6 +37,7 @@
                     android:textAppearance="?android:attr/textAppearanceListItemSmall"
                     android:textColor="@android:color/black"
                     android:singleLine="true"
+                    android:ellipsize="end"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:clickable="false"
@@ -52,11 +51,9 @@
                     android:layout_alignParentStart="true"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp" />
-
-            </RelativeLayout>
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:id="@+id/song_singer"
                         android:minHeight="?android:attr/listPreferredItemHeightSmall"
@@ -75,9 +72,10 @@
                         android:layout_alignParentStart="false"
                         android:layout_alignBottom="@+id/song_title"
                         android:layout_marginTop="5dp"
-                        android:layout_marginRight="5dp" />
+                        android:layout_marginRight="5dp"
+                        android:ellipsize="end"/>
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dip"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:id="@+id/song_author"
@@ -95,9 +93,10 @@
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
                         android:layout_marginTop="5dp"
-                        android:layout_marginRight="5dp" />
+                        android:layout_marginRight="5dp"
+                        android:ellipsize="marquee"/>
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dip"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:id="@+id/song_producer"
@@ -116,7 +115,8 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="false"
                         android:layout_marginTop="5dp"
-                        android:layout_marginRight="1dp" />
+                        android:layout_marginRight="1dp"
+                        android:ellipsize="marquee"/>
         </TableRow>
     </TableLayout>
     <!--RelativeLayout

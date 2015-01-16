@@ -98,29 +98,32 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             }
         });
         if (context.listingBy.equalsIgnoreCase("favorites")) {
-            holder.idTxtView.setText(song.convertedTitle);
+            holder.idTxtView.setText(song.convertedTitle.trim());
         } else {
-            holder.idTxtView.setText(song.id);
+            holder.idTxtView.setText(song.id.trim());
         }
         holder.titleTxtView.setTypeface(font);
 //        holder.titleTxtView.setTextSize(21);
-        holder.titleTxtView.setText(song.title);
+        holder.titleTxtView.setText(song.title.trim());
         holder.singerTxtView.setTypeface(font2);
 //        Log.v(LiveOkeRemoteApplication.TAG,"oriented: " + context.app.landscapeOriented);
         if (holder.authorTxtView != null) {
-            holder.authorTxtView.setText(song.author);
+            holder.authorTxtView.setText(song.author.trim());
         }
         if (holder.producerTxtView != null) {
-            holder.producerTxtView.setText(song.producer);
+            holder.producerTxtView.setText(song.producer.trim());
         }
         if (context.app.landscapeOriented) {
             if (smallLandscape == null) {
-                holder.singerTxtView.setText(song.singer);
+                // large landscape mode
+                holder.singerTxtView.setText(song.singer.trim());
             } else {
-                holder.singerTxtView.setText(song.singer + " - " + song.author + " - " + song.producer);
+                // small landscape
+                holder.singerTxtView.setText(song.singer.trim() + " - " + song.author.trim() + " - " + song.producer.trim());
             }
         } else {
-            holder.singerTxtView.setText(song.singer);
+            // portrait mode (all modes)
+            holder.singerTxtView.setText(song.singer.trim());
         }
     }
 

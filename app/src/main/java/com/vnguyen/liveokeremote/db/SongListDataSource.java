@@ -434,14 +434,14 @@ public class SongListDataSource {
                     } else if (context.app.songInitialIconBy.equalsIgnoreCase("Author")) {
                         if (song.author != null && !song.author.equals("")) {
                             song.icon = (new DrawableHelper()).buildDrawable(song.author.substring(0, 1), "round");
-                        } else {
-                            song.icon = (new DrawableHelper()).buildDrawable("?Unknown".substring(0, 1), "round");
+//                        } else {
+//                            song.icon = (new DrawableHelper()).buildDrawable("?Unknown".substring(0, 1), "round");
                         }
                     } else if (context.app.songInitialIconBy.equalsIgnoreCase("Producer")) {
                         if (song.producer != null && !song.producer.equals("")) {
                             song.icon = (new DrawableHelper()).buildDrawable(song.producer.substring(0, 1), "round");
-                        } else {
-                            song.icon = (new DrawableHelper()).buildDrawable("?Unknown".substring(0, 1), "round");
+//                        } else {
+//                            song.icon = (new DrawableHelper()).buildDrawable("?Unknown".substring(0, 1), "round");
                         }
                     }
                     //Log.d("K7","song: " + song.getTitle());
