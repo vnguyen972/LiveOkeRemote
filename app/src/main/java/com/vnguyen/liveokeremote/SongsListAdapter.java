@@ -3,6 +3,7 @@ package com.vnguyen.liveokeremote;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,11 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -229,6 +232,11 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                                 context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                         swipeLayout.toggle();
                                         if (context.interstitialAd.isLoaded()) {
+                                            try {
+                                                Thread.sleep(500);
+                                            } catch (InterruptedException e) {
+
+                                            }
                                             context.interstitialAd.show();
                                             // update the reserved count notification
                                             //context.reservedCount++;
@@ -383,12 +391,16 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                             }
                                         }
                                         context.actionBarHelper.setSubTitle(songs.size() + " Songs.");
+                                        context.getPagerFavorites();
+                                        context.updateMainDisplay();
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
                                                 .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                                                 .textColor(Color.WHITE)
                                                 .color(Color.BLACK)
                                                 .text("Favorite Item Removed."));
+                                        context.navigationDrawerHelper.refreshDrawer();
+                                        context.db.saveDB();
                                     } catch (Exception ex) {
                                         Log.e(context.app.TAG,ex.getMessage(),ex);
 
@@ -434,6 +446,10 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                                 .textColor(Color.WHITE)
                                                 .color(Color.BLACK)
                                                 .text("Saved '" + sTitle + "' to your favorites successfully."));
+                                        context.getPagerFavorites();
+                                        context.updateMainDisplay();
+                                        context.navigationDrawerHelper.refreshDrawer();
+                                        context.db.saveDB();
                                     } catch (Exception ex) {
                                         Log.e(context.app.TAG, ex.getMessage(), ex);
                                     } finally {

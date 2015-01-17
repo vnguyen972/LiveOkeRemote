@@ -673,4 +673,9 @@ public class NavigationDrawerHelper {
         });
 
     }
+
+    public void refreshDrawer() {
+        Toolbar toolbar = (Toolbar) context.findViewById(R.id.mainToolbar);
+        context.navigationDrawerHelper.setupSlidingNav(toolbar);
+    }
 }
