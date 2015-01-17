@@ -431,7 +431,18 @@ public class NavigationDrawerHelper {
                     favIcon.setIcon("fa-heart");
                     favIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = favIcon;
-                    showCounter = false;
+                    showCounter = true;
+                    try {
+                        context.db.open();
+                        int count = context.db.getTotalFavorites();
+                        navCounter = ""+count;
+                        Log.v(LiveOkeRemoteApplication.TAG,"count = " + count);
+                    } catch (Exception ex) {
+                        Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
+                    } finally {
+                        context.db.close();
+                    }
+
                     break;
                 case VN_SONGS:
                     // Vietnamese Songs

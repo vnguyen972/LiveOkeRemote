@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 
 import java.util.ArrayList;
@@ -95,7 +96,8 @@ public class NavDrawerListAdapter extends BaseAdapter {
                     convertView = mInflater.inflate(R.layout.nav_menu_item, null);
                     holder.imgIcon = (ImageView) convertView.findViewById(R.id.nav_icon);
                     holder.txtTitle = (TextView) convertView.findViewById(R.id.nav_title);
-                    holder.txtCount = (TextView) convertView.findViewById(R.id.nav_counter);
+                    View view = (View) convertView.findViewById(R.id.nav_counter);
+                    holder.txtCount = new BadgeView(context,view);
                     break;
                 case TYPE_HEADER:
                     convertView = mInflater.inflate(R.layout.nav_menu_header, null);
@@ -122,9 +124,12 @@ public class NavDrawerListAdapter extends BaseAdapter {
         if (holder.txtCount != null) {
             if (navDrawerItems.get(position).counterVisible) {
                 holder.txtCount.setText(navDrawerItems.get(position).count);
+                holder.txtCount.setBadgeBackgroundColor(context.getResources().getColor(R.color.orange_500));
+                holder.txtCount.show();
             } else {
                 // hide the counter view
-                holder.txtCount.setVisibility(View.GONE);
+                //holder.txtCount.setVisibility(View.GONE);
+                holder.txtCount.hide();
             }
         }
         return convertView;
@@ -133,6 +138,6 @@ public class NavDrawerListAdapter extends BaseAdapter {
     public static class NavViewHolder {
         public ImageView imgIcon;
         public TextView txtTitle;
-        public TextView txtCount;
+        public BadgeView txtCount;
     }
 }

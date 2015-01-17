@@ -660,6 +660,19 @@ public class SongListDataSource {
         return count;
     }
 
+    public int getTotalFavorites() throws Exception {
+        int count = 0;
+        String query = "select count(*) from favoriteslist";
+        Cursor cursor = database.rawQuery(query, null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                count = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return count;
+    }
+
     public int getSongTotalNum() throws Exception {
         int count = 0;
         String query = "select count(*) from songslist";
