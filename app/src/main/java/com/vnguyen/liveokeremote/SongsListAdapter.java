@@ -107,13 +107,13 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         holder.titleTxtView.setText(song.title.trim());
         holder.singerTxtView.setTypeface(font2);
 //        Log.v(LiveOkeRemoteApplication.TAG,"oriented: " + context.app.landscapeOriented);
-        if (holder.authorTxtView != null) {
-            holder.authorTxtView.setText(song.author.trim());
-        }
-        if (holder.producerTxtView != null) {
-            holder.producerTxtView.setText(song.producer.trim());
-        }
         if (context.app.landscapeOriented) {
+            if (holder.authorTxtView != null) {
+                holder.authorTxtView.setText(song.author.trim());
+            }
+            if (holder.producerTxtView != null) {
+                holder.producerTxtView.setText(song.producer.trim());
+            }
             if (smallLandscape == null) {
                 // large landscape mode
                 holder.singerTxtView.setText(song.singer.trim());
@@ -123,7 +123,17 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             }
         } else {
             // portrait mode (all modes)
-            holder.singerTxtView.setText(song.singer.trim());
+            switch (context.app.songInitialIconBy) {
+                case "Author":
+                    holder.singerTxtView.setText(song.author.trim());
+                    break;
+                case "Producer":
+                    holder.singerTxtView.setText(song.producer.trim());
+                    break;
+                default:
+                    holder.singerTxtView.setText(song.singer.trim());
+                    break;
+            }
         }
     }
 

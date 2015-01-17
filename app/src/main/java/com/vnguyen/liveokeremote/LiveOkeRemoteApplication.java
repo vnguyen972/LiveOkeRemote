@@ -20,7 +20,6 @@ public class LiveOkeRemoteApplication extends Application {
     public LiveOkeRemoteApplication() {
     }
 
-
     @Override
     public void onCreate() {
         rsvpList = new ArrayList<>();
