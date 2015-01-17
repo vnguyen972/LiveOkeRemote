@@ -31,6 +31,7 @@
         <item>IP Address</item>
         <item>MasterCode</item>
         <item>Song Initial Icon By</item>
+        <item>Display Song Description</item>
         <item>Help</item>
     </string-array>
 
@@ -43,5 +44,7 @@
     <string name="port">port</string>
     <string name="myName">myName</string>
     <string name="myAvatarURI">myAvatarURI</string>
+    <string name="song_initial_icon">songInitialIcon</string>
+    <string name="song_desc_display">songDescDisplay</string>
 
 </resources>

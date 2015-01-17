@@ -6,6 +6,7 @@ import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
+import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ public class LiveOkeRemoteApplication extends Application {
     private ArrayList<ReservedListItem> rsvpList;
     public String songInitialIconBy = "Singer";
     public boolean landscapeOriented = false;
+    public ArrayList<String> displaySongDescFrom;
 
     public LiveOkeRemoteApplication() {
     }
@@ -23,6 +25,8 @@ public class LiveOkeRemoteApplication extends Application {
     @Override
     public void onCreate() {
         rsvpList = new ArrayList<>();
+        displaySongDescFrom = new ArrayList<>();
+        displaySongDescFrom.add("singer");
         super.onCreate();
     }
 

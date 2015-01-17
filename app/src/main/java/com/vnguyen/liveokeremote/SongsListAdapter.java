@@ -108,32 +108,59 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         holder.singerTxtView.setTypeface(font2);
 //        Log.v(LiveOkeRemoteApplication.TAG,"oriented: " + context.app.landscapeOriented);
         if (context.app.landscapeOriented) {
-            if (holder.authorTxtView != null) {
-                holder.authorTxtView.setText(song.author.trim());
-            }
-            if (holder.producerTxtView != null) {
-                holder.producerTxtView.setText(song.producer.trim());
-            }
-            if (smallLandscape == null) {
-                // large landscape mode
-                holder.singerTxtView.setText(song.singer.trim());
+            if (context.listingBy.equalsIgnoreCase("favorites")) {
+                holder.singerTxtView.setText("");
             } else {
-                // small landscape
-                holder.singerTxtView.setText(song.singer.trim() + " - " + song.author.trim() + " - " + song.producer.trim());
+                if (holder.authorTxtView != null) {
+                    holder.authorTxtView.setText(song.author.trim());
+                }
+                if (holder.producerTxtView != null) {
+                    holder.producerTxtView.setText(song.producer.trim());
+                }
+                if (smallLandscape == null) {
+                    // large landscape mode
+                    holder.singerTxtView.setText(song.singer.trim());
+                } else {
+                    // small landscape
+                    //holder.singerTxtView.setText(song.singer.trim() + " - " + song.author.trim() + " - " + song.producer.trim());
+                    String desc2Display = "";
+                    for (String desc : context.app.displaySongDescFrom) {
+                        switch (desc) {
+                            case "Author":
+                                desc2Display += (desc2Display.length() > 0 ? "-" + song.author : song.author);
+                                break;
+                            case "Producer":
+                                desc2Display += (desc2Display.length() > 0 ? "-" + song.producer : song.producer);
+                                break;
+                            default:
+                                desc2Display += (desc2Display.length() > 0 ? "-" + song.singer : song.singer);
+                                break;
+                        }
+                    }
+                    holder.singerTxtView.setText(desc2Display);
+                }
             }
         } else {
             // portrait mode (all modes)
-            switch (context.app.songInitialIconBy) {
-                case "Author":
-                    holder.singerTxtView.setText(song.author.trim());
-                    break;
-                case "Producer":
-                    holder.singerTxtView.setText(song.producer.trim());
-                    break;
-                default:
-                    holder.singerTxtView.setText(song.singer.trim());
-                    break;
+            String desc2Display = "";
+            if (!context.listingBy.equalsIgnoreCase("favorites")) {
+                for (String desc : context.app.displaySongDescFrom) {
+                    switch (desc) {
+                        case "Author":
+                            desc2Display += (desc2Display.length() > 0 ? "-" + song.author : song.author);
+                            break;
+                        case "Producer":
+                            desc2Display += (desc2Display.length() > 0 ? "-" + song.producer : song.producer);
+                            break;
+                        default:
+                            desc2Display += (desc2Display.length() > 0 ? "-" + song.singer : song.singer);
+                            break;
+                    }
+                }
+            } else {
+                desc2Display = "";
             }
+            holder.singerTxtView.setText(desc2Display);
         }
     }
 

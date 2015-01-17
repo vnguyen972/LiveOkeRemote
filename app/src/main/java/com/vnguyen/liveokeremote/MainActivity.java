@@ -69,6 +69,7 @@ import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
 import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
+import com.vnguyen.liveokeremote.helper.SongHelper;
 import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
@@ -78,6 +79,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -239,6 +241,17 @@ public class MainActivity extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
         // Load Shared Preference
+        String initialIconBy = PreferencesHelper.getInstance(this).getPreference(getResources().getString(R.string.song_initial_icon));
+        if (initialIconBy != null && !initialIconBy.equals("")) {
+            app.songInitialIconBy = initialIconBy;
+        }
+        Set<String> set = PreferencesHelper.getInstance(this).getPreferences().getStringSet(getResources().getString(R.string.song_desc_display),null);
+        if (set != null) {
+            app.displaySongDescFrom = new ArrayList<>();
+            for (String str : set) {
+                app.displaySongDescFrom.add(str);
+            }
+        }
         if (wsInfo == null) {
             wsInfo = new LiveOkeSocketInfo();
             wsInfo.ipAddress = PreferencesHelper.getInstance(MainActivity.this).getPreference(
@@ -708,8 +721,8 @@ public class MainActivity extends ActionBarActivity {
         try {
             db.open();
             listingBy = "search";
-            this.searchStr = searchStr;
-            pagerTitles = db.getNewSearchKeysMap(searchStr);
+            this.searchStr = SongHelper.convertAllChars(searchStr);
+            pagerTitles = db.getNewSearchKeysMap(this.searchStr);
         } catch (Exception e) {
             Log.e(LiveOkeRemoteApplication.TAG,e.getLocalizedMessage(),e);
         } finally {

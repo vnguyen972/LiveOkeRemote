@@ -72,6 +72,14 @@ public class PreferencesHelper {
         getPreferences().edit().putInt("total_friends", total+1).apply();
     }
 
+    public void addSongDescDisplay(ArrayList<String> bys) {
+        Set<String> set = new HashSet<>(bys.size());
+        for (String by : bys) {
+            set.add(by);
+        }
+        getPreferences().edit().putStringSet(context.getResources().getString(R.string.song_desc_display),set).apply();
+    }
+
     public void removeFriend(User friend, int position) {
         Set<String> set = getPreferences().getStringSet("friends",new HashSet<String>());
         if (!set.isEmpty()) {

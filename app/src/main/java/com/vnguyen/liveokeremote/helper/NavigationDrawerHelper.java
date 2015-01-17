@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 import java.util.TimeZone;
 
 public class NavigationDrawerHelper {
@@ -62,7 +63,8 @@ public class NavigationDrawerHelper {
     public static final int IP_ADDRESS = 14;
     public static final int MASTER_CODE = 15;
     public static final int SONG_INITIAL_ICON_BY = 16;
-    public static final int HELP = 17;
+    public static final int DISPLAY_SONG_DESC_WITH = 17;
+    public static final int HELP = 18;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -286,8 +288,10 @@ public class NavigationDrawerHelper {
                             .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
                                 @Override
                                 public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                    Log.v(context.app.TAG, "Selected: " + charSequence);
+                                    //Log.v(context.app.TAG, "Selected: " + charSequence);
                                     context.app.songInitialIconBy = charSequence+"";
+                                    PreferencesHelper.getInstance(context).setStringPreference(
+                                            context.getResources().getString(R.string.song_initial_icon), charSequence+"");
                                     context.getPagerTitles();
                                     context.updateMainDisplay();
                                 }
@@ -297,6 +301,48 @@ public class NavigationDrawerHelper {
                             .show();
 
                     mDrawerList.setItemChecked(SONG_INITIAL_ICON_BY, false);
+                } else if (mDrawerList.getCheckedItemPosition() == DISPLAY_SONG_DESC_WITH) {
+                    CharSequence[] options = {"Singer", "Author", "Producer"};
+                    Set<String> set = PreferencesHelper.getInstance(context).getPreferences().getStringSet(context.getResources().getString(R.string.song_desc_display),null);
+                    Integer[] selectedIdx;
+                    if (set != null) {
+                        selectedIdx = new Integer[set.size()];
+                        int i = 0;
+                        for (String s : set) {
+                            for (int j = 0; j < options.length;j++) {
+                                String s2 = options[j]+"";
+                                if (s.equalsIgnoreCase(s2)) {
+                                    selectedIdx[i] = j;
+                                    break;
+                                }
+                            }
+                            i++;
+                        }
+                    } else {
+                        selectedIdx = new Integer[]{0};
+                    }
+                    new MaterialDialog.Builder(context)
+                            .title("Display Song Description With")
+                            .items(options)
+                            .itemsCallbackMultiChoice(selectedIdx, new MaterialDialog.ListCallbackMulti() {
+                                @Override
+                                public void onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                                    context.app.displaySongDescFrom = new ArrayList<>();
+                                    for (CharSequence charSeq : charSequences) {
+                                        //Log.v(LiveOkeRemoteApplication.TAG,"Selected: " + charSeq);
+                                        context.app.displaySongDescFrom.add(charSeq+"");
+
+                                    }
+                                    PreferencesHelper.getInstance(context).addSongDescDisplay(context.app.displaySongDescFrom);
+                                    context.getPagerTitles();
+                                    context.updateMainDisplay();
+                                }
+                            })
+                            .positiveText("Choose")
+                            .negativeText("Cancel")
+                            .show();
+
+                    mDrawerList.setItemChecked(DISPLAY_SONG_DESC_WITH, false);
                 } else if (mDrawerList.getCheckedItemPosition() == TOGGLE_FULL_SCREEN) {
                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                     if (context.liveOkeUDPClient != null) {
@@ -509,6 +555,13 @@ public class NavigationDrawerHelper {
                     songIcon.setIcon("gmd-palette");
                     songIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = songIcon;
+                    showCounter = false;
+                    break;
+                case DISPLAY_SONG_DESC_WITH:
+                    IconicFontDrawable descIcon = new IconicFontDrawable(context.getApplicationContext());
+                    descIcon.setIcon("gmd-view-list");
+                    descIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = descIcon;
                     showCounter = false;
                     break;
                 case HELP:
