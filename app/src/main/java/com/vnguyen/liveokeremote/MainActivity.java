@@ -14,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,6 +46,7 @@ import android.widget.ViewFlipper;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.androidquery.AQuery;
+import com.github.fernandodev.easyratingdialog.library.EasyRatingDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -142,10 +142,18 @@ public class MainActivity extends ActionBarActivity {
 
     private Handler handler = new Handler();
     private Runnable pingPong;
+    private EasyRatingDialog easyRatingDialog;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        easyRatingDialog.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        easyRatingDialog = new EasyRatingDialog(this);
         setContentView(R.layout.activity_main);
 
         try {
@@ -370,6 +378,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        easyRatingDialog.showIfNeeded();
         Log.v(LiveOkeRemoteApplication.TAG, "*** App RESUMING ***");
 //        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
