@@ -7,8 +7,8 @@ android {
         applicationId 'com.vnguyen.liveokeremote'
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 8
-        versionName "1.2.3"
+        versionCode 9
+        versionName "1.2.4"
     }
     repositories {
         maven {
