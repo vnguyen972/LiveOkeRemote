@@ -34,6 +34,7 @@ public class DrawableHelper {
 
     }
 
+
     public Drawable LoadImageFromWebOperations(String url) {
         try {
             InputStream is = (InputStream) new URL(url).getContent();

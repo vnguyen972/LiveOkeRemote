@@ -41,7 +41,7 @@
     <ListView
         android:id="@+id/songs_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="#ffffff"
         android:choiceMode="singleChoice"
         android:divider="@color/primary_material_light"

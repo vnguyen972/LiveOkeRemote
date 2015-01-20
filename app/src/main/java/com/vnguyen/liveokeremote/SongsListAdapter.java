@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.SongResult;
 import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
+import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
@@ -122,7 +124,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                 adapter = new SongResultsAdapter(context,results);
 
                             } catch (JSONException e) {
-                                e.printStackTrace();
+//                                e.printStackTrace();
                             }
                             return null;
                         }
@@ -140,11 +142,13 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                                         if (adapter.myHandler != null) {
                                             adapter.myHandler.removeCallbacks(adapter.mProgressUpdater);
-                                            adapter.mediaPlayer.reset();
+                                            context.mediaPlayer.stop();
                                         }
                                         dialog.dismiss();
                                     }
-                                    return true;
+                                    // return false: telling Android that I ONLY handle the
+                                    // keys specified here, Android does the rest.
+                                    return false;
                                 }
                             });
                             adh.dismissProgress();

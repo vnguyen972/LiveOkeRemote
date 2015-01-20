@@ -2,6 +2,8 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -38,7 +40,6 @@ public class SongResultsAdapter extends BaseAdapter {
     private SwipeLayout swipeLayout;
     private double startTime;
     private double finalTime;
-    public MediaPlayer mediaPlayer;
     public Handler myHandler;
     private int mPlayingPosition = NOT_PLAYING;
     public PlaybackUpdater mProgressUpdater = new PlaybackUpdater();
@@ -91,23 +92,16 @@ public class SongResultsAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) view.getTag();
         }
-//        final ImageView thumbNail = (ImageView) view.findViewById(R.id.result_image_view);
-//        TextView resultTitle = (TextView) view.findViewById(R.id.result_title);
-//        TextView resultArtist = (TextView) view.findViewById(R.id.result_artist);
-//        TextView resultHost = (TextView) view.findViewById(R.id.result_host);
-//        TextView mp3urlView = (TextView) view.findViewById(R.id.result_mp3_url);
-//        TextView lyricUrlView = (TextView) view.findViewById(R.id.result_lyric_url);
-//        final ImageView playView = (ImageView) view.findViewById(R.id.imageButton1);
-//        ImageView imgButton2 = (ImageView) view.findViewById(R.id.imageButton2);
-//        final SeekBar seekBar = (SeekBar) view.findViewById(R.id.selected_seek_bar);
 
         holder.playView.setImageDrawable(playButton);
         holder.imgButton2.setImageDrawable(new IconDrawable(context,Iconify.IconValue.md_subject));
         if (position == mPlayingPosition) {
             holder.seekBar.setVisibility(View.VISIBLE);
+            holder.playView.setBackground(stopButton);
             mProgressUpdater.mBarToUpdate = holder.seekBar;
             myHandler.postDelayed(mProgressUpdater, 100);
         } else {
+            holder.playView.setBackground(playButton);
             holder.seekBar.setVisibility(View.INVISIBLE);
             holder.seekBar.setProgress(0);
             if (mProgressUpdater.mBarToUpdate == holder.seekBar) {
@@ -120,19 +114,6 @@ public class SongResultsAdapter extends BaseAdapter {
         }
         final Drawable d = (new DrawableHelper()).buildDrawable(result.Artist.substring(0, 1), "rect");
         if (result.Avatar != null) {
-//            Ion.with(context)
-//                    .load(result.Avatar + "&code=" + SongHelper.JSEARCH_API_CODE)
-//                    .withBitmap()
-//                    .asBitmap().setCallback(new FutureCallback<Bitmap>() {
-//                        @SuppressLint("NewApi")
-//                        @Override
-//                        public void onCompleted(Exception e, Bitmap result) {
-//                            if (result != null) {
-//                                holder.thumbNail.setBackground(new RoundImgDrawable(result));
-//                            }
-//                        }
-//                    })
-//            ;
             Ion.with(holder.thumbNail)
                     .centerCrop()
                     .placeholder(d)
@@ -158,39 +139,50 @@ public class SongResultsAdapter extends BaseAdapter {
                 try {
                     Log.v(LiveOkeRemoteApplication.TAG,"play TAG = " + holder.playView.getTag());
                     if (holder.playView.getTag().equals("stop")) {
-                        holder.playView.setBackground(stopButton);
                         //holder.playView.setImageDrawable(stopButton);
                         myHandler = new Handler();
-                        if (mediaPlayer != null) {
-                            mediaPlayer.reset();
-                        } else {
-                            mediaPlayer = new MediaPlayer();
-                            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                                @Override
-                                public void onCompletion(MediaPlayer mp) {
-                                    holder.playView.setBackground(playButton);
-                                    holder.playView.setTag("stop");
-                                    holder.seekBar.setProgress(0);
-                                    notifyDataSetChanged();
-                                }
-                            });
-                        }
-                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        mediaPlayer.setDataSource(context, Uri.parse(mp3Url));
-                        mediaPlayer.prepare();
-                        mediaPlayer.start();
-                        finalTime = mediaPlayer.getDuration();
-                        startTime = mediaPlayer.getCurrentPosition();
-                        mPlayingPosition = position;
-                        holder.seekBar.setClickable(false);
-                        myHandler.postDelayed(mProgressUpdater, 100);
-                        holder.playView.setTag("play");
+                        context.mediaPlayer.reset();
+                        context.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        context.mediaPlayer.setDataSource(context, Uri.parse(mp3Url));
+                        final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                .title("Please Wait..")
+                                .content("Media is buffering...")
+                                .build();
+                        context.mediaPlayer.prepareAsync();
+                        dialog.show();
+                        //mediaPlayer.start();
+                        context.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                Log.v(LiveOkeRemoteApplication.TAG, "DONE PLAYING?");
+                                mPlayingPosition = NOT_PLAYING;
+                                holder.playView.setBackground(playButton);
+                                holder.playView.setTag("stop");
+                                holder.seekBar.setProgress(0);
+                                notifyDataSetChanged();
+                            }
+                        });
+                        context.mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                dialog.dismiss();
+                                mp.start();
+                                holder.playView.setBackground(stopButton);
+                                finalTime = context.mediaPlayer.getDuration();
+                                startTime = context.mediaPlayer.getCurrentPosition();
+                                mPlayingPosition = position;
+                                holder.seekBar.setClickable(false);
+                                myHandler.postDelayed(mProgressUpdater, 100);
+                                holder.playView.setTag("play");
+                                notifyDataSetChanged();
+                            }
+                        });
                     } else {
-                        mediaPlayer.stop();
+                        context.mediaPlayer.stop();
                         holder.playView.setBackground(playButton);
                         holder.playView.setTag("stop");
+                        notifyDataSetChanged();
                     }
-                    notifyDataSetChanged();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -239,10 +231,11 @@ public class SongResultsAdapter extends BaseAdapter {
     private class PlaybackUpdater implements Runnable {
         public SeekBar mBarToUpdate = null;
 
+        @SuppressLint("NewApi")
         @Override
         public void run() {
             if ((mPlayingPosition != NOT_PLAYING) && (null != mBarToUpdate)) {
-                mBarToUpdate.setProgress( (100*mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration()) );    //Cast
+                mBarToUpdate.setProgress( (100*context.mediaPlayer.getCurrentPosition() / context.mediaPlayer.getDuration()) );    //Cast
                 myHandler.postDelayed(this, 100);
             } else {
                 //not playing so stop updating

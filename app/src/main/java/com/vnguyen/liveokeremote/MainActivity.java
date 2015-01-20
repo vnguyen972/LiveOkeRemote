@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -144,6 +145,8 @@ public class MainActivity extends ActionBarActivity {
     private Runnable pingPong;
     private EasyRatingDialog easyRatingDialog;
 
+    public MediaPlayer mediaPlayer;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -151,9 +154,18 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (isChangingConfigurations()) {
+            mediaPlayer.stop();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         easyRatingDialog = new EasyRatingDialog(this);
+        mediaPlayer = new MediaPlayer();
         setContentView(R.layout.activity_main);
 
         try {
