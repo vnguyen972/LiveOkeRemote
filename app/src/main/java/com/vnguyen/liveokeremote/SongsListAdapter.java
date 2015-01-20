@@ -1,10 +1,14 @@
 package com.vnguyen.liveokeremote;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.v7.widget.Toolbar;
+import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +19,21 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
+import com.vnguyen.liveokeremote.data.SongResult;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
+import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -86,14 +95,68 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             public void onClick(View v) {
                 Log.v(LiveOkeRemoteApplication.TAG,"CLICK ON SONG: " + song.title);
                 try {
-                    new Thread(new Runnable() {
+                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                        final AlertDialogHelper adh = new AlertDialogHelper(context);
+                        ArrayList<SongResult> results = new ArrayList<>();
+                        MaterialDialog dialog;
+                        SongResultsAdapter adapter;
+
                         @Override
-                        public void run() {
-                            context.liveOkeUDPClient.sendMessage("getlyric,"+song.id,
-                                    context.liveOkeUDPClient.liveOkeIPAddress,
-                                    context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                        protected void onPreExecute() {
+                            adh.popupProgress("Searching online for " + song.title);
                         }
-                    }).start();
+
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            String json = SongHelper.searchSong(song.title);
+                            Log.v(LiveOkeRemoteApplication.TAG,"JSON = " + json);
+                            try {
+                                JSONArray jsonArray = new JSONArray(json);
+                                Gson gson = new Gson();
+                                for (int i = 0; i < jsonArray.length();i++) {
+                                    JSONObject obj = jsonArray.getJSONObject(i);
+                                    SongResult result = gson.fromJson(obj.toString(),SongResult.class);
+                                    results.add(result);
+                                }
+                                Log.v(LiveOkeRemoteApplication.TAG, "RESULTS: " + results.size());
+                                adapter = new SongResultsAdapter(context,results);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+
+                        @SuppressLint("NewApi")
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            dialog = new MaterialDialog.Builder(context)
+                                    .title(Html.fromHtml("Found <font color='#009688'>" + song.title + "</font> Online: "))
+                                    .adapter(adapter)
+                                    .build();
+                            dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                                @Override
+                                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                                        if (adapter.myHandler != null) {
+                                            adapter.myHandler.removeCallbacks(adapter.mProgressUpdater);
+                                            adapter.mediaPlayer.reset();
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                    return true;
+                                }
+                            });
+                            adh.dismissProgress();
+                            dialog.show();
+                        }
+
+                    };
+                    task.execute((Void[]) null);
+
+//                            context.liveOkeUDPClient.sendMessage("getlyric,"+song.id,
+//                                    context.liveOkeUDPClient.liveOkeIPAddress,
+//                                    context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
 
                 } catch (Exception e) {
                     e.printStackTrace();

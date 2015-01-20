@@ -23,10 +23,9 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
-import com.vnguyen.liveokeremote.R;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class DrawableHelper {
@@ -34,6 +33,30 @@ public class DrawableHelper {
     public DrawableHelper() {
 
     }
+
+    public Drawable LoadImageFromWebOperations(String url) {
+        try {
+            InputStream is = (InputStream) new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, "src name");
+            return d;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Bitmap drawable_from_url(String url) throws java.net.MalformedURLException, java.io.IOException {
+        Bitmap x;
+
+        HttpURLConnection connection = (HttpURLConnection)new URL(url) .openConnection();
+        connection.setRequestProperty("User-agent","Mozilla/4.0");
+
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return x;
+    }
+
     public Drawable buildDrawable(String value, String shape) {
         ColorGenerator generator = ColorGenerator.DEFAULT;
         int color = generator.getColor(value);

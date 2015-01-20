@@ -6,7 +6,20 @@ import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.data.KeySong;
 import com.vnguyen.liveokeremote.data.Song;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -19,6 +32,87 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class SongHelper {
+    public static String JSEARCH_API_CODE = "d5d0cb6a-e7c7-422e-a9f4-9103f4d06276";
+
+    public static String getLyric(String url) {
+        StringBuilder builder = new StringBuilder();
+        HttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = null;
+        try {
+            httpGet = new HttpGet(url);
+            HttpResponse response = client.execute(httpGet);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            //Log.v(LiveOkeRemoteApplication.TAG,"status code = " + statusCode);
+            if (statusCode == 200) {
+                HttpEntity entity = response.getEntity();
+                InputStream content = entity.getContent();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    //Log.v(LiveOkeRemoteApplication.TAG,"line = " + line);
+                    builder.append(line);
+                }
+                //Log.v(LiveOkeRemoteApplication.TAG,"builder.toString = " + builder.toString());
+            } else {
+                Log.e(LiveOkeRemoteApplication.TAG, "Failed to search song");
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return builder.toString();
+    }
+
+    public static String unescapeJava(String escaped) {
+        if(escaped.indexOf("\\u")==-1)
+            return escaped;
+
+        String processed="";
+
+        int position=escaped.indexOf("\\u");
+        while(position!=-1) {
+            if(position!=0)
+                processed+=escaped.substring(0,position);
+            String token=escaped.substring(position+2,position+6);
+            escaped=escaped.substring(position+6);
+            processed+=(char)Integer.parseInt(token,16);
+            position=escaped.indexOf("\\u");
+        }
+        processed+=escaped;
+
+        return processed;
+    }
+
+    public static String searchSong(String title) {
+        StringBuilder builder = new StringBuilder();
+        HttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = null;
+        try {
+            httpGet = new HttpGet("http://j.ginggong.com/jOut.ashx?code="+ JSEARCH_API_CODE +
+                    "&k="+ URLEncoder.encode(title, "utf-8"));
+            HttpResponse response = client.execute(httpGet);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            if (statusCode == 200) {
+                HttpEntity entity = response.getEntity();
+                InputStream content = entity.getContent();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
+            } else {
+                Log.e(LiveOkeRemoteApplication.TAG, "Failed to search song");
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return unescapeJava(builder.toString());
+    }
 
     private static String makeItQuick(String title) throws Exception {
         String quick = "";
