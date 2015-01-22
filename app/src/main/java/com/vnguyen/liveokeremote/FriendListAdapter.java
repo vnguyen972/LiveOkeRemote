@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -141,11 +142,26 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                                 }
                             }).show();
                 } else {
-                    new MaterialDialog.Builder(context)
+                    MaterialDialog dialog = new MaterialDialog.Builder(context)
                             .title(frName.getText())
                             .theme(Theme.LIGHT)
                             .titleColor(R.color.primary)
-                            .show();
+                            .customView(R.layout.friend_info_tab)
+                            .build();
+                    TabHost tabHost = (TabHost) dialog.getCustomView().findViewById(R.id.tabhost);
+                    tabHost.setup();
+
+                    TabHost.TabSpec favSpec = tabHost.newTabSpec("FavTab");
+                    favSpec.setContent(R.id.friend_favorite);
+                    favSpec.setIndicator("Likes");
+                    TabHost.TabSpec chatSpec = tabHost.newTabSpec("ChatTab");
+                    chatSpec.setContent(R.id.friend_chat);
+                    chatSpec.setIndicator("Chat");
+
+                    tabHost.addTab(favSpec);
+                    tabHost.addTab(chatSpec);
+
+                    dialog.show();
                 }
             }
         });
