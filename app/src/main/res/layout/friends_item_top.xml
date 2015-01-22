@@ -43,6 +43,18 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:selectAllOnFocus="true"
+            android:text="Friends Name"
             />
+        <TextView
+            android:id="@+id/friends_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text=""
+            android:textColor="@android:color/black"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:layout_marginRight="5dp"
+        />
     </RelativeLayout>
 </LinearLayout>

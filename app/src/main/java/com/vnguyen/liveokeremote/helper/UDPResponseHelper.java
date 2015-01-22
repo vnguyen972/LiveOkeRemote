@@ -40,8 +40,13 @@ public class UDPResponseHelper {
             if (senderMSG.startsWith("{")) {
                 // Message is a JSON message
                 final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
+                msg.ipAddress = senderIP;
+                User u = new User(msg.name);
+                u.ipAddress = senderIP;
+                u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
+                context.friendsList.add(u);
                 // if the message coming from this app
-                if (msg.from.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
+                if (msg.fromWhere.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
                     // is it really from another client with different IP?
                     if (!senderIP.equals(context.liveOkeUDPClient.getMyIP())) {
                         try {
@@ -52,6 +57,7 @@ public class UDPResponseHelper {
                                         .textColor(Color.WHITE)
                                         .color(context.getResources().getColor(R.color.indigo_500))
                                         .text(msg.name + " is online!"));
+                                Log.v(LiveOkeRemoteApplication.TAG,"friends.list = " + context.friendsList.size());
                             } else if (msg.greeting.equalsIgnoreCase("Bye")) {
                                 SnackbarManager.show(Snackbar.with(context)
                                         .type(SnackbarType.MULTI_LINE)
@@ -59,6 +65,13 @@ public class UDPResponseHelper {
                                         .textColor(Color.WHITE)
                                         .color(context.getResources().getColor(R.color.indigo_500))
                                         .text(msg.name + " is offline!"));
+
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        context.friendsListHelper.adapter.removeFriendFromAdapter(msg.name);
+                                    }
+                                });
                             }
                         } catch (Exception e) {
                             Log.e(LiveOkeRemoteApplication.TAG, e.getMessage(), e);

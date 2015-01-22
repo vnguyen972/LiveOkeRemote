@@ -24,12 +24,26 @@ import java.util.Iterator;
 public class FriendListAdapter extends BaseSwipeAdapter {
     private MainActivity context;
     public ArrayList<User> friends;
+    private IconicFontDrawable iconTrash;
+    private IconicFontDrawable iconInfo;
+    private SwipeLayout swipeLayout;
 
     public FriendListAdapter(Context context, ArrayList<User> list) {
         this.context = (MainActivity) context;
         Log.v(LiveOkeRemoteApplication.TAG, "New Adapter!");
         friends = new ArrayList<>();
         friends.addAll(list);
+        iconTrash = new IconicFontDrawable(context);
+        iconTrash.setIcon("fa-trash");
+        iconTrash.setIconColor(context.getResources().getColor(R.color.white));
+        iconTrash.setIntrinsicHeight(30);
+        iconTrash.setIntrinsicWidth(30);
+
+        iconInfo = new IconicFontDrawable(context);
+        iconInfo.setIcon("fa-info");
+        iconInfo.setIconColor(context.getResources().getColor(R.color.white));
+        iconInfo.setIntrinsicHeight(30);
+        iconInfo.setIntrinsicWidth(30);
     }
 
     public void clear() {
@@ -45,10 +59,9 @@ public class FriendListAdapter extends BaseSwipeAdapter {
     @Override
     public View generateView(int position, ViewGroup viewGroup) {
         View v = LayoutInflater.from(context).inflate(R.layout.friends_list_item, null);
-        SwipeLayout swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
+        swipeLayout = (SwipeLayout) v.findViewById(getSwipeLayoutResourceId(position));
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.setDragEdge(SwipeLayout.DragEdge.Left);
-        setupActionButtonsBelow(swipeLayout);
         return v;
     }
 
@@ -60,10 +73,13 @@ public class FriendListAdapter extends BaseSwipeAdapter {
             holder = new FriendsViewHolder();
             holder.icon = (ImageView) view.findViewById(R.id.friends_icon);
             holder.name = (TextView) view.findViewById(R.id.friends_name);
+            holder.ipAddress = (TextView) view.findViewById(R.id.friends_ip);
             view.setTag(holder);
         }
         holder.icon.setImageDrawable(friend.avatar);
         holder.name.setText(friend.name);
+        holder.ipAddress.setText(friend.ipAddress);
+        setupActionButtonsBelow(swipeLayout);
     }
 
     @Override
@@ -87,65 +103,79 @@ public class FriendListAdapter extends BaseSwipeAdapter {
         ViewGroup vBottom = swipeLayout.getBottomView();
         ViewGroup vTop = swipeLayout.getSurfaceView();
         final TextView frName = (TextView) vTop.findViewById(R.id.friends_name);
+        final TextView ipAddr = (TextView) vTop.findViewById(R.id.friends_ip);
 
         // Setup below layer for "actions"
         ImageView deleteImg = (ImageView) vBottom.findViewById(R.id.f_ic_delete_id);
 
 //        DrawableHelper.getInstance().setIconAsBackground("fa-trash", R.color.white, deleteImg,context);
-        IconicFontDrawable icon = new IconicFontDrawable(context);
-        icon.setIcon("fa-trash");
-        icon.setIconColor(context.getResources().getColor(R.color.white));
-        icon.setIntrinsicHeight(30);
-        icon.setIntrinsicWidth(30);
         deleteImg.setImageDrawable(null);
-        deleteImg.setImageDrawable(icon);
+        if (ipAddr.getText() == null || ipAddr.getText().toString().equals("")) {
+            deleteImg.setImageDrawable(iconTrash);
+        } else {
+            deleteImg.setImageDrawable(iconInfo);
+        }
 
 
 
         deleteImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new MaterialDialog.Builder(context)
-                        .title("Are you sure to delete " + frName.getText() + "?")
-                        .theme(Theme.LIGHT)
-                        .positiveText("OK")
-                        .titleColor(R.color.half_black)
-                        .negativeText("Cancel")
-                        .callback(new MaterialDialog.Callback() {
-                            @Override
-                            public void onNegative(MaterialDialog materialDialog) {
-                            }
+                if (ipAddr.getText() == null || ipAddr.getText().toString().equals("")) {
+                    new MaterialDialog.Builder(context)
+                            .title("Are you sure to delete " + frName.getText() + "?")
+                            .theme(Theme.LIGHT)
+                            .positiveText("OK")
+                            .titleColor(R.color.half_black)
+                            .negativeText("Cancel")
+                            .callback(new MaterialDialog.Callback() {
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
+                                }
 
-                            @Override
-                            public void onPositive(MaterialDialog materialDialog) {
-                                int i = 0;
-                                for (Iterator<User> it = friends.iterator();it.hasNext();i++) {
-                                    User u = it.next();
-                                    if (u.name.equalsIgnoreCase(frName.getText().toString())) {
-                                        // delete
-                                        PreferencesHelper.getInstance(context).removeFriend(u,i);
-                                        it.remove();
-                                        break;
-                                    }
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    removeFriendFromAdapter(frName.getText().toString());
+                                    swipeLayout.toggle();
+                                    notifyDataSetChanged();
                                 }
-                                for (Iterator<User> it = context.friendsList.iterator();it.hasNext();) {
-                                    User u = it.next();
-                                    if (u.name.equalsIgnoreCase(frName.getText().toString())) {
-                                        it.remove();
-                                        break;
-                                    }
-                                }
-                                swipeLayout.toggle();
-                                notifyDataSetChanged();
-                            }
-                        }).show();
+                            }).show();
+                } else {
+                    new MaterialDialog.Builder(context)
+                            .title(frName.getText())
+                            .theme(Theme.LIGHT)
+                            .titleColor(R.color.primary)
+                            .show();
+                }
             }
         });
 
     }
 
+    public void removeFriendFromAdapter(String frName) {
+        int i = 0;
+        for (Iterator<User> it = friends.iterator(); it.hasNext(); i++) {
+            User u = it.next();
+            if (u.name.equalsIgnoreCase(frName.toString())) {
+                // delete
+                PreferencesHelper.getInstance(context).removeFriend(u, i);
+                it.remove();
+                break;
+            }
+        }
+        for (Iterator<User> it = context.friendsList.iterator(); it.hasNext(); ) {
+            User u = it.next();
+            if (u.name.equalsIgnoreCase(frName.toString())) {
+                it.remove();
+                break;
+            }
+        }
+        notifyDataSetChanged();
+    }
+
     private class FriendsViewHolder {
         ImageView icon;
         TextView name;
+        TextView ipAddress;
     }
 }

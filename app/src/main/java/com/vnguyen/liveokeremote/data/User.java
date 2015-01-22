@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 
 public class User {
     public String name;
+    public String ipAddress;
     public String avatarURI;
     public Drawable avatar;
 
