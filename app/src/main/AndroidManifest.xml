@@ -29,7 +29,7 @@
             android:name="com.vnguyen.liveokeremote.MainActivity"
             android:label="@string/app_name"
             android:parentActivityName="com.vnguyen.liveokeremote.MainActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

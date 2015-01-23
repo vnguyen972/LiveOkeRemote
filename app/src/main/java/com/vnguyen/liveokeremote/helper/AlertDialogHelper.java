@@ -12,11 +12,13 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,12 +69,14 @@ public class AlertDialogHelper {
                 .build();
 
         ListView msgList = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
+
         final EditText edTxt = (EditText) dialog.getCustomView().findViewById(R.id.chat_text);
         Button sendButton = (Button) dialog.getCustomView().findViewById(R.id.send_button);
 
         u.chatMessages = new ArrayList<>();
         final ChatAdapter ca = new ChatAdapter(context, u.chatMessages);
         msgList.setAdapter(ca);
+        //setListViewHeightBasedOnChildren(msgList);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -370,5 +374,25 @@ public class AlertDialogHelper {
                         rsvpListAdapter.notifyDataSetChanged();
                     }
                 }).show();
+    }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 }

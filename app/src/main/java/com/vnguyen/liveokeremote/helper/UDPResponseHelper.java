@@ -95,7 +95,7 @@ public class UDPResponseHelper {
                             } else if (msg.greeting.equalsIgnoreCase("Chat")) {
                                 SnackbarManager.show(Snackbar.with(context)
                                         .type(SnackbarType.MULTI_LINE)
-                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                        .duration(Snackbar.SnackbarDuration.LENGTH_INDEFINITE)
                                         .textColor(Color.WHITE)
                                         .color(context.getResources().getColor(R.color.indigo_500))
                                         .text(msg.name + " says: " + msg.message)

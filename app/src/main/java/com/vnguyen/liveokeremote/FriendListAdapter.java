@@ -162,26 +162,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                             context.chatMap.put(u.name, dialog);
                         }
                         dialog.show();
-                        Display display = context.getWindowManager().getDefaultDisplay();
-                        int mwidth = display.getWidth();
-                        int mheight = display.getHeight();
-
-                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                        lp.copyFrom(dialog.getWindow().getAttributes());
-                        lp.width = mwidth;
-                        lp.height = mheight/2;
-
-                        //change position of window on screen
-                        lp.x = mwidth; //set these values to what work for you; probably like I have here at
-                        lp.y = mheight;        //half the screen width and height so it is in center
-
-                        //set the dim level of the background
-                        lp.dimAmount=0.1f; //change this value for more or less dimming
-
-                        dialog.getWindow().setAttributes(lp);
-
-                        //add a blur/dim flags
-                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND | WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                        dialog.getWindow().setLayout(700, 1000);
                     }
                 }
             }
