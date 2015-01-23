@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
+import com.nispok.snackbar.listeners.ActionClickListener;
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
@@ -17,6 +18,7 @@ import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.util.StringTokenizer;
 
@@ -41,16 +43,16 @@ public class UDPResponseHelper {
                 // Message is a JSON message
                 final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
                 msg.ipAddress = senderIP;
-                User u = new User(msg.name);
-                u.ipAddress = senderIP;
-                u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
-                context.friendsList.add(u);
                 // if the message coming from this app
                 if (msg.fromWhere.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
                     // is it really from another client with different IP?
-                    if (!senderIP.equals(context.liveOkeUDPClient.getMyIP())) {
+                    if (!context.liveOkeUDPClient.isMine(senderIP)) {
+                        User u = new User(msg.name);
+                        u.ipAddress = senderIP;
+                        u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
+                        context.friendsList.add(u);
                         try {
-                            if (msg.greeting.equalsIgnoreCase("Hi")) {
+                            if (msg.greeting.equalsIgnoreCase("Hi") || msg.greeting.equalsIgnoreCase("Hello")) {
                                 SnackbarManager.show(Snackbar.with(context)
                                         .type(SnackbarType.MULTI_LINE)
                                         .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
@@ -58,6 +60,23 @@ public class UDPResponseHelper {
                                         .color(context.getResources().getColor(R.color.indigo_500))
                                         .text(msg.name + " is online!"));
                                 Log.v(LiveOkeRemoteApplication.TAG,"friends.list = " + context.friendsList.size());
+                                if (msg.greeting.equalsIgnoreCase("Hi")) {
+                                    // only say Hello when receive Hi
+                                    LiveOkeRemoteBroadcastMsg bcMsg =
+                                            new LiveOkeRemoteBroadcastMsg("Hello",
+                                                    context.getResources().getString(R.string.app_name), context.me.name);
+                                    if (context.liveOkeUDPClient != null) {
+                                        context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), senderIP, UDPListenerService.BROADCAST_PORT);
+                                    }
+                                }
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (context.viewFlipper.getDisplayedChild() != 0) {
+                                            context.friendsListHelper.displayFriendsListPanel();
+                                        }
+                                    }
+                                });
                             } else if (msg.greeting.equalsIgnoreCase("Bye")) {
                                 SnackbarManager.show(Snackbar.with(context)
                                         .type(SnackbarType.MULTI_LINE)
@@ -72,6 +91,21 @@ public class UDPResponseHelper {
                                         context.friendsListHelper.adapter.removeFriendFromAdapter(msg.name);
                                     }
                                 });
+                            } else if (msg.greeting.equalsIgnoreCase("Chat")) {
+                                SnackbarManager.show(Snackbar.with(context)
+                                        .type(SnackbarType.MULTI_LINE)
+                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                        .textColor(Color.WHITE)
+                                        .color(context.getResources().getColor(R.color.indigo_500))
+                                        .text(msg.name + " says: " + msg.message)
+                                        .actionLabel("Reply")
+                                        .actionListener(new ActionClickListener() {
+                                            @Override
+                                            public void onActionClicked(Snackbar snackbar) {
+                                                Log.v(LiveOkeRemoteApplication.TAG,"Reply the message");
+                                            }
+                                        })
+                                );
                             }
                         } catch (Exception e) {
                             Log.e(LiveOkeRemoteApplication.TAG, e.getMessage(), e);

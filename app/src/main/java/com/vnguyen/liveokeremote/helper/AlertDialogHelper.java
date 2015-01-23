@@ -101,7 +101,7 @@ public class AlertDialogHelper {
                 .positiveText("OK")
                 .customView(input)
                 .titleColor(R.color.half_black)
-                .callback(new MaterialDialog.Callback(){
+                .callback(new MaterialDialog.ButtonCallback(){
                     @Override
                     public void onNegative(MaterialDialog materialDialog) {
                     }
@@ -133,7 +133,7 @@ public class AlertDialogHelper {
                 .customView(input)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
-                .callback(new MaterialDialog.Callback() {
+                .callback(new MaterialDialog.ButtonCallback() {
 
                     @Override
                     public void onNegative(MaterialDialog materialDialog) {
@@ -165,7 +165,7 @@ public class AlertDialogHelper {
                 .customView(input)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
-                .callback(new MaterialDialog.Callback() {
+                .callback(new MaterialDialog.ButtonCallback() {
 
                     @Override
                     public void onNegative(MaterialDialog materialDialog) {
@@ -195,7 +195,7 @@ public class AlertDialogHelper {
                 .customView(input)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
-                .callback(new MaterialDialog.Callback() {
+                .callback(new MaterialDialog.ButtonCallback() {
 
                     @Override
                     public void onNegative(MaterialDialog materialDialog) {
@@ -288,7 +288,7 @@ public class AlertDialogHelper {
                 .positiveText("OK")
                 .titleColor(R.color.black)
                 .negativeText("Cancel")
-                .callback(new MaterialDialog.Callback() {
+                .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onNegative(MaterialDialog materialDialog) {
                     }

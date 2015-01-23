@@ -17,26 +17,11 @@
             android:layout_height="fill_parent">
             <!--LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/friend_info"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    android:text="INFO"
-                    android:padding="15dip"
-                    android:textSize="18dip"
-                    android:textColor="@android:color/black"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout-->
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/friend_favorite"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <!-- Screen Design for the FRIENDS LIKES -->
                 <TextView
                     android:text="FAVORITES"
                     android:padding="15dip"
@@ -44,7 +29,7 @@
                     android:textColor="@android:color/black"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"/>
-            </LinearLayout>
+            </LinearLayout-->
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/friend_chat"

@@ -72,7 +72,7 @@ public class FloatingButtonsHelper {
                         .positiveText("OK")
                         .titleColor(R.color.half_black)
                         .negativeText("Cancel")
-                        .callback(new MaterialDialog.Callback() {
+                        .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onNegative(MaterialDialog materialDialog) {
                             }
@@ -167,7 +167,7 @@ public class FloatingButtonsHelper {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
@@ -206,7 +206,7 @@ public class FloatingButtonsHelper {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
@@ -269,7 +269,7 @@ public class FloatingButtonsHelper {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {

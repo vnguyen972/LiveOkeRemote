@@ -51,6 +51,10 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
         }
     }
 
+    public boolean isMine(String senderIP) {
+        return senderIP.equals(getMyIP());
+    }
+
     public String getMyIP() {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         int ipAddress = wifiManager.getConnectionInfo().getIpAddress();

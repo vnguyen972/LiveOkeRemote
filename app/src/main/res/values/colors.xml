@@ -31,4 +31,8 @@
     <color name="list_background">#ffffff</color>
     <color name="list_background_pressed">#808080</color>
 
+    <color name="sendLightColor">#8897BF</color>
+    <color name="sendMeduimColor">#5D6CA5</color>
+    <color name="sendDarkColor">#515F9F</color>
+
 </resources>

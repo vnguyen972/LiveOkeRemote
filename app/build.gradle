@@ -40,7 +40,7 @@ dependencies {
     // this library only create icons from Google Material Designs
     compile 'com.github.theDazzler:droidicon:0.1.4@aar'
     // this library will create icons drawable from 5 different icon suites (yes!)
-    compile 'com.afollestad:material-dialogs:0.4.3'
+    compile 'com.afollestad:material-dialogs:0.6.1.4'
     compile 'com.daimajia.swipelayout:library:1.1.7@aar'
     compile "org.java-websocket:Java-WebSocket:1.3.0"
     compile 'com.nispok:snackbar:2.7.3'

@@ -7,17 +7,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TabHost;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.google.gson.Gson;
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +33,8 @@ public class FriendListAdapter extends BaseSwipeAdapter {
     private IconicFontDrawable iconTrash;
     private IconicFontDrawable iconInfo;
     private SwipeLayout swipeLayout;
+    private ChatAdapter ca;
+    private ArrayList<LiveOkeRemoteBroadcastMsg> messages;
 
     public FriendListAdapter(Context context, ArrayList<User> list) {
         this.context = (MainActivity) context;
@@ -41,7 +48,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
         iconTrash.setIntrinsicWidth(30);
 
         iconInfo = new IconicFontDrawable(context);
-        iconInfo.setIcon("fa-info");
+        iconInfo.setIcon("fa-comment");
         iconInfo.setIconColor(context.getResources().getColor(R.color.white));
         iconInfo.setIntrinsicHeight(30);
         iconInfo.setIntrinsicWidth(30);
@@ -129,7 +136,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                             .positiveText("OK")
                             .titleColor(R.color.half_black)
                             .negativeText("Cancel")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
                                 }
@@ -143,29 +150,53 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                             }).show();
                 } else {
                     MaterialDialog dialog = new MaterialDialog.Builder(context)
-                            .title(frName.getText())
+                            .title("LiveOke Chat")
                             .theme(Theme.LIGHT)
                             .titleColor(R.color.primary)
-                            .customView(R.layout.friend_info_tab)
+                            .customView(R.layout.friend_tab,false)
                             .build();
-                    TabHost tabHost = (TabHost) dialog.getCustomView().findViewById(R.id.tabhost);
-                    tabHost.setup();
 
-                    TabHost.TabSpec favSpec = tabHost.newTabSpec("FavTab");
-                    favSpec.setContent(R.id.friend_favorite);
-                    favSpec.setIndicator("Likes");
-                    TabHost.TabSpec chatSpec = tabHost.newTabSpec("ChatTab");
-                    chatSpec.setContent(R.id.friend_chat);
-                    chatSpec.setIndicator("Chat");
+                    ListView msgList = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
+                    final EditText edTxt = (EditText) dialog.getCustomView().findViewById(R.id.chat_text);
+                    Button sendButton = (Button) dialog.getCustomView().findViewById(R.id.send_button);
 
-                    tabHost.addTab(favSpec);
-                    tabHost.addTab(chatSpec);
+                    final User u = findFriend(frName.getText().toString());
+                    if (u != null) {
+                        u.chatMessages = new ArrayList<>();
+                        ca = new ChatAdapter(context,u.chatMessages);
+                        msgList.setAdapter(ca);
+                        sendButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String str = edTxt.getText().toString();
+                                LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat","LiveOke Remote",context.me.name);
+                                msg.message = str;
+                                Log.v(LiveOkeRemoteApplication.TAG,"Message SENT = " + msg.message);
+                                u.chatMessages.add(msg);
+                                ca.notifyDataSetChanged();
+                                context.liveOkeUDPClient.sendMessage((new Gson()).toJson(msg),msg.ipAddress, UDPListenerService.BROADCAST_PORT);
+                                Log.v(LiveOkeRemoteApplication.TAG,"CA Size = " + ca.getCount());
+                                edTxt.setText("");
+                            }
+                        });
 
-                    dialog.show();
+                        dialog.show();
+                    }
                 }
             }
         });
 
+    }
+
+    public User findFriend(String frName) {
+        User u = null;
+        for (Iterator<User> it = friends.iterator(); it.hasNext();) {
+            u = it.next();
+            if (u.name.equalsIgnoreCase(frName.toString())) {
+                break;
+            }
+        }
+        return u;
     }
 
     public void removeFriendFromAdapter(String frName) {
@@ -186,6 +217,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                 break;
             }
         }
+        context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
         notifyDataSetChanged();
     }
 

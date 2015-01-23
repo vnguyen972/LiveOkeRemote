@@ -549,7 +549,7 @@ public class MainActivity extends ActionBarActivity {
                     .content("Do you want to quit LiveOke Remote?")
                     .positiveText("OK")
                     .negativeText("CANCEL")
-                    .callback(new MaterialDialog.Callback() {
+                    .callback(new MaterialDialog.ButtonCallback() {
 
                         @Override
                         public void onNegative(MaterialDialog materialDialog) {

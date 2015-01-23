@@ -126,7 +126,7 @@ public class NavigationDrawerHelper {
                             .content("Do you want to update your songs list?")
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
@@ -248,7 +248,7 @@ public class NavigationDrawerHelper {
                             .customView(input)
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {

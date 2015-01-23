@@ -39,6 +39,9 @@
     <string name="search_label">Search</string>
     <string name="search_global_description">Search Global</string>
 
+    <string name="main_empty_list">There is no recent conversation, write new message
+		to start one.</string>
+
     <!-- Preferences -->
     <string name="ip_adress">ipAddress</string>
     <string name="port">port</string>
@@ -46,5 +49,7 @@
     <string name="myAvatarURI">myAvatarURI</string>
     <string name="song_initial_icon">songInitialIcon</string>
     <string name="song_desc_display">songDescDisplay</string>
+
+
 
 </resources>

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
@@ -28,7 +27,6 @@ import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.SongResult;
 import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
-import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
@@ -281,7 +279,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
@@ -334,7 +332,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
@@ -420,7 +418,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                         new MaterialDialog.Builder(context)
                                 .title("No Friends Yet")
                                 .content("Add new friend?")
-                                .callback(new MaterialDialog.SimpleCallback() {
+                                .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog materialDialog) {
                                         context.friendsListHelper.displayFriendsListPanel();
@@ -437,7 +435,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
@@ -491,7 +489,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                             .positiveText("OK")
                             .negativeText("CANCEL")
-                            .callback(new MaterialDialog.Callback() {
+                            .callback(new MaterialDialog.ButtonCallback() {
 
                                 @Override
                                 public void onNegative(MaterialDialog materialDialog) {
