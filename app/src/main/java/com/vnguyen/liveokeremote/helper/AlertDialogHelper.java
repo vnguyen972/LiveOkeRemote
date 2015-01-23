@@ -10,26 +10,34 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
+import com.vnguyen.liveokeremote.ChatAdapter;
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.RsvpListAdapter;
+import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,6 +57,38 @@ public class AlertDialogHelper {
         this.context = (MainActivity) context;
     }
 
+
+    public MaterialDialog popupChat(final User u) {
+        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                .title("LiveOke Chat")
+                .theme(Theme.LIGHT)
+                .titleColor(R.color.primary)
+                .customView(R.layout.friend_tab, false)
+                .build();
+
+        ListView msgList = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
+        final EditText edTxt = (EditText) dialog.getCustomView().findViewById(R.id.chat_text);
+        Button sendButton = (Button) dialog.getCustomView().findViewById(R.id.send_button);
+
+        u.chatMessages = new ArrayList<>();
+        final ChatAdapter ca = new ChatAdapter(context, u.chatMessages);
+        msgList.setAdapter(ca);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String str = edTxt.getText().toString();
+                LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat", "LiveOke Remote", context.me.name);
+                msg.message = str;
+                Log.v(LiveOkeRemoteApplication.TAG, "Message SENT = " + msg.message);
+                u.chatMessages.add(msg);
+                ca.notifyDataSetChanged();
+                context.liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), msg.ipAddress, UDPListenerService.BROADCAST_PORT);
+                Log.v(LiveOkeRemoteApplication.TAG, "CA Size = " + ca.getCount());
+                edTxt.setText("");
+            }
+        });
+        return dialog;
+    }
 
     public void popupSplash() {
             if (splashDialog == null) {

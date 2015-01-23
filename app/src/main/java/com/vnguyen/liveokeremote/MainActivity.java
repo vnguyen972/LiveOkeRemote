@@ -80,6 +80,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -147,6 +148,8 @@ public class MainActivity extends ActionBarActivity {
 
     public MediaPlayer mediaPlayer;
 
+    public HashMap<String,MaterialDialog> chatMap;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -166,6 +169,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         easyRatingDialog = new EasyRatingDialog(this);
         mediaPlayer = new MediaPlayer();
+        chatMap = new HashMap<>();
         setContentView(R.layout.activity_main);
 
         try {

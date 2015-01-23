@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
@@ -103,6 +104,19 @@ public class UDPResponseHelper {
                                             @Override
                                             public void onActionClicked(Snackbar snackbar) {
                                                 Log.v(LiveOkeRemoteApplication.TAG,"Reply the message");
+                                                MaterialDialog dialog;
+                                                User u = context.friendsListHelper.findFriend(msg.name);
+                                                if (u != null) {
+                                                    if (context.chatMap.containsKey(msg.name)) {
+                                                        // already got chat going on
+                                                        dialog = context.chatMap.get(msg.name);
+                                                    } else {
+                                                        // new chat
+                                                        dialog = (new AlertDialogHelper(context)).popupChat(u);
+                                                        context.chatMap.put(msg.name, dialog);
+                                                    }
+                                                    dialog.show();
+                                                }
                                             }
                                         })
                                 );

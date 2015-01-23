@@ -17,6 +17,7 @@ import com.vnguyen.liveokeremote.data.User;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class FriendsListHelper {
     private MainActivity context;
@@ -75,6 +76,17 @@ public class FriendsListHelper {
             context.viewFlipper.showNext();
         }
         context.actionBarHelper.setTitle(context.getResources().getString(R.string.friends_title));
+    }
+
+    public User findFriend(String frName) {
+        User u = null;
+        for (Iterator<User> it = context.friendsList.iterator(); it.hasNext();) {
+            u = it.next();
+            if (u.name.equalsIgnoreCase(frName.toString())) {
+                break;
+            }
+        }
+        return u;
     }
 
 }

@@ -4,9 +4,11 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,6 +23,7 @@ import com.google.gson.Gson;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
@@ -149,38 +152,36 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                                 }
                             }).show();
                 } else {
-                    MaterialDialog dialog = new MaterialDialog.Builder(context)
-                            .title("LiveOke Chat")
-                            .theme(Theme.LIGHT)
-                            .titleColor(R.color.primary)
-                            .customView(R.layout.friend_tab,false)
-                            .build();
-
-                    ListView msgList = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
-                    final EditText edTxt = (EditText) dialog.getCustomView().findViewById(R.id.chat_text);
-                    Button sendButton = (Button) dialog.getCustomView().findViewById(R.id.send_button);
-
-                    final User u = findFriend(frName.getText().toString());
+                    final User u = context.friendsListHelper.findFriend(frName.getText().toString());
+                    MaterialDialog dialog;
                     if (u != null) {
-                        u.chatMessages = new ArrayList<>();
-                        ca = new ChatAdapter(context,u.chatMessages);
-                        msgList.setAdapter(ca);
-                        sendButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String str = edTxt.getText().toString();
-                                LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat","LiveOke Remote",context.me.name);
-                                msg.message = str;
-                                Log.v(LiveOkeRemoteApplication.TAG,"Message SENT = " + msg.message);
-                                u.chatMessages.add(msg);
-                                ca.notifyDataSetChanged();
-                                context.liveOkeUDPClient.sendMessage((new Gson()).toJson(msg),msg.ipAddress, UDPListenerService.BROADCAST_PORT);
-                                Log.v(LiveOkeRemoteApplication.TAG,"CA Size = " + ca.getCount());
-                                edTxt.setText("");
-                            }
-                        });
-
+                        if (context.chatMap.containsKey(u.name)) {
+                            dialog = context.chatMap.get(u.name);
+                        } else {
+                            dialog = (new AlertDialogHelper(context)).popupChat(u);
+                            context.chatMap.put(u.name, dialog);
+                        }
                         dialog.show();
+                        Display display = context.getWindowManager().getDefaultDisplay();
+                        int mwidth = display.getWidth();
+                        int mheight = display.getHeight();
+
+                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                        lp.copyFrom(dialog.getWindow().getAttributes());
+                        lp.width = mwidth;
+                        lp.height = mheight/2;
+
+                        //change position of window on screen
+                        lp.x = mwidth; //set these values to what work for you; probably like I have here at
+                        lp.y = mheight;        //half the screen width and height so it is in center
+
+                        //set the dim level of the background
+                        lp.dimAmount=0.1f; //change this value for more or less dimming
+
+                        dialog.getWindow().setAttributes(lp);
+
+                        //add a blur/dim flags
+                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND | WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                     }
                 }
             }
@@ -188,16 +189,6 @@ public class FriendListAdapter extends BaseSwipeAdapter {
 
     }
 
-    public User findFriend(String frName) {
-        User u = null;
-        for (Iterator<User> it = friends.iterator(); it.hasNext();) {
-            u = it.next();
-            if (u.name.equalsIgnoreCase(frName.toString())) {
-                break;
-            }
-        }
-        return u;
-    }
 
     public void removeFriendFromAdapter(String frName) {
         int i = 0;
