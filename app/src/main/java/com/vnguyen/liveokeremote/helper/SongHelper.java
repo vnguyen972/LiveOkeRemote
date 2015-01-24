@@ -189,66 +189,6 @@ public class SongHelper {
         return song;
     }
 
-    public static String convertAllCharsNew(String string) throws Exception {
-        String str = "";
-        StringBuilder sb = new StringBuilder();
-//        char[] chars = string.toCharArray();
-//        for (int i = 0; i < chars.length;i++) {
-//            char c = chars[i];
-//        }
-        for (int i = 0; i < string.length(); i++) {
-            String s = string.charAt(i)+"";
-            Characters c = Characters.forString(s.toUpperCase(Locale.US));
-            if (c != null) {
-                switch (c) {
-                    case ONE:case TWO:case THREE:case FOUR:case FIVE:case SIX:
-                    case SEVEN:case EIGHT:case NINE:case ZERO:
-                        str += s;
-                        break;
-                    case A1:case A2:case A3:case A4:case A5:case A6:case A7:
-                    case A8:case A9:case A10:case A11:case A12:case A13:
-                    case A14:case A15:case A16:case A17:case A18:case A19:
-                    case A20:case A21:case A22:case A23:case A24:
-                        str += "A";
-                        break;
-                    case B:case C:case F:case G:case H:case J:case K:case L:
-                    case M:case N:case P:case Q:case R:case S:case T:case V:
-                    case W:case X:case Z:
-                        str += s.toUpperCase(Locale.US);
-                        break;
-                    case D1:case D2:case D3:
-                        str += "D";
-                        break;
-                    case E1:case E2:case E3:case E4:case E5:case E6:case E7:
-                    case E8:case E9:case E10:case E11:case E12:case E13:case E14:
-                    case E15:case E16:case E17:
-                        str += "E";
-                        break;
-                    case I1:case I2:case I3:case I4:case I5:case I6:case I7:
-                        str += "I";
-                        break;
-                    case O1:case O2:case O3:case O4:case O5:case O6:case O7:
-                    case O8:case O9:case O10:case O11:case O12:case O13:
-                    case O14:case O15:case O16:case O17:case O18:case O19:
-                    case O20:case O21:
-                        str += "O";
-                        break;
-                    case U1:case U2:case U3:case U4:case U5:case U6:case U7:
-                    case U8:case U9:case U10:case U11:case U12:case U13:
-                    case U14:case U15:case U16:
-                        str += "U";
-                        break;
-                    case Y1:case Y2:case Y3:case Y4:case Y5:case Y6:
-                        str += "Y";
-                        break;
-                }
-            } else {
-                str += s;
-            }
-        }
-        return str;
-    }
-
     /**
      * Convert UTF-8 string to normal string for easy to compare when searching
      *
@@ -268,10 +208,11 @@ public class SongHelper {
                     case SEVEN:case EIGHT:case NINE:case ZERO:
                         chars[i] = s.charAt(0);
                         break;
-                    case A1:case A2:case A3:case A4:case A5:case A6:case A7:
-                    case A8:case A9:case A10:case A11:case A12:case A13:
-                    case A14:case A15:case A16:case A17:case A18:case A19:
-                    case A20:case A21:case A22:case A23:case A24:
+                    case A1:case A2:case A3:case A4:case A5:case A6:case A7:case A8:
+                    case A9:case A10:case A11:case A12:case A13:case A14:case A15:
+                    case A16:case A17:case A18:case A19:case A20:case A21:case A22:
+                    case A23:case A24:case A25:case A26:case A27:case A28:case A29:
+                    case A30:
                         chars[i] = "A".charAt(0);
                         break;
                     case B:case C:case F:case G:case H:case J:case K:case L:
@@ -282,9 +223,9 @@ public class SongHelper {
                     case D1:case D2:case D3:
                         chars[i] = "D".charAt(0);
                         break;
-                    case E1:case E2:case E3:case E4:case E5:case E6:case E7:
-                    case E8:case E9:case E10:case E11:case E12:case E13:case E14:
-                    case E15:case E16:case E17:
+                    case E1:case E2:case E3:case E4:case E5:case E6:case E7:case E8:
+                    case E9:case E10:case E11:case E12:case E13:case E14:case E15:
+                    case E16:case E17:case E18:case E19:case E20:
                         chars[i] = "E".charAt(0);
                         break;
                     case I1:case I2:case I3:case I4:case I5:case I6:case I7:
@@ -293,15 +234,16 @@ public class SongHelper {
                     case O1:case O2:case O3:case O4:case O5:case O6:case O7:
                     case O8:case O9:case O10:case O11:case O12:case O13:
                     case O14:case O15:case O16:case O17:case O18:case O19:
-                    case O20:case O21:
+                    case O20:case O21:case O22:case O23:case O24:case O25:case O26:
                         chars[i] = "O".charAt(0);
                         break;
                     case U1:case U2:case U3:case U4:case U5:case U6:case U7:
                     case U8:case U9:case U10:case U11:case U12:case U13:
-                    case U14:case U15:case U16:
+                    case U14:case U15:case U16:case U17:case U18:case U19:
                         chars[i] = "U".charAt(0);
                         break;
-                    case Y1:case Y2:case Y3:case Y4:case Y5:case Y6:
+                    case Y1:case Y2:case Y3:case Y4:case Y5:case Y6:case Y7:
+
                         chars[i] = "Y".charAt(0);
                         break;
                 }
@@ -329,6 +271,9 @@ public class SongHelper {
             s += "'" + Characters.A19.getStr() + "','" + Characters.A20.getStr() + "',";
             s += "'" + Characters.A21.getStr() + "','" + Characters.A22.getStr() + "',";
             s += "'" + Characters.A23.getStr() + "','" + Characters.A24.getStr() + "'";
+            s += "'" + Characters.A25.getStr() + "','" + Characters.A26.getStr() + "'";
+            s += "'" + Characters.A27.getStr() + "','" + Characters.A28.getStr() + "'";
+            s += "'" + Characters.A29.getStr() + "','" + Characters.A30.getStr() + "'";
         } else if (key.equalsIgnoreCase("D")) {
             s += "'" + Characters.D1.getStr() + "','" + Characters.D2.getStr() + "',";
             s += "'" + Characters.D3.getStr() + "'";
@@ -341,7 +286,9 @@ public class SongHelper {
             s += "'" + Characters.E11.getStr() + "','" + Characters.E12.getStr() + "',";
             s += "'" + Characters.E13.getStr() + "','" + Characters.E14.getStr() + "',";
             s += "'" + Characters.E15.getStr() + "','" + Characters.E16.getStr() + "',";
-            s += "'" + Characters.E17.getStr() + "'";
+            s += "'" + Characters.E17.getStr() + "','" + Characters.E18.getStr() + "',";
+            s += "'" + Characters.E19.getStr() + "','" + Characters.E20.getStr() + "',";
+
         } else if (key.equalsIgnoreCase("I")) {
             s += "'" + Characters.I1.getStr() + "','" + Characters.I2.getStr() + "',";
             s += "'" + Characters.I3.getStr() + "','" + Characters.I4.getStr() + "',";
@@ -358,7 +305,9 @@ public class SongHelper {
             s += "'" + Characters.O15.getStr() + "','" + Characters.O16.getStr() + "',";
             s += "'" + Characters.O17.getStr() + "','" + Characters.O18.getStr() + "',";
             s += "'" + Characters.O19.getStr() + "','" + Characters.O20.getStr() + "',";
-            s += "'" + Characters.O21.getStr() + "'";
+            s += "'" + Characters.O21.getStr() + "','" + Characters.O22.getStr() + "'";
+            s += "'" + Characters.O23.getStr() + "','" + Characters.O24.getStr() + "'";
+            s += "'" + Characters.O25.getStr() + "','" + Characters.O26.getStr() + "'";
         } else if (key.equalsIgnoreCase("U")) {
             s += "'" + Characters.U1.getStr() + "','" + Characters.U2.getStr() + "',";
             s += "'" + Characters.U3.getStr() + "','" + Characters.U4.getStr() + "',";
@@ -368,6 +317,13 @@ public class SongHelper {
             s += "'" + Characters.U11.getStr() + "','" + Characters.U12.getStr() + "',";
             s += "'" + Characters.U13.getStr() + "','" + Characters.U14.getStr() + "',";
             s += "'" + Characters.U15.getStr() + "','" + Characters.U16.getStr() + "'";
+            s += "'" + Characters.U17.getStr() + "','" + Characters.U18.getStr() + "'";
+            s += "'" + Characters.U19.getStr() + "'";
+        } else if (key.equalsIgnoreCase("Y")) {
+            s += "'" + Characters.Y1.getStr() + "','" + Characters.Y2.getStr() + "'";
+            s += "'" + Characters.Y3.getStr() + "','" + Characters.Y4.getStr() + "'";
+            s += "'" + Characters.Y5.getStr() + "','" + Characters.Y6.getStr() + "'";
+            s += "'" + Characters.Y7.getStr() + "'";
         } else {
             s += "'" + key + "'";
         }
@@ -392,66 +348,6 @@ public class SongHelper {
             }
         } else {
             key = letter;
-        }
-        return key;
-    }
-    /**
-     * Translate the key from the provided first character in the song
-     * name/title/..etc..
-     *
-     * @param firstLetter
-     * @return
-     * @throws Exception
-     */
-    public static String getKey(String firstLetter) throws Exception {
-        String key = "Unknown";
-        Characters c = Characters.forString(firstLetter.toUpperCase(Locale.US));
-        if (c != null) {
-            switch (c) {
-                case ONE:case TWO:case THREE:case FOUR:case FIVE:case SIX:
-                case SEVEN:case EIGHT:case NINE:case ZERO:
-                    key = "#";
-                    break;
-                case A1:case A2:case A3:case A4:case A5:case A6:case A7:case A8:
-                case A9:case A10:case A11:case A12:case A13:case A14:case A15:
-                case A16:case A17:case A18:case A19:case A20:case A21:case A22:
-                case A23:case A24:
-                    key = "A";
-                    break;
-                case B:case C:case F:case G:case H:case J:case K:case L:case M:
-                case N:case P:case Q:case R:case S:case T:case V:case W:case X:
-                case Z:
-                    key = firstLetter.toUpperCase(Locale.US);
-                    break;
-                case D1:case D2:case D3:
-                    key = "D";
-                    break;
-                case E1:case E2:case E3:case E4:case E5:case E6:case E7:case E8:
-                case E9:case E10:case E11:case E12:case E13:case E14:case E15:
-                case E16:case E17:
-                    key = "E";
-                    break;
-                case I1:case I2:case I3:case I4:case I5:case I6:case I7:
-                    key = "I";
-                    break;
-                case O1:case O2:case O3:case O4:case O5:case O6:case O7:
-                case O8:case O9:case O10:case O11:case O12:case O13:
-                case O14:case O15:case O16:case O17:case O18:case O19:
-                case O20:case O21:
-                    key = "O";
-                    break;
-                case U1:case U2:case U3:case U4:case U5:case U6:case U7:
-                case U8:case U9:case U10:case U11:case U12:case U13:
-                case U14:case U15:case U16:
-                    key = "U";
-                    break;
-                case Y1:case Y2:case Y3:case Y4:case Y5:case Y6:
-                    key = "Y";
-                    break;
-            }
-        } else {
-            throw new Exception("Unsupported key '" + firstLetter.toUpperCase(Locale.US)
-                    + "'! ");
         }
         return key;
     }
@@ -614,16 +510,30 @@ public class SongHelper {
         NINE("9"), ZERO("0"), A1("A"), A2("Á"), A3("À"), A4("Ả"), A5("Ã"), A6("Ạ"), A7("Ă"),
         A8("Ắ"), A9("Ằ"), A10("Ẳ"), A11("Ẵ"), A12("Ặ"), A13("Â"), A14("Ấ"), A15("Ầ"), A16("Ẩ"),
         A17("Ẫ"), A18("Ậ"), A19("Á"), A20("À"), A21("Ã"), A22("Ầ"), A23("Á"), A24("Ắ"),
+
+        A25("Á"),A26("Ấ"),A27("Á"),A28("Ả"),A29("À"),A30("Ạ"),
+
         B("B"), C("C"), F("F"), G("G"), H("H"), J("J"), K("K"), L("L"), M("M"), N("N"), P("P"),
         Q("Q"), R("R"), S("S"), T("T"), V("V"), W("W"), X("X"), Z("Z"), D1("D"), D2("Ð"), D3("Đ"),
         E1("E"), E2("É"), E3("È"), E4("Ẻ"), E5("Ẽ"), E6("Ẹ"), E7("Ê"), E8("Ế"), E9("Ề"), E10("Ể"),
-        E11("Ễ"), E12("Ệ"), E13("Ế"), E14("Ễ"), E15("Ế"), E16("Ế"), E17("Ề"), I1("I"),
-        I2("Í"), I3("Ì"), I4("Ỉ"), I5("Ĩ"), I6("Ị"), I7("Í"), O1("O"), O2("Ô"), O3("Ở"), O4("Ơ"),
+        E11("Ễ"), E12("Ệ"), E13("Ế"), E14("Ễ"), E15("Ế"), E16("Ế"), E17("Ề"),E18("Ẽ"),E19("Ế"),
+
+        E20("Ệ"),
+
+        I1("I"),I2("Í"), I3("Ì"), I4("Ỉ"), I5("Ĩ"), I6("Ị"), I7("Í"), O1("O"), O2("Ô"), O3("Ở"), O4("Ơ"),
         O5("Ọ"), O6("Ó"), O7("Ò"), O8("Ỏ"), O9("Õ"), O10("Ố"), O11("Ồ"), O12("Ổ"), O13("Ỗ"),
-        O14("Ộ"), O15("Ớ"), O16("Ờ"), O17("Ỡ"), O18("Ợ"), O19("Ồ"), O20("Ở"), O21("Ỡ"),
+        O14("Ộ"), O15("Ớ"), O16("Ờ"), O17("Ỡ"), O18("Ợ"), O19("Ồ"), O20("Ở"), O21("Ỡ"),O22("Ớ"),
+
+        O23("Ọ"),O24("Ố"),O25("Ọ"),O26("Ộ"),
+
         U1("U"), U2("Ú"), U3("Ù"), U4("Ủ"), U5("Ũ"), U6("Ụ"), U7("Ư"), U8("Ứ"), U9("Ừ"), U10("Ử"),
-        U11("Ữ"), U12("Ự"), U13("Ủ"), U14("Ù"), U15("Ü"), U16("Ù"), Y1("Y"), Y2("Ý"), Y3("Ỳ"),
-        Y4("Ỷ"), Y5("Ỹ"), Y6("Ỵ");
+        U11("Ữ"), U12("Ự"), U13("Ủ"), U14("Ù"), U15("Ü"), U16("Ù"),U17("Ư"),
+
+        U18("Ù"),U19("Ũ"),
+
+        Y1("Y"), Y2("Ý"), Y3("Ỳ"),Y4("Ỷ"), Y5("Ỹ"), Y6("Ỵ"),
+
+        Y7("Ý");
 
         private final String str;
         private static ConcurrentHashMap<String, Characters> map;
