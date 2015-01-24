@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
+import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
@@ -12,6 +13,7 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.vnguyen.liveokeremote.ChatAdapter;
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
@@ -115,6 +117,10 @@ public class UDPResponseHelper {
                                                         dialog = (new AlertDialogHelper(context)).popupChat(u);
                                                         context.chatMap.put(msg.name, dialog);
                                                     }
+                                                    ListView list = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
+                                                    ChatAdapter ca = (ChatAdapter) list.getAdapter();
+                                                    ca.messages.add(msg);
+                                                    ca.notifyDataSetChanged();
                                                     dialog.show();
                                                 }
                                             }
