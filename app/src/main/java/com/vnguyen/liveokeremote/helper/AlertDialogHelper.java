@@ -10,12 +10,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -25,21 +22,17 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
-import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
-import com.vnguyen.liveokeremote.ChatAdapter;
 import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.RsvpListAdapter;
-import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -314,10 +307,16 @@ public class AlertDialogHelper {
                                     String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
                                     Log.d(LiveOkeRemoteApplication.TAG,"masterCode = '" + masterCode + "'");
                                     Log.d(LiveOkeRemoteApplication.TAG,"masterCodeSERVER = '" + context.serverMasterCode + "'");
-                                    if (masterCode != null && !masterCode.equals("") && context.serverMasterCode != null &&
-                                            !context.serverMasterCode.equals("") &&
-                                            masterCode.equalsIgnoreCase(context.serverMasterCode)) {
-                                        //context.webSocketHelper.sendMessage(wsCommand + "," + rsvpNumber);
+                                    boolean ok2Delete = false;
+                                    if (context.serverMasterCode != null) {
+                                        if (masterCode != null && !masterCode.equals("") &&
+                                                masterCode.equalsIgnoreCase(context.serverMasterCode)) {
+                                            ok2Delete = true;
+                                        }
+                                    } else {
+                                        ok2Delete = true;
+                                    }
+                                    if (ok2Delete) {
                                         context.liveOkeUDPClient.sendMessage(wsCommand + "," + rsvpNumber,
                                                 context.liveOkeUDPClient.liveOkeIPAddress,
                                                 context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
