@@ -40,7 +40,7 @@ public class ChatHelper {
         }
         if (showIt) {
             dialog.show();
-            dialog.getWindow().setLayout(900, 1000);
+            //dialog.getWindow().setLayout(900, 1000);
         }
         return dialog;
     }
