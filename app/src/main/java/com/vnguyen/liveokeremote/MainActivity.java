@@ -148,7 +148,6 @@ public class MainActivity extends ActionBarActivity {
 
     public MediaPlayer mediaPlayer;
     public ChatHelper chatHelper;
-    private boolean saidBye = false;
 
 
     @Override
@@ -381,20 +380,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         Log.v(LiveOkeRemoteApplication.TAG,"*** App PAUSING ***");
-//        try {
-//            unregisterReceiver(liveOkeUDPClient);
-//        } catch (IllegalArgumentException ex) {
-//            // receiver isn't registered.
-//        }
         if (handler != null) {
             handler.removeCallbacks(pingPong);
-        }
-        Log.v(LiveOkeRemoteApplication.TAG,"saidBye = " + saidBye);
-        if (!saidBye) {
-            LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Pause", "LiveOke Remote", me.name);
-            if (liveOkeUDPClient != null) {
-                liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), null, UDPListenerService.BROADCAST_PORT);
-            }
         }
     }
 
@@ -403,7 +390,6 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
         easyRatingDialog.showIfNeeded();
         Log.v(LiveOkeRemoteApplication.TAG, "*** App RESUMING ***");
-//        registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         if (liveOkeUDPClient != null) {
             liveOkeUDPClient.initClient();
         }
@@ -413,10 +399,6 @@ public class MainActivity extends ActionBarActivity {
             app.landscapeOriented = false;
         }
         handler.postDelayed(pingPong, 10000);
-        LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Resume", "LiveOke Remote", me.name);
-        if (liveOkeUDPClient != null) {
-            liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), null, UDPListenerService.BROADCAST_PORT);
-        }
     }
 
 
@@ -580,8 +562,6 @@ public class MainActivity extends ActionBarActivity {
                                     //helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
                                     if (liveOkeUDPClient != null) {
                                         liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
-                                        saidBye = true;
-                                        Log.v(LiveOkeRemoteApplication.TAG,"saidBye = " + saidBye);
                                     }
                                 }
                             }).start();
