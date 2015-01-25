@@ -4,28 +4,20 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.google.gson.Gson;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
-import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -152,18 +144,9 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                                 }
                             }).show();
                 } else {
-                    final User u = context.friendsListHelper.findFriend(frName.getText().toString());
-                    MaterialDialog dialog;
-                    if (u != null) {
-                        if (context.chatMap.containsKey(u.name)) {
-                            dialog = context.chatMap.get(u.name);
-                        } else {
-                            dialog = (new AlertDialogHelper(context)).popupChat(u);
-                            context.chatMap.put(u.name, dialog);
-                        }
-                        dialog.show();
-                        dialog.getWindow().setLayout(700, 1000);
-                    }
+                    // CHAT
+                    User u = context.friendsListHelper.findFriend(frName.getText().toString());
+                    context.chatHelper.chat(u, true);
                 }
             }
         });
@@ -182,14 +165,14 @@ public class FriendListAdapter extends BaseSwipeAdapter {
                 break;
             }
         }
-        for (Iterator<User> it = context.friendsList.iterator(); it.hasNext(); ) {
-            User u = it.next();
+        for (Iterator<User> it2 = context.friendsList.iterator(); it2.hasNext(); ) {
+            User u = it2.next();
             if (u.name.equalsIgnoreCase(frName.toString())) {
-                it.remove();
+                it2.remove();
                 break;
             }
         }
-        context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
+        context.actionBarHelper.setSubTitle(context.friendsList.size() + " Friends.");
         notifyDataSetChanged();
     }
 

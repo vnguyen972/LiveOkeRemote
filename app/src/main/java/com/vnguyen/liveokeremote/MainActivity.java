@@ -63,6 +63,7 @@ import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.ActionBarHelper;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.BackupHelper;
+import com.vnguyen.liveokeremote.helper.ChatHelper;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
 import com.vnguyen.liveokeremote.helper.FriendsListHelper;
@@ -80,7 +81,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -147,8 +147,9 @@ public class MainActivity extends ActionBarActivity {
     private EasyRatingDialog easyRatingDialog;
 
     public MediaPlayer mediaPlayer;
+    public ChatHelper chatHelper;
+    private boolean saidBye = false;
 
-    public HashMap<String,MaterialDialog> chatMap;
 
     @Override
     protected void onStart() {
@@ -167,9 +168,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        chatHelper = new ChatHelper(this);
         easyRatingDialog = new EasyRatingDialog(this);
         mediaPlayer = new MediaPlayer();
-        chatMap = new HashMap<>();
         setContentView(R.layout.activity_main);
 
         try {
@@ -380,14 +381,20 @@ public class MainActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         Log.v(LiveOkeRemoteApplication.TAG,"*** App PAUSING ***");
-        //unregisterReceiver(bReceiver);
-        try {
-            unregisterReceiver(liveOkeUDPClient);
-        } catch (IllegalArgumentException ex) {
-            // receiver isn't registered.
-        }
+//        try {
+//            unregisterReceiver(liveOkeUDPClient);
+//        } catch (IllegalArgumentException ex) {
+//            // receiver isn't registered.
+//        }
         if (handler != null) {
             handler.removeCallbacks(pingPong);
+        }
+        Log.v(LiveOkeRemoteApplication.TAG,"saidBye = " + saidBye);
+        if (!saidBye) {
+            LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Pause", "LiveOke Remote", me.name);
+            if (liveOkeUDPClient != null) {
+                liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), null, UDPListenerService.BROADCAST_PORT);
+            }
         }
     }
 
@@ -396,8 +403,7 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
         easyRatingDialog.showIfNeeded();
         Log.v(LiveOkeRemoteApplication.TAG, "*** App RESUMING ***");
-//        registerReceiver(bReceiver, new IntentFilter(UDPListenerService.UDP_BROADCAST));
-        registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
+//        registerReceiver(liveOkeUDPClient, new IntentFilter(UDPListenerService.UDP_BROADCAST));
         if (liveOkeUDPClient != null) {
             liveOkeUDPClient.initClient();
         }
@@ -407,6 +413,10 @@ public class MainActivity extends ActionBarActivity {
             app.landscapeOriented = false;
         }
         handler.postDelayed(pingPong, 10000);
+        LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Resume", "LiveOke Remote", me.name);
+        if (liveOkeUDPClient != null) {
+            liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), null, UDPListenerService.BROADCAST_PORT);
+        }
     }
 
 
@@ -570,9 +580,17 @@ public class MainActivity extends ActionBarActivity {
                                     //helper.broadcastToOtherSelves((new Gson()).toJson(bcMsg),(WifiManager) getSystemService(Context.WIFI_SERVICE));
                                     if (liveOkeUDPClient != null) {
                                         liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+                                        saidBye = true;
+                                        Log.v(LiveOkeRemoteApplication.TAG,"saidBye = " + saidBye);
                                     }
                                 }
                             }).start();
+                            try {
+                                unregisterReceiver(liveOkeUDPClient);
+                            } catch (IllegalArgumentException ex) {
+                                // receiver isn't registered.
+                            }
+
                             finish();
                         }
                     })

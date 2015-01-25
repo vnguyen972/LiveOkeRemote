@@ -59,6 +59,7 @@ public class FriendsListHelper {
                 }
             });
         } else {
+            adapter.friends.clear();
             adapter.friends.addAll(friends);
         }
         adapter.notifyDataSetChanged();

@@ -4,6 +4,7 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -46,16 +47,21 @@ public class UDPResponseHelper {
                 // Message is a JSON message
                 final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
                 msg.ipAddress = senderIP;
+                Log.v(LiveOkeRemoteApplication.TAG,"msg.ip = " + msg.ipAddress);
                 // if the message coming from this app
                 if (msg.fromWhere.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
                     // is it really from another client with different IP?
                     if (!context.liveOkeUDPClient.isMine(senderIP)) {
-                        User u = new User(msg.name);
-                        u.ipAddress = senderIP;
-                        u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
-                        context.friendsList.add(u);
                         try {
-                            if (msg.greeting.equalsIgnoreCase("Hi") || msg.greeting.equalsIgnoreCase("Hello")) {
+                            if (msg.greeting.equalsIgnoreCase("Hi") || msg.greeting.equalsIgnoreCase("Hello") ||
+                                    msg.greeting.equalsIgnoreCase("Pause") || msg.greeting.equalsIgnoreCase("Resume")) {
+                                User u = context.friendsListHelper.findFriend(msg.name);
+                                if (u == null || !u.ipAddress.equalsIgnoreCase(msg.ipAddress)) {
+                                    u = new User(msg.name);
+                                    u.ipAddress = senderIP;
+                                    u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0) + "", "round");
+                                    context.friendsList.add(u);
+                                }
                                 SnackbarManager.show(Snackbar.with(context)
                                         .type(SnackbarType.MULTI_LINE)
                                         .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
@@ -72,11 +78,21 @@ public class UDPResponseHelper {
                                         context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), senderIP, UDPListenerService.BROADCAST_PORT);
                                     }
                                 }
+                                final User usr = u;
                                 context.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         if (context.viewFlipper.getDisplayedChild() != 0) {
                                             context.friendsListHelper.displayFriendsListPanel();
+                                        }
+                                        MaterialDialog dialog = context.chatHelper.chat(usr, false);
+                                        ListView list = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
+                                        if (msg.greeting.equalsIgnoreCase("Hi") || msg.greeting.equalsIgnoreCase("Pause") ||
+                                                msg.greeting.equalsIgnoreCase("Resume")) {
+                                            // update chat window
+                                            ((ChatAdapter) list.getAdapter()).messages.add(msg);
+                                            ((ChatAdapter) list.getAdapter()).notifyDataSetChanged();
+
                                         }
                                     }
                                 });
@@ -91,44 +107,48 @@ public class UDPResponseHelper {
                                 context.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        User u = context.friendsListHelper.findFriend(msg.name);
+                                        if (u != null) {
+                                            // update chat window
+                                            MaterialDialog dialog = context.chatHelper.chat(u, false);
+                                            ListView list = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
+                                            ((ChatAdapter)list.getAdapter()).messages.add(msg);
+                                            ((ChatAdapter)list.getAdapter()).notifyDataSetChanged();
+                                        }
                                         context.friendsListHelper.adapter.removeFriendFromAdapter(msg.name);
                                     }
                                 });
                             } else if (msg.greeting.equalsIgnoreCase("Chat")) {
+                                Vibrator v = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
+                                // Vibrate for 500 milliseconds
+                                v.vibrate(500);
                                 MaterialDialog dialog = null;
                                 User messenger = context.friendsListHelper.findFriend(msg.name);
                                 if (messenger != null) {
-                                    if (context.chatMap.containsKey(msg.name)) {
-                                        // already got chat going on
-                                        dialog = context.chatMap.get(msg.name);
-                                    } else {
-                                        // new chat
-                                        dialog = (new AlertDialogHelper(context)).popupChat(u);
-                                        context.chatMap.put(msg.name, dialog);
-                                    }
+                                    dialog = context.chatHelper.chat(messenger, false);
                                     ListView list = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
                                     ChatAdapter ca = (ChatAdapter) list.getAdapter();
                                     ca.messages.add(msg);
                                     ca.notifyDataSetChanged();
-                                }
-                                if (dialog != null) {
-                                    final MaterialDialog d = dialog;
-                                    if (!d.isShowing()) {
-                                        SnackbarManager.show(Snackbar.with(context)
-                                                        .type(SnackbarType.MULTI_LINE)
-                                                        .duration(Snackbar.SnackbarDuration.LENGTH_INDEFINITE)
-                                                        .textColor(Color.WHITE)
-                                                        .color(context.getResources().getColor(R.color.indigo_500))
-                                                        .text(msg.name + " says: " + msg.message)
-                                                        .actionLabel("Reply")
-                                                        .actionListener(new ActionClickListener() {
-                                                            @Override
-                                                            public void onActionClicked(Snackbar snackbar) {
-                                                                Log.v(LiveOkeRemoteApplication.TAG,"Reply the message");
-                                                                d.show();
-                                                            }
-                                                        })
-                                        );
+                                    if (dialog != null) {
+                                        final MaterialDialog d = dialog;
+                                        if (!d.isShowing()) {
+                                            SnackbarManager.show(Snackbar.with(context)
+                                                            .type(SnackbarType.MULTI_LINE)
+                                                            .duration(Snackbar.SnackbarDuration.LENGTH_INDEFINITE)
+                                                            .textColor(Color.WHITE)
+                                                            .color(context.getResources().getColor(R.color.indigo_500))
+                                                            .text(msg.name + " says: " + msg.message)
+                                                            .actionLabel("Reply")
+                                                            .actionListener(new ActionClickListener() {
+                                                                @Override
+                                                                public void onActionClicked(Snackbar snackbar) {
+                                                                    Log.v(LiveOkeRemoteApplication.TAG,"Reply the message");
+                                                                    d.show();
+                                                                }
+                                                            })
+                                            );
+                                        }
                                     }
                                 }
                             }

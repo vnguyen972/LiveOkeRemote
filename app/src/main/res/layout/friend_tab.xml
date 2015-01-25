@@ -33,7 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="5sp"
             android:layout_weight="1"
-            android:background="@drawable/message_field"
             android:hint="Write here"
             android:paddingRight="20dp"
             android:paddingLeft="20dp"
@@ -41,6 +40,7 @@
             android:padding="5sp"
             android:textColor="@color/black"
             />
+        <!--             android:background="@drawable/message_field" -->
         <Button
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
@@ -49,9 +49,11 @@
             android:paddingLeft="15sp"
             android:paddingRight="15sp"
             android:paddingTop="5sp"
-            android:background="@drawable/send_button"
             android:text="Send"
+            android:textColor="@color/white"
+            android:background="@color/primary"
         >
+            <!--             android:background="@drawable/send_button" -->
 
         </Button>
     </LinearLayout>

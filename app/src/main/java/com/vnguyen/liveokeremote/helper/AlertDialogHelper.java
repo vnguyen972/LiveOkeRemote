@@ -60,40 +60,6 @@ public class AlertDialogHelper {
     }
 
 
-    public MaterialDialog popupChat(final User u) {
-        MaterialDialog dialog = new MaterialDialog.Builder(context)
-                .title("LiveOke Chat")
-                .theme(Theme.LIGHT)
-                .titleColor(R.color.primary)
-                .customView(R.layout.friend_tab, false)
-                .build();
-
-        ListView msgList = (ListView) dialog.getCustomView().findViewById(R.id.chat_message);
-
-        final EditText edTxt = (EditText) dialog.getCustomView().findViewById(R.id.chat_text);
-        Button sendButton = (Button) dialog.getCustomView().findViewById(R.id.send_button);
-
-        u.chatMessages = new ArrayList<>();
-        final ChatAdapter ca = new ChatAdapter(context, u.chatMessages);
-        msgList.setAdapter(ca);
-        //setListViewHeightBasedOnChildren(msgList);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String str = edTxt.getText().toString();
-                LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat", "LiveOke Remote", context.me.name);
-                msg.message = str;
-                Log.v(LiveOkeRemoteApplication.TAG, "Message SENT = " + msg.message);
-                u.chatMessages.add(msg);
-                ca.notifyDataSetChanged();
-                context.liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), msg.ipAddress, UDPListenerService.BROADCAST_PORT);
-                Log.v(LiveOkeRemoteApplication.TAG, "CA Size = " + ca.getCount());
-                edTxt.setText("");
-            }
-        });
-        return dialog;
-    }
-
     public void popupSplash() {
             if (splashDialog == null) {
                 splashDialog = new MaterialDialog.Builder(context)

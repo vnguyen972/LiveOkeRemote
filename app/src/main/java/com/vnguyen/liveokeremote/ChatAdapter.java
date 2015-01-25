@@ -2,6 +2,7 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,18 +53,40 @@ public class ChatAdapter extends BaseAdapter {
         } else {
             holder = (ChatViewHolder) convertView.getTag();
         }
-        holder.message.setText(message.name + ": " + message.message + "   ");
+        holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + ": " + message.message + "   "));
         LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) holder.message.getLayoutParams();
         holder.message.setBackground(null);
-        if (message.ipAddress == null) {
-            // this is my message
-            holder.message.setBackgroundResource(R.drawable.speech_bubble_green);
-            lp.gravity = Gravity.RIGHT;
-            holder.message.setTextColor(context.getResources().getColor(R.color.black));
-        } else {
-            holder.message.setBackgroundResource(R.drawable.speech_bubble_orange);
+        if (message.greeting.equalsIgnoreCase("Chat")) {
+            if (message.ipAddress == null) {
+                // this is my message
+                holder.message.setBackgroundResource(R.drawable.speech_bubble_green);
+                lp.gravity = Gravity.RIGHT;
+                holder.message.setTextColor(context.getResources().getColor(R.color.black));
+            } else {
+                holder.message.setBackgroundResource(R.drawable.speech_bubble_orange);
+                lp.gravity = Gravity.LEFT;
+                holder.message.setTextColor(context.getResources().getColor(R.color.black));
+            }
+        } else if (message.greeting.equalsIgnoreCase("Bye")){
+            holder.message.setBackground(null);
             lp.gravity = Gravity.LEFT;
-            holder.message.setTextColor(context.getResources().getColor(R.color.black));
+            holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
+            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is off-line!"));
+        } else if (message.greeting.equalsIgnoreCase("Hi")) {
+            holder.message.setBackground(null);
+            lp.gravity = Gravity.LEFT;
+            holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
+            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is on-line!"));
+        } else if (message.greeting.equalsIgnoreCase("Pause")) {
+            holder.message.setBackground(null);
+            lp.gravity = Gravity.LEFT;
+            holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
+            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is not active and will NOT receive any messages!"));
+        } else if (message.greeting.equalsIgnoreCase("Resume")) {
+            holder.message.setBackground(null);
+            lp.gravity = Gravity.LEFT;
+            holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
+            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is now active and will receive messages!"));
         }
         holder.message.setLayoutParams(lp);
         return convertView;
