@@ -25,9 +25,7 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.SongResult;
-import com.vnguyen.liveokeremote.data.User;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
-import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
 import org.json.JSONArray;
@@ -355,10 +353,10 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             @Override
             public void onClick(View v) {
                 if (!context.listingBy.equalsIgnoreCase("favorites")) {
-                    ArrayList<User> friends = PreferencesHelper.getInstance(context).retrieveFriendsList();
-                    String[] frNames = new String[friends.size()];
+                    //ArrayList<User> friends = PreferencesHelper.getInstance(context).retrieveFriendsList();
+                    String[] frNames = new String[context.friendsList.size()];
                     for (int i = 0; i < frNames.length; i++) {
-                        frNames[i] = friends.get(i).name;
+                        frNames[i] = context.friendsList.get(i).name;
                     }
                     if (frNames.length > 0) {
                         new MaterialDialog.Builder(context)
