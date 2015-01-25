@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -30,9 +31,11 @@ import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.RsvpListAdapter;
+import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -118,6 +121,11 @@ public class AlertDialogHelper {
                                     context.getResources().getString(R.string.myName), value);
                             context.me = new User(value);
                             Toast.makeText(context, "Hello "+ value, Toast.LENGTH_LONG).show();
+                            LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                                    context.getResources().getString(R.string.app_name), context.me.name);
+                            if (context.liveOkeUDPClient != null) {
+                                context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+                            }
                             context.nowPlayingHelper.popTitle();
                             context.loadExtra();
                         }
@@ -305,8 +313,8 @@ public class AlertDialogHelper {
                                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                 if (context.liveOkeUDPClient != null) {
                                     String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
-                                    Log.d(LiveOkeRemoteApplication.TAG,"masterCode = '" + masterCode + "'");
-                                    Log.d(LiveOkeRemoteApplication.TAG,"masterCodeSERVER = '" + context.serverMasterCode + "'");
+                                    Log.d(LiveOkeRemoteApplication.TAG, "masterCode = '" + masterCode + "'");
+                                    Log.d(LiveOkeRemoteApplication.TAG, "masterCodeSERVER = '" + context.serverMasterCode + "'");
                                     boolean ok2Delete = false;
                                     if (context.serverMasterCode != null) {
                                         if (masterCode != null && !masterCode.equals("") &&
