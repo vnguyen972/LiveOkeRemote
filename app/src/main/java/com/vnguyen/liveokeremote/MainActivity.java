@@ -1,6 +1,9 @@
 package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +28,7 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -81,6 +85,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -148,7 +153,6 @@ public class MainActivity extends ActionBarActivity {
 
     public MediaPlayer mediaPlayer;
     public ChatHelper chatHelper;
-
 
     @Override
     protected void onStart() {
@@ -374,6 +378,8 @@ public class MainActivity extends ActionBarActivity {
                 handler.postDelayed(this, 10000);
             }
         };
+
+        // test notification
     }
 
     @Override
