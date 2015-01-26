@@ -270,9 +270,9 @@ public class SongHelper {
             s += "'" + Characters.A17.getStr() + "','" + Characters.A18.getStr() + "',";
             s += "'" + Characters.A19.getStr() + "','" + Characters.A20.getStr() + "',";
             s += "'" + Characters.A21.getStr() + "','" + Characters.A22.getStr() + "',";
-            s += "'" + Characters.A23.getStr() + "','" + Characters.A24.getStr() + "'";
-            s += "'" + Characters.A25.getStr() + "','" + Characters.A26.getStr() + "'";
-            s += "'" + Characters.A27.getStr() + "','" + Characters.A28.getStr() + "'";
+            s += "'" + Characters.A23.getStr() + "','" + Characters.A24.getStr() + "',";
+            s += "'" + Characters.A25.getStr() + "','" + Characters.A26.getStr() + "',";
+            s += "'" + Characters.A27.getStr() + "','" + Characters.A28.getStr() + "',";
             s += "'" + Characters.A29.getStr() + "','" + Characters.A30.getStr() + "'";
         } else if (key.equalsIgnoreCase("D")) {
             s += "'" + Characters.D1.getStr() + "','" + Characters.D2.getStr() + "',";
@@ -287,7 +287,7 @@ public class SongHelper {
             s += "'" + Characters.E13.getStr() + "','" + Characters.E14.getStr() + "',";
             s += "'" + Characters.E15.getStr() + "','" + Characters.E16.getStr() + "',";
             s += "'" + Characters.E17.getStr() + "','" + Characters.E18.getStr() + "',";
-            s += "'" + Characters.E19.getStr() + "','" + Characters.E20.getStr() + "',";
+            s += "'" + Characters.E19.getStr() + "','" + Characters.E20.getStr() + "'";
 
         } else if (key.equalsIgnoreCase("I")) {
             s += "'" + Characters.I1.getStr() + "','" + Characters.I2.getStr() + "',";
@@ -305,8 +305,8 @@ public class SongHelper {
             s += "'" + Characters.O15.getStr() + "','" + Characters.O16.getStr() + "',";
             s += "'" + Characters.O17.getStr() + "','" + Characters.O18.getStr() + "',";
             s += "'" + Characters.O19.getStr() + "','" + Characters.O20.getStr() + "',";
-            s += "'" + Characters.O21.getStr() + "','" + Characters.O22.getStr() + "'";
-            s += "'" + Characters.O23.getStr() + "','" + Characters.O24.getStr() + "'";
+            s += "'" + Characters.O21.getStr() + "','" + Characters.O22.getStr() + "',";
+            s += "'" + Characters.O23.getStr() + "','" + Characters.O24.getStr() + "',";
             s += "'" + Characters.O25.getStr() + "','" + Characters.O26.getStr() + "'";
         } else if (key.equalsIgnoreCase("U")) {
             s += "'" + Characters.U1.getStr() + "','" + Characters.U2.getStr() + "',";
@@ -316,13 +316,13 @@ public class SongHelper {
             s += "'" + Characters.U9.getStr() + "','" + Characters.U10.getStr() + "',";
             s += "'" + Characters.U11.getStr() + "','" + Characters.U12.getStr() + "',";
             s += "'" + Characters.U13.getStr() + "','" + Characters.U14.getStr() + "',";
-            s += "'" + Characters.U15.getStr() + "','" + Characters.U16.getStr() + "'";
-            s += "'" + Characters.U17.getStr() + "','" + Characters.U18.getStr() + "'";
+            s += "'" + Characters.U15.getStr() + "','" + Characters.U16.getStr() + "',";
+            s += "'" + Characters.U17.getStr() + "','" + Characters.U18.getStr() + "',";
             s += "'" + Characters.U19.getStr() + "'";
         } else if (key.equalsIgnoreCase("Y")) {
-            s += "'" + Characters.Y1.getStr() + "','" + Characters.Y2.getStr() + "'";
-            s += "'" + Characters.Y3.getStr() + "','" + Characters.Y4.getStr() + "'";
-            s += "'" + Characters.Y5.getStr() + "','" + Characters.Y6.getStr() + "'";
+            s += "'" + Characters.Y1.getStr() + "','" + Characters.Y2.getStr() + "',";
+            s += "'" + Characters.Y3.getStr() + "','" + Characters.Y4.getStr() + "',";
+            s += "'" + Characters.Y5.getStr() + "','" + Characters.Y6.getStr() + "',";
             s += "'" + Characters.Y7.getStr() + "'";
         } else {
             s += "'" + key + "'";
