@@ -1,0 +1,80 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@color/primary">
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
+    <RelativeLayout
+        android:id="@+id/info_not"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/notification_icon"
+        android:layout_toLeftOf="@+id/control_not"
+        >
+        <TextView
+            android:id="@+id/notification_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Now Playing"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/notification_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="message message message message message message message "
+            android:layout_below="@+id/notification_title"
+            android:layout_marginLeft="5dp"
+            android:textStyle="bold|italic"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/control_not"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+     >
+        <ImageView
+            android:id="@+id/micIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_mic_white_18dp"
+            android:layout_marginTop="5dp"
+            android:padding="5dp"
+            />
+        <ImageView
+            android:id="@+id/playIcon"
+            android:layout_toRightOf="@+id/micIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_play"
+            android:padding="5dp"
+            />
+        <ImageView
+            android:id="@+id/nextIcon"
+            android:layout_toRightOf="@+id/playIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_next"
+            android:padding="5dp"
+            />
+
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/notification_rsvp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/control_not"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:textStyle="bold|italic"
+        />
+
+</RelativeLayout>

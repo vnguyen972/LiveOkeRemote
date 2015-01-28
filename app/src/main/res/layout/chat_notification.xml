@@ -1,0 +1,51 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary">
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
+    <TextView
+        android:id="@+id/notification_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Title goes here"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/notification_icon"
+        android:layout_toEndOf="@+id/notification_icon"
+        android:layout_toLeftOf="@+id/notification_time"
+        android:layout_toStartOf="@+id/notification_time"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/notification_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="message"
+        android:layout_below="@+id/notification_title"
+        android:layout_toRightOf="@+id/notification_icon"
+        android:layout_toEndOf="@+id/notification_icon"
+        android:layout_toLeftOf="@+id/notification_time"
+        android:layout_toStartOf="@+id/notification_time"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/white"
+        android:textStyle="bold|italic"
+        />
+    <TextView
+        android:id="@+id/notification_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="50-10pm"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+     />
+
+</RelativeLayout>

@@ -1,9 +1,6 @@
 package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,7 +25,6 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -72,6 +68,7 @@ import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
 import com.vnguyen.liveokeremote.helper.FriendsListHelper;
 import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
+import com.vnguyen.liveokeremote.helper.NotificationHelper;
 import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
@@ -85,7 +82,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -154,6 +150,9 @@ public class MainActivity extends ActionBarActivity {
     public MediaPlayer mediaPlayer;
     public ChatHelper chatHelper;
 
+    public NotificationHelper notificationHelper;
+    public boolean isInForegroundMode;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -174,6 +173,9 @@ public class MainActivity extends ActionBarActivity {
         chatHelper = new ChatHelper(this);
         easyRatingDialog = new EasyRatingDialog(this);
         mediaPlayer = new MediaPlayer();
+        notificationHelper = new NotificationHelper(MainActivity.this);
+
+
         setContentView(R.layout.activity_main);
 
         try {
@@ -239,6 +241,11 @@ public class MainActivity extends ActionBarActivity {
                 };
                 IntentFilter filter = new IntentFilter();
                 filter.addAction(UDPListenerService.UDP_BROADCAST);
+                filter.addAction(NotificationHelper.LIVEOKE_NOTIFICATION_PLAY);
+                filter.addAction(NotificationHelper.LIVEOKE_NOTIFICATION_PAUSE);
+                filter.addAction(NotificationHelper.LIVEOKE_NOTIFICATION_NEXT);
+                filter.addAction(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_OFF);
+                filter.addAction(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_ON);
                 registerReceiver(liveOkeUDPClient, filter);
                 if (me != null) {
                     // build a hello packet to broadcast to other clients like me!
@@ -379,7 +386,7 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
-        // test notification
+
     }
 
     @Override
@@ -389,6 +396,7 @@ public class MainActivity extends ActionBarActivity {
         if (handler != null) {
             handler.removeCallbacks(pingPong);
         }
+        isInForegroundMode = false;
     }
 
     @Override
@@ -405,8 +413,19 @@ public class MainActivity extends ActionBarActivity {
             app.landscapeOriented = false;
         }
         handler.postDelayed(pingPong, 10000);
+        isInForegroundMode = true;
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        String reply = intent.getStringExtra("reply-chat");
+        Log.v(LiveOkeRemoteApplication.TAG,"REPLY = " + reply);
+        String chatUsr = intent.getStringExtra("chat-user");
+        if (reply != null && reply.equalsIgnoreCase("yes")) {
+            notificationHelper.chatMap.get(chatUsr).clear();
+            notificationHelper.removeChatNotification();
+        }
+    }
 
     public void toggleOn() {
         ImageView iv = (ImageView) onOffSwitch.getActionView().findViewById(R.id.network_status_indicator);
@@ -473,6 +492,7 @@ public class MainActivity extends ActionBarActivity {
         super.onDestroy();
         unbindService(udpServiceConnection);
         stopService(udpListenerServiceIntent);
+        notificationHelper.removeNotification();
     }
 
     @Override

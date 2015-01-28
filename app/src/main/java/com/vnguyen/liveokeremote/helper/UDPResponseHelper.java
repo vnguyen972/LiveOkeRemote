@@ -4,6 +4,7 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
 import android.widget.ListView;
@@ -22,9 +23,13 @@ import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.service.UDPListenerService;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
+
+import static com.vnguyen.liveokeremote.service.UDPListenerService.BROADCAST_PORT;
+import static com.vnguyen.liveokeremote.service.UDPListenerService.UDP_BROADCAST;
 
 public class UDPResponseHelper {
     private MainActivity context;
@@ -34,11 +39,60 @@ public class UDPResponseHelper {
     }
 
     public void processResponseIntent(Intent intent) {
-        final String senderIP = intent.getStringExtra("senderIP");
-        final int senderPORT = intent.getIntExtra("senderPORT", 0);
-        final String senderMSG = intent.getStringExtra("message");
-        Log.v(LiveOkeRemoteApplication.TAG, "Received msg: " + senderMSG);
-        processMessage(senderIP, senderMSG);
+        String senderMSG;
+        if (intent.getAction().equalsIgnoreCase(UDP_BROADCAST)) {
+            String senderIP = intent.getStringExtra("senderIP");
+            int senderPORT = intent.getIntExtra("senderPORT", 0);
+            senderMSG = intent.getStringExtra("message");
+            Log.v(LiveOkeRemoteApplication.TAG, "Received msg: " + senderMSG);
+            processMessage(senderIP, senderMSG);
+        } else if (intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PLAY) ||
+                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PAUSE) ||
+                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_NEXT) ||
+                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_OFF) ||
+                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_ON)) {
+            Log.v(LiveOkeRemoteApplication.TAG, "Received intent: " + intent);
+            dumpIntent(intent);
+            senderMSG = intent.getStringExtra("command");
+            Log.v(LiveOkeRemoteApplication.TAG, "Received message: " + senderMSG);
+            processNotification(senderMSG);
+        }
+    }
+
+    private void processNotification(String message) {
+        switch (message) {
+            case "play":case "pause":
+                context.liveOkeUDPClient.sendMessage("play",
+                        context.liveOkeUDPClient.liveOkeIPAddress,
+                        context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                if (message.equalsIgnoreCase("play")) {
+                    context.notificationHelper.pause = false;
+                    context.notificationHelper.addNotification();
+                } else {
+                    context.notificationHelper.pause = true;
+                    context.notificationHelper.addNotification();
+                }
+                break;
+            case "next":
+                context.liveOkeUDPClient.sendMessage("next",
+                        context.liveOkeUDPClient.liveOkeIPAddress,
+                        context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                break;
+            case "mic-on":case "mic-off":
+                context.liveOkeUDPClient.sendMessage("toggleaudio",
+                        context.liveOkeUDPClient.liveOkeIPAddress,
+                        context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                if (message.equalsIgnoreCase("mic-on")) {
+                    context.notificationHelper.micOn = false;
+                    context.notificationHelper.addNotification();
+                } else {
+                    context.notificationHelper.micOn = true;
+                    context.notificationHelper.addNotification();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     //public void processMessage(String senderIP, String senderMSG) {
@@ -75,7 +129,7 @@ public class UDPResponseHelper {
                                             new LiveOkeRemoteBroadcastMsg("Hello",
                                                     context.getResources().getString(R.string.app_name), context.me.name);
                                     if (context.liveOkeUDPClient != null) {
-                                        context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), senderIP, UDPListenerService.BROADCAST_PORT);
+                                        context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), senderIP, BROADCAST_PORT);
                                     }
                                 }
                                 final User usr = u;
@@ -119,6 +173,9 @@ public class UDPResponseHelper {
                                     }
                                 });
                             } else if (msg.greeting.equalsIgnoreCase("Chat")) {
+                                if (!context.isInForegroundMode) {
+                                    context.notificationHelper.chatNotification(msg.name,msg.message);
+                                }
                                 Vibrator v = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
                                 // Vibrate for 500 milliseconds
                                 v.vibrate(500);
@@ -173,6 +230,9 @@ public class UDPResponseHelper {
                     Log.d(LiveOkeRemoteApplication.TAG,"Server Master Code = " + code);
                     if (!code.equalsIgnoreCase("")) {
                         context.serverMasterCode = senderMSG.substring(11, senderMSG.length());
+//                        // test notification
+//                        context.notificationHelper.pause = true;
+//                        context.notificationHelper.addNotification();
                     }
                 } else if (senderMSG.startsWith("Track:")) {
                     String nextTrack = senderMSG.substring(6, senderMSG.length());
@@ -182,6 +242,8 @@ public class UDPResponseHelper {
                             @Override
                             public void run() {
                                 context.floatingButtonsHelper.micOff();
+                                context.notificationHelper.micOn = false;
+                                context.notificationHelper.addNotification();
                             }
                         });
                     } else {
@@ -190,6 +252,8 @@ public class UDPResponseHelper {
                             @Override
                             public void run() {
                                 context.floatingButtonsHelper.micOn();
+                                context.notificationHelper.micOn = true;
+                                context.notificationHelper.addNotification();
                             }
                         });
                     }
@@ -200,11 +264,17 @@ public class UDPResponseHelper {
                         public void run() {
                             context.nowPlayingHelper.pushTitle("Pause:<br><b>" + context.liveOkeUDPClient.currentSong + "</b>");
                             context.floatingButtonsHelper.togglePlayBtn();
+                            context.notificationHelper.nowPlayingTitle = "PAUSE";
+                            context.notificationHelper.nowPlayingStr = context.liveOkeUDPClient.currentSong;
+                            context.notificationHelper.pause = true;
                             if (currentAudioTrack.equalsIgnoreCase("Karaoke")) {
                                 context.floatingButtonsHelper.micOn();
+                                context.notificationHelper.micOn = true;
                             } else {
+                                context.notificationHelper.micOn = false;
                                 context.floatingButtonsHelper.micOff();
                             }
+                            context.notificationHelper.addNotification();
                         }
                     });
                 } else if (senderMSG.startsWith("Quit")) {
@@ -225,12 +295,18 @@ public class UDPResponseHelper {
                         @Override
                         public void run() {
                             context.nowPlayingHelper.setTitle("Now Playing:<br><b>" + context.liveOkeUDPClient.currentSong + "</b>");
+                            context.notificationHelper.nowPlayingTitle = "NOW PLAYING";
+                            context.notificationHelper.nowPlayingStr = context.liveOkeUDPClient.currentSong;
                             context.floatingButtonsHelper.togglePlayBtn();
+                            context.notificationHelper.pause = false;
                             if (currentAudioTrack.equalsIgnoreCase("Karaoke")) {
                                 context.floatingButtonsHelper.micOn();
+                                context.notificationHelper.micOn = true;
                             } else {
                                 context.floatingButtonsHelper.micOff();
+                                context.notificationHelper.micOn = false;
                             }
+                            context.notificationHelper.addNotification();
                         }
                     });
                 } else if (senderMSG.startsWith("Reserve:")) {
@@ -282,9 +358,25 @@ public class UDPResponseHelper {
                         public void run() {
                             context.rsvpPanelHelper.refreshRsvpList(context.liveOkeUDPClient.rsvpList);
                             context.updateRsvpCounter(context.liveOkeUDPClient.rsvpList.size());
+                            context.notificationHelper.totalRsvp = context.liveOkeUDPClient.rsvpList.size();
+                            context.notificationHelper.addNotification();
                         }
                     });
                 }
             }
+    }
+    public void dumpIntent(Intent i){
+
+        Bundle bundle = i.getExtras();
+        if (bundle != null) {
+            Set<String> keys = bundle.keySet();
+            Iterator<String> it = keys.iterator();
+            Log.v(LiveOkeRemoteApplication.TAG,"Dumping Intent start");
+            while (it.hasNext()) {
+                String key = it.next();
+                Log.v(LiveOkeRemoteApplication.TAG,"[" + key + "=" + bundle.get(key)+"]");
+            }
+            Log.v(LiveOkeRemoteApplication.TAG,"Dumping Intent end");
+        }
     }
 }

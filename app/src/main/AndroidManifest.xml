@@ -50,7 +50,7 @@
             android:theme="@android:style/Theme.Translucent" />
         <service android:name=".service.UDPListenerService" />
         <activity
-            android:name=".NotificationActivity"
+            android:name=".DismissNotificationActivity"
             android:taskAffinity=""
             android:excludeFromRecents="true">
         </activity>
