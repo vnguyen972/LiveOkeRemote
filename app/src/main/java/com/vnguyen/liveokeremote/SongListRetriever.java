@@ -34,12 +34,6 @@ public class SongListRetriever implements  LiveOkeTCPClient {
 
     public SongListRetriever(Context context) {
         this.context = (MainActivity) context;
-//        this.udpClient = udpClient;
-//        if (udpClient != null) {
-//            if (udpClient.liveOkeIPAddress != null && !udpClient.liveOkeIPAddress.equals("")) {
-//                this.serverHost = udpClient.liveOkeIPAddress;
-//            }
-//        }
     }
 
     public void getSongList() {
@@ -92,7 +86,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             byteArrayOutputStream.reset();
                             printStream.print("getsong");
                             printStream.flush();
-                            Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i++);
+                            //Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i++);
                             onReceived(response);
                         }
                         //System.out.println("RESPONSE = " + response);
