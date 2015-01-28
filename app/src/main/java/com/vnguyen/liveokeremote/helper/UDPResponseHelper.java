@@ -65,13 +65,13 @@ public class UDPResponseHelper {
                 context.liveOkeUDPClient.sendMessage("play",
                         context.liveOkeUDPClient.liveOkeIPAddress,
                         context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                if (message.equalsIgnoreCase("play")) {
-                    context.notificationHelper.pause = false;
-                    context.notificationHelper.addNotification();
-                } else {
-                    context.notificationHelper.pause = true;
-                    context.notificationHelper.addNotification();
-                }
+//                if (message.equalsIgnoreCase("play")) {
+//                    context.notificationHelper.pause = false;
+//                    context.notificationHelper.addNotification();
+//                } else {
+//                    context.notificationHelper.pause = true;
+//                    context.notificationHelper.addNotification();
+//                }
                 break;
             case "next":
                 context.liveOkeUDPClient.sendMessage("next",
@@ -82,13 +82,13 @@ public class UDPResponseHelper {
                 context.liveOkeUDPClient.sendMessage("toggleaudio",
                         context.liveOkeUDPClient.liveOkeIPAddress,
                         context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                if (message.equalsIgnoreCase("mic-on")) {
-                    context.notificationHelper.micOn = false;
-                    context.notificationHelper.addNotification();
-                } else {
-                    context.notificationHelper.micOn = true;
-                    context.notificationHelper.addNotification();
-                }
+//                if (message.equalsIgnoreCase("mic-on")) {
+//                    context.notificationHelper.micOn = false;
+//                    context.notificationHelper.addNotification();
+//                } else {
+//                    context.notificationHelper.micOn = true;
+//                    context.notificationHelper.addNotification();
+//                }
                 break;
             default:
                 break;
