@@ -72,6 +72,7 @@ public class NotificationHelper {
                         .setAutoCancel(false)
                         .setContentTitle(name + " says")
                         .setContentText(message)
+                        .setContentIntent(contentIntent)
                         .setColor(context.getResources().getColor(R.color.primary))
                         .setVibrate(null)
                         .addAction(R.drawable.ic_clear_white_18dp, "DISMISS", dismissIntent)
@@ -96,6 +97,11 @@ public class NotificationHelper {
     }
 
     public void addNotification() {
+        // click on notification will bring the app to the foreground
+        Intent appIntent = new Intent(context, MainActivity.class);
+        //appIntent.setAction(LIVEOKE_NOTIFICATION_APP);
+        PendingIntent pendingAppIntent = PendingIntent.getActivity(context,0,appIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context)
                         .setDefaults(Notification.DEFAULT_LIGHTS)
@@ -103,6 +109,7 @@ public class NotificationHelper {
                         .setOngoing(true) // cannot swipe to remove, only to be removed by app
                         .setAutoCancel(false)
                         .setVibrate(null) // no vibration on this notification -> not annoying
+                        .setContentIntent(pendingAppIntent)
                 ;
 
         // custom view for this notification
@@ -156,11 +163,7 @@ public class NotificationHelper {
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(context,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         expandedView.setOnClickPendingIntent(R.id.nextIcon, pendingNextIntent);
 
-        // click on message text will bring the app to the foreground
-        Intent appIntent = new Intent(context, MainActivity.class);
-        //appIntent.setAction(LIVEOKE_NOTIFICATION_APP);
-        PendingIntent pendingAppIntent = PendingIntent.getActivity(context,0,appIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        expandedView.setOnClickPendingIntent(R.id.notification_msg,pendingAppIntent);
+        //expandedView.setOnClickPendingIntent(R.id.notification_msg,pendingAppIntent);
 
         notificationBuilder.setContent(expandedView);
         //builder.setContentIntent(contentIntent);
