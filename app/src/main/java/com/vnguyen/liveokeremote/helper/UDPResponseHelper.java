@@ -287,6 +287,8 @@ public class UDPResponseHelper {
                         @Override
                         public void run() {
                             context.nowPlayingHelper.setTitle("Current Song:<br><b>" + context.liveOkeUDPClient.currentSong + "</b>");
+                            context.notificationHelper.nowPlayingTitle = "NOW PLAYING";
+                            context.notificationHelper.nowPlayingStr = context.liveOkeUDPClient.currentSong;
                         }
                     });
                 } else if (senderMSG.startsWith("Play:")) {
