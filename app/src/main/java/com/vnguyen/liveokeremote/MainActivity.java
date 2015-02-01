@@ -364,7 +364,8 @@ public class MainActivity extends ActionBarActivity {
 
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
-        if (intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
+        if (intent != null && intent.getAction() != null &&
+                intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.v(LiveOkeRemoteApplication.TAG, "Search QUERY  = " + query);
             getPagerSearch(query);
@@ -426,7 +427,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         Log.v(LiveOkeRemoteApplication.TAG,"Intent ACTION = " + intent.getAction());
-        if (intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
+        if (intent != null && intent.getAction() != null &&
+                intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.v(LiveOkeRemoteApplication.TAG,"Search QUERY  = " + query);
             getPagerSearch(query);

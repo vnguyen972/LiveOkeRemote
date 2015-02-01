@@ -84,7 +84,7 @@ public class NotificationHelper {
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         inboxStyle.setBigContentTitle(name + " says");
-        inboxStyle.setSummaryText("LiveOke Remote Chat");
+        inboxStyle.setSummaryText(context.getResources().getString(R.string.app_name) + " Chat");
 
         for (String msg: msgList) {
             inboxStyle.addLine(msg);
