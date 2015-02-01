@@ -1,8 +1,12 @@
 package com.vnguyen.liveokeremote;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.SongHelper;
@@ -188,6 +192,12 @@ public class SongListRetriever implements  LiveOkeTCPClient {
     @Override
     public void onErrored(Exception exception) {
         Log.e(LiveOkeRemoteApplication.TAG,exception.getMessage(),exception);
+        SnackbarManager.show(Snackbar.with(context)
+                .type(SnackbarType.MULTI_LINE)
+                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                .textColor(Color.WHITE)
+                .color(Color.RED)
+                .text("ERROR: " + exception.getMessage()));
     }
 
     public void insertDBNow(ArrayList<Song> songsList) throws Exception {
