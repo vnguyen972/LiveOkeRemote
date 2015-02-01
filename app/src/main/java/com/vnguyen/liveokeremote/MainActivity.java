@@ -175,7 +175,6 @@ public class MainActivity extends ActionBarActivity {
         mediaPlayer = new MediaPlayer();
         notificationHelper = new NotificationHelper(MainActivity.this);
 
-
         setContentView(R.layout.activity_main);
 
         try {
@@ -363,9 +362,17 @@ public class MainActivity extends ActionBarActivity {
         floatingButtonsHelper.setupFriendsFloatingActionButtons();
         //setupFriendsListPanel();
 
-
-        updateMainDisplay();
-        loadExtra();
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        if (intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Log.v(LiveOkeRemoteApplication.TAG, "Search QUERY  = " + query);
+            getPagerSearch(query);
+            updateMainDisplay();
+        } else {
+            updateMainDisplay();
+            loadExtra();
+        }
 
 
         pingPong = new Runnable() {
@@ -418,12 +425,20 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        String reply = intent.getStringExtra("reply-chat");
-        Log.v(LiveOkeRemoteApplication.TAG,"REPLY = " + reply);
-        String chatUsr = intent.getStringExtra("chat-user");
-        if (reply != null && reply.equalsIgnoreCase("yes")) {
-            notificationHelper.chatMap.get(chatUsr).clear();
-            notificationHelper.removeChatNotification();
+        Log.v(LiveOkeRemoteApplication.TAG,"Intent ACTION = " + intent.getAction());
+        if (intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Log.v(LiveOkeRemoteApplication.TAG,"Search QUERY  = " + query);
+            getPagerSearch(query);
+            updateMainDisplay();
+        } else {
+            String reply = intent.getStringExtra("reply-chat");
+            Log.v(LiveOkeRemoteApplication.TAG, "REPLY = " + reply);
+            String chatUsr = intent.getStringExtra("chat-user");
+            if (reply != null && reply.equalsIgnoreCase("yes")) {
+                notificationHelper.chatMap.get(chatUsr).clear();
+                notificationHelper.removeChatNotification();
+            }
         }
     }
 

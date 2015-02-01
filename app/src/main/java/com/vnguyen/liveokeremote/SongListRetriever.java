@@ -40,7 +40,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (context.liveOkeUDPClient != null && context.liveOkeUDPClient.liveOkeIPAddress != null && !context.liveOkeUDPClient.liveOkeIPAddress.equals("")) {
+                if (context.liveOkeUDPClient != null &&
+                        context.liveOkeUDPClient.liveOkeIPAddress != null &&
+                        !context.liveOkeUDPClient.liveOkeIPAddress.equals("")) {
                     doneGettingData = false;
                     Socket socket = null;
                     ByteArrayOutputStream byteArrayOutputStream = null;

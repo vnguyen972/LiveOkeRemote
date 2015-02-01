@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_version">1.0.1</string>
-    <string name="app_name">LiveOke Remote</string>
+    <string name="app_name">Karaoke4Pro Remote</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="open">Nav Drawer Opens</string>
