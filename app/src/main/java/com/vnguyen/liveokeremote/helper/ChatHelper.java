@@ -65,7 +65,8 @@ public class ChatHelper {
             @Override
             public void onClick(View v) {
                 String str = edTxt.getText().toString();
-                LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat", "LiveOke Remote", context.me.name);
+                LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat",
+                        context.getResources().getString(R.string.app_name), context.me.name);
                 msg.message = str;
                 Log.v(LiveOkeRemoteApplication.TAG, "Message SENT = " + msg.message);
                 chatAdapter.messages.add(msg);

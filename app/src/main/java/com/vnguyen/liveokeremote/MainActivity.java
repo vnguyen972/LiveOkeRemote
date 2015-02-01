@@ -583,7 +583,7 @@ public class MainActivity extends ActionBarActivity {
             new MaterialDialog.Builder(this)
                     .title("Quit Application.")
                     .theme(Theme.LIGHT)  // the default is light, so you don't need this line
-                    .content("Do you want to quit LiveOke Remote?")
+                    .content("Do you want to quit " + getResources().getString(R.string.app_name) + "?")
                     .positiveText("OK")
                     .negativeText("CANCEL")
                     .callback(new MaterialDialog.ButtonCallback() {

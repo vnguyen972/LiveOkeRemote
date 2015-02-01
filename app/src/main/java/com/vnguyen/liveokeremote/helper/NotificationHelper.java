@@ -36,7 +36,7 @@ public class NotificationHelper {
 
     // default string to display on notification
     public String nowPlayingStr = "Happy Singing!";
-    public String nowPlayingTitle = "LiveOke Remote";
+    public String nowPlayingTitle;
     public int totalRsvp = 0;
 
     // hashmap to store user's chat message for chat notifications
@@ -44,6 +44,7 @@ public class NotificationHelper {
 
     public NotificationHelper(Context context) {
         this.context = (MainActivity) context;
+        nowPlayingTitle = this.context.getResources().getString(R.string.app_name);
         chatMap = new HashMap<>();
     }
 
