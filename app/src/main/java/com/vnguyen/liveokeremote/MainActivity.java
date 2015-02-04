@@ -422,6 +422,12 @@ public class MainActivity extends ActionBarActivity {
         }
         handler.postDelayed(pingPong, 10000);
         isInForegroundMode = true;
+        // Say Hi to any "new" friends
+        LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                getResources().getString(R.string.app_name), me.name);
+        if (liveOkeUDPClient != null) {
+            liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+        }
     }
 
     @Override
@@ -689,7 +695,7 @@ public class MainActivity extends ActionBarActivity {
         if (avatarURI != null && !avatarURI.equals("")) {
             imgURI = Uri.parse(avatarURI);
             bm = uriToBitmap(imgURI);
-            bm = drawableHelper.detectFace(bm, 800, 800,getResources());
+            //bm = drawableHelper.detectFace(bm, 800, 800,getResources());
         } else {
             //bm = drawableHelper.drawableToBitmap(getResources().getDrawable(R.drawable.default_profile));
             bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_profile);
@@ -701,8 +707,9 @@ public class MainActivity extends ActionBarActivity {
 //        }
 //        RoundImgDrawable img = new RoundImgDrawable(bm);
         //RoundImgDrawable img = new RoundImgDrawable(bitmap);
-        BitmapDrawable bd = new BitmapDrawable(drawableHelper.getCroppedBitmap(bm));
-        return bd;
+        //BitmapDrawable bd = new BitmapDrawable(drawableHelper.getCroppedBitmap(bm));
+        //return bd;
+        return new BitmapDrawable(bm);
     }
 
     public void updateNowPlaying(String title) {
@@ -735,10 +742,8 @@ public class MainActivity extends ActionBarActivity {
 //            if (bitmap.getHeight() > 120 && bitmap.getWidth() > 120) {
 //                bitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
 //            }
-            bitmap = drawableHelper.detectFace(bitmap, 800, 800,getResources());
-            bitmap = drawableHelper.getCroppedBitmap(bitmap);
-            //RoundImgDrawable img = new RoundImgDrawable(bitmap);
-            //mReservedCountImgView.setImageDrawable(img);
+            //bitmap = drawableHelper.detectFace(bitmap, 800, 800,getResources());
+            //bitmap = drawableHelper.getCroppedBitmap(bitmap);
             BitmapDrawable img = new BitmapDrawable(bitmap);
             aquiredPhoto.imgView.setImageDrawable(img);
             if (aquiredPhoto.prefKey.equalsIgnoreCase("myAvatarURI")) {

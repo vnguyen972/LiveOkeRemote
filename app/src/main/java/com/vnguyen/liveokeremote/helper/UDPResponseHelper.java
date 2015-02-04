@@ -113,7 +113,8 @@ public class UDPResponseHelper {
                                 if (u == null || !u.ipAddress.equalsIgnoreCase(msg.ipAddress)) {
                                     u = new User(msg.name);
                                     u.ipAddress = senderIP;
-                                    u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0) + "", "round");
+                                    //u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0) + "", "round");
+                                    PreferencesHelper.getInstance(context).findFriendAvatar(u);
                                     context.friendsList.add(u);
                                 }
                                 SnackbarManager.show(Snackbar.with(context)

@@ -3,22 +3,19 @@ package com.vnguyen.liveokeremote.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
-import com.vnguyen.liveokeremote.RoundImgDrawable;
 import com.vnguyen.liveokeremote.data.User;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import cat.lafosca.facecropper.FaceCropper;
 
 public class PreferencesHelper {
     private MainActivity context;
@@ -125,33 +122,61 @@ public class PreferencesHelper {
             Log.v(context.app.TAG,"userInfo = " + name);
             if (!name.equals("")) {
                 User u = new User(name);
-                Bitmap _bm;
-                Bitmap bm;
-                String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
-                Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
-                if (avatarURI != null && !avatarURI.equals("")) {
-                    u.avatarURI = avatarURI;
-                    Uri imgURI = Uri.parse(avatarURI);
-                    _bm = context.uriToBitmap(imgURI);
-                    FaceCropper mFaceCropper = new FaceCropper();
-                    if (!_bm.isRecycled()) {
-                        bm = mFaceCropper.getCroppedImage(_bm);
-                        if (bm.getWidth() > 120 || bm.getHeight() > 120) {
-                            bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
-                        }
-                        u.avatar =  new RoundImgDrawable(bm);
-                    } else {
-                        Log.v(context.app.TAG, "bitmap is recycling..");
-                    }
-                } else {
-                    //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
-                    //_bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
-                    u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
-                }
+                findFriendAvatar(u);
+//                Bitmap _bm;
+//                Bitmap bm;
+//                String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
+//                Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
+//                if (avatarURI != null && !avatarURI.equals("")) {
+//                    u.avatarURI = avatarURI;
+//                    Uri imgURI = Uri.parse(avatarURI);
+//                    _bm = context.uriToBitmap(imgURI);
+//                    FaceCropper mFaceCropper = new FaceCropper();
+//                    if (!_bm.isRecycled()) {
+//                        bm = mFaceCropper.getCroppedImage(_bm);
+//                        if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+//                            bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+//                        }
+//                        u.avatar =  new RoundImgDrawable(bm);
+//                    } else {
+//                        Log.v(context.app.TAG, "bitmap is recycling..");
+//                    }
+//                } else {
+//                    //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+//                    //_bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
+//                    u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
+//                }
                 list.add(u);
             }
         }
         Log.v(context.app.TAG,"TOTAL IN LIST = " + list.size());
         return list;
+    }
+
+    public void findFriendAvatar(User u) {
+        Bitmap _bm;
+        Bitmap bm;
+        String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
+        Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
+        if (avatarURI != null && !avatarURI.equals("")) {
+            u.avatarURI = avatarURI;
+            Uri imgURI = Uri.parse(avatarURI);
+            _bm = context.uriToBitmap(imgURI);
+            u.avatar = new BitmapDrawable(_bm);
+//            FaceCropper mFaceCropper = new FaceCropper();
+//            if (!_bm.isRecycled()) {
+//                bm = mFaceCropper.getCroppedImage(_bm);
+//                if (bm.getWidth() > 120 || bm.getHeight() > 120) {
+//                    bm = Bitmap.createScaledBitmap(bm, 120, 120, false);
+//                }
+//                u.avatar =  new RoundImgDrawable(bm);
+//            } else {
+//                Log.v(context.app.TAG, "bitmap is recycling..");
+//            }
+        } else {
+            //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
+            //_bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
+            u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.daimajia.swipe.SwipeLayout;
+import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
@@ -114,12 +115,18 @@ public class SongResultsAdapter extends BaseAdapter {
         }
         final Drawable d = (new DrawableHelper()).buildDrawable(result.Artist.substring(0, 1), "rect");
         if (result.Avatar != null) {
-            Ion.with(holder.thumbNail)
-                    .centerCrop()
-                    .placeholder(d)
-                    .error(d)
-                    .load(result.Avatar + "&code=" + SongHelper.JSEARCH_API_CODE)
-            ;
+            Ion.with(context).load(result.Avatar + "&code=" + SongHelper.JSEARCH_API_CODE)
+                    .withBitmap().asBitmap()
+                    .setCallback(new FutureCallback<Bitmap>() {
+                        @Override
+                        public void onCompleted(Exception e, Bitmap result) {
+                            if (result != null) {
+                                holder.thumbNail.setImageDrawable(new BitmapDrawable(result));
+                            } else {
+                                holder.thumbNail.setImageDrawable(d);
+                            }
+                        }
+                    });
         } else {
             holder.thumbNail.setImageDrawable(d);
         }
