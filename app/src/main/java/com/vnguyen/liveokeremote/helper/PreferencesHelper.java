@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -122,7 +123,7 @@ public class PreferencesHelper {
             Log.v(context.app.TAG,"userInfo = " + name);
             if (!name.equals("")) {
                 User u = new User(name);
-                findFriendAvatar(u);
+                u.avatar = findFriendAvatar(name);
 //                Bitmap _bm;
 //                Bitmap bm;
 //                String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
@@ -153,16 +154,18 @@ public class PreferencesHelper {
         return list;
     }
 
-    public void findFriendAvatar(User u) {
+    public Drawable findFriendAvatar(String name) {
         Bitmap _bm;
         Bitmap bm;
-        String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
-        Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
+        Drawable d;
+        String avatarURI = PreferencesHelper.getInstance(context).getPreference(name+"_avatar");
+        Log.v(context.app.TAG, "Avatar for '" + name + "' from Pref. URI: " + avatarURI);
         if (avatarURI != null && !avatarURI.equals("")) {
-            u.avatarURI = avatarURI;
+            //u.avatarURI = avatarURI;
             Uri imgURI = Uri.parse(avatarURI);
             _bm = context.uriToBitmap(imgURI);
-            u.avatar = new BitmapDrawable(_bm);
+            //u.avatar = new BitmapDrawable(_bm);
+            d = new BitmapDrawable(_bm);
 //            FaceCropper mFaceCropper = new FaceCropper();
 //            if (!_bm.isRecycled()) {
 //                bm = mFaceCropper.getCroppedImage(_bm);
@@ -176,7 +179,9 @@ public class PreferencesHelper {
         } else {
             //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
             //_bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_profile);
-            u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
+            //u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0)+"","round");
+            d = context.drawableHelper.buildDrawable(name.charAt(0)+"","round");
         }
+        return d;
     }
 }

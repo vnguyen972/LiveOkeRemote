@@ -88,10 +88,10 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         byteArrayOutputStream.reset();
                         int i = 0;
                         while (!response.startsWith("Finish")) {
-                            //Log.d(LiveOkeRemoteApplication.TAG,"*** START READING ***");
+                            Log.d(LiveOkeRemoteApplication.TAG,"*** START READING ***");
                             bytesRead = inputStream.read(buffer);
-                            //Log.d(LiveOkeRemoteApplication.TAG,"*** BYTES READ = " + bytesRead);
-                            //System.out.println("bytesread = " + bytesRead);
+                            Log.d(LiveOkeRemoteApplication.TAG,"*** BYTES READ = " + bytesRead);
+                            System.out.println("bytesread = " + bytesRead);
                             byteArrayOutputStream.write(buffer, 0, bytesRead);
                             response = byteArrayOutputStream.toString("UTF-8") + "\r\n";
                             // clear out the outputstream array
@@ -99,7 +99,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             printStream.print("getsong");
                             printStream.flush();
                             final String res = response;
-                            //Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i + " - " + res);
+                            Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i + " - " + res);
                             AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                                 @Override
                                 protected Void doInBackground(Void... params) {
@@ -200,7 +200,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 executor = null;
                 pool = null;
                 context.liveOkeUDPClient.doneGettingSongList = true;
-                db.saveDB();
+                if (db != null) {
+                    db.saveDB();
+                }
                 songRawDataList.clear();
                 context.runOnUiThread(new Runnable() {
                     @Override
@@ -217,14 +219,19 @@ public class SongListRetriever implements  LiveOkeTCPClient {
     }
 
     @Override
-    public void onErrored(Exception exception) {
+    public void onErrored(final Exception exception) {
         Log.e(LiveOkeRemoteApplication.TAG,exception.getMessage(),exception);
-        SnackbarManager.show(Snackbar.with(context)
-                .type(SnackbarType.MULTI_LINE)
-                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                .textColor(Color.WHITE)
-                .color(Color.RED)
-                .text("ERROR: " + exception.getMessage()));
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SnackbarManager.show(Snackbar.with(context)
+                        .type(SnackbarType.MULTI_LINE)
+                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                        .textColor(Color.WHITE)
+                        .color(Color.RED)
+                        .text("ERROR: " + exception.getMessage()));
+            }
+        });
     }
 
     public void insertDBNow(ArrayList<Song> songsList) throws Exception {

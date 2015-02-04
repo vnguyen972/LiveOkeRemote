@@ -114,7 +114,7 @@ public class UDPResponseHelper {
                                     u = new User(msg.name);
                                     u.ipAddress = senderIP;
                                     //u.avatar = context.drawableHelper.buildDrawable(u.name.charAt(0) + "", "round");
-                                    PreferencesHelper.getInstance(context).findFriendAvatar(u);
+                                    u.avatar = PreferencesHelper.getInstance(context).findFriendAvatar(u.name);
                                     context.friendsList.add(u);
                                 }
                                 SnackbarManager.show(Snackbar.with(context)
