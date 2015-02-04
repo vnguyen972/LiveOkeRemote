@@ -35,13 +35,21 @@
         <item name="color">@android:color/white</item>
     </style>
 
-    <style name="AlertDialogCustom" parent="@style/Theme.AppCompat.Light">
-        <item name="android:background">#ffffff</item>
-        <item name="android:textColor">#000000</item>
-        <item name="android:typeface">monospace</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
-        <item name="android:editTextBackground">@color/light_blue_500</item>
+    <style name="MyProgressTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:alertDialogStyle">@style/AlertDialogCustom</item>
+        <item name="android:textColorPrimary">#000000</item>
+    </style>
+    <style name="AlertDialogCustom" parent="@android:style/Theme.Dialog">
+        <item name="android:bottomBright">@android:color/white</item>
+        <item name="android:bottomDark">@android:color/white</item>
+        <item name="android:bottomMedium">@android:color/white</item>
+        <item name="android:centerBright">@android:color/white</item>
+        <item name="android:centerDark">@android:color/white</item>
+        <item name="android:centerMedium">@android:color/white</item>
+        <item name="android:fullBright">@android:color/white</item>
+        <item name="android:fullDark">@android:color/white</item>
+        <item name="android:topBright">@android:color/white</item>
+        <item name="android:topDark">@android:color/white</item>
     </style>
 
 </resources>

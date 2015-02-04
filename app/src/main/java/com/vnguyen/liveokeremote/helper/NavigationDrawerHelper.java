@@ -1,6 +1,7 @@
 package com.vnguyen.liveokeremote.helper;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -137,7 +138,14 @@ public class NavigationDrawerHelper {
                                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     if (context.liveOkeUDPClient != null) {
                                         final long startTime = System.currentTimeMillis();
-                                        final AlertDialogHelper adh = new AlertDialogHelper(context);
+                                        //final AlertDialogHelper adh = new AlertDialogHelper(context);
+                                        final ProgressDialog pd = new ProgressDialog(context,R.style.MyProgressTheme);
+                                        pd.setProgressDrawable(context.getResources().getDrawable(R.drawable.my_progress_bar));
+                                        pd.setTitle("Please Wait...");
+                                        pd.setProgressStyle(pd.STYLE_HORIZONTAL);
+                                        pd.setInverseBackgroundForced(true);
+                                        pd.setProgress(0);
+                                        final SongListRetriever slRetriever = new SongListRetriever(context,pd);;
                                         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                                             @Override
                                             protected void onPreExecute() {
@@ -149,7 +157,8 @@ public class NavigationDrawerHelper {
                                                     //context.webSocketHelper.gotTotalSongResponse = false;
                                                     context.liveOkeUDPClient.gotTotalSongResponse = false;
                                                     Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: set gotTotalSongResponse to false");
-                                                    adh.popupProgress("Updating song list...");
+                                                    //adh.popupProgress("Updating song list...");
+                                                    pd.setMessage("Updating song list...");
                                                 } catch (Throwable t) {
                                                     t.printStackTrace();
                                                 }
@@ -158,11 +167,6 @@ public class NavigationDrawerHelper {
                                             @Override
                                             protected Void doInBackground(Void... params) {
                                                 try {
-                                                    //context.webSocketHelper.sendMessage("getsonglist");
-//                                                    context.liveOkeUDPClient.sendMessage("getsonglist",
-//                                                            context.liveOkeUDPClient.liveOkeIPAddress,
-//                                                            context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
-                                                    SongListRetriever slRetriever = new SongListRetriever(context);
                                                     slRetriever.getSongList();
                                                     Log.v(LiveOkeRemoteApplication.TAG, "PRE-Exec: sending 'getsonglist' command...");
                                                     //while (!context.webSocketHelper.gotTotalSongResponse) {
@@ -183,7 +187,10 @@ public class NavigationDrawerHelper {
                                                         context.runOnUiThread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                adh.popupProgress("Downloading " + context.totalSong + " songs...");
+                                                                //adh.popupProgress("Downloading " + context.totalSong + " songs...");
+                                                                pd.setMax(context.totalSong);
+                                                                pd.setMessage("Downloading " + context.totalSong + " songs...");
+                                                                pd.show();
                                                             }
                                                         });
                                                     }
@@ -208,20 +215,16 @@ public class NavigationDrawerHelper {
                                                 long total = endTime - startTime;
                                                 SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                                                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                                context.getPagerTitles();
-                                                context.updateMainDisplay();
-                                                adh.dismissProgress();
+//                                                context.getPagerTitles();
+//                                                context.updateMainDisplay();
+                                                //adh.dismissProgress();
+                                                pd.dismiss();
                                                 SnackbarManager.show(Snackbar.with(context)
                                                         .type(SnackbarType.MULTI_LINE)
                                                         .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                                                         .textColor(Color.WHITE)
                                                         .color(Color.BLACK)
                                                         .text(context.totalSong + " songs loaded in " + dateFormat.format(new Date(total))));
-                                                try {
-                                                    context.db.saveDB();
-                                                } catch (IOException e) {
-                                                    Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
-                                                }
                                             }
                                         };
                                         Log.v(LiveOkeRemoteApplication.TAG,"Exec: getsonglist");

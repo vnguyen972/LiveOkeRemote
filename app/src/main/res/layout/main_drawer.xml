@@ -42,7 +42,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="top"
-                            android:background="@color/primary_dark"
+                            android:background="@color/primary_700"
                             android:paddingBottom="4dp"
                             android:paddingTop="4dp"
                             android:textColor="@color/white" />
