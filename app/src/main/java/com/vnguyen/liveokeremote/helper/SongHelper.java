@@ -155,24 +155,24 @@ public class SongHelper {
         if (str[1].equals("")) {
             song.title = "?Unavailable";
         } else {
-            song.title = str[1];
+            song.title = str[1].trim();
         }
         //song.setConvertedTitle(decompose(str[1]));
-        song.convertedTitle = convertAllChars(str[1]);
+        song.convertedTitle = convertAllChars(song.title);
         if (str[2].equals("")) {
             song.singer = "?Unavailable";
         } else {
-            song.singer = str[2];
+            song.singer = str[2].trim();
         }
         song.quickTitle = makeItQuick(song.convertedTitle);
         //song.setConvertedSinger(decompose(str[2]));
-        song.convertedSinger = convertAllChars(str[2]);
+        song.convertedSinger = convertAllChars(song.singer);
         song.quickSinger = makeItQuick(song.convertedSinger);
         song.singerIcon = str[3];
-        song.author = str[4];
-        song.convertedAuthor = convertAllChars(str[4]);
-        song.producer = str[5];
-        song.convertProducer = convertAllChars(str[5]);
+        song.author = str[4].trim();
+        song.convertedAuthor = convertAllChars(song.author);
+        song.producer = str[5].trim();
+        song.convertProducer = convertAllChars(song.producer);
         song.songPath = str[6];
         song.type = str[7];
         song.classified = str[8];
