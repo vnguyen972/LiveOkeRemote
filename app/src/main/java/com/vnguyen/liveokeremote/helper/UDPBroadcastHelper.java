@@ -5,9 +5,7 @@ import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.data.LiveOkeSocketInfo;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
@@ -47,7 +45,7 @@ public class UDPBroadcastHelper {
         try {
             ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
         } catch (UnknownHostException ex) {
-            Log.e(LiveOkeRemoteApplication.TAG, "Unable to get host address:" + ex.getMessage(),ex);
+            LogHelper.e( "Unable to get host address:" + ex.getMessage(),ex);
             ipAddressString = null;
         }
 
@@ -81,16 +79,16 @@ public class UDPBroadcastHelper {
 
                     InetAddress address = getBroadcastAddress(wifi);
                     if (address != null) {
-                        Log.i(LiveOkeRemoteApplication.TAG, "*** About to broadcast to: " + address.getHostAddress());
+                        LogHelper.i("*** About to broadcast to: " + address.getHostAddress());
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, UDPListenerService.BROADCAST_PORT);
                         c.send(sendPacket);
                     } else {
                         // not on WIFI
-                        Log.e(LiveOkeRemoteApplication.TAG,"*** Not on WIFI? Turn on and connect to WIFI then try again!");
+                        LogHelper.e("*** Not on WIFI? Turn on and connect to WIFI then try again!");
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());
+                    LogHelper.v("Exception: " + ex.getMessage());
                 } finally {
                     if (c != null) {
                         c.close();
@@ -117,7 +115,7 @@ public class UDPBroadcastHelper {
             try {
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 8888);
                 c.send(sendPacket);
-                Log.v(LiveOkeRemoteApplication.TAG,getClass().getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+                LogHelper.v(getClass().getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
             } catch (Exception e) {
             }
 
@@ -144,11 +142,11 @@ public class UDPBroadcastHelper {
                         e.printStackTrace();
                     }
 
-                    Log.v(LiveOkeRemoteApplication.TAG,getClass().getName() + ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                    LogHelper.v(getClass().getName() + ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                 }
             }
 
-            Log.v(LiveOkeRemoteApplication.TAG,getClass().getName() + ">>> Done looping over all network interfaces. Now waiting for a reply!");
+            LogHelper.v(getClass().getName() + ">>> Done looping over all network interfaces. Now waiting for a reply!");
 
             //Wait for a response
             c.setSoTimeout(10000);
@@ -157,13 +155,13 @@ public class UDPBroadcastHelper {
             try {
                 c.receive(receivePacket);
                 //We have a response
-                Log.v(LiveOkeRemoteApplication.TAG,getClass().getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                LogHelper.v(getClass().getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
 
                 //Check if the message is correct
                 String message = new String(receivePacket.getData()).trim();
                 if (message.startsWith("ws://")) {
                     //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
-                    Log.v(LiveOkeRemoteApplication.TAG,"message = " + message);
+                    LogHelper.v("message = " + message);
                     wsInfo = new LiveOkeSocketInfo();
                     wsInfo.uri = message.trim();
                     String address = receivePacket.getAddress().toString();
@@ -182,7 +180,7 @@ public class UDPBroadcastHelper {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.v(LiveOkeRemoteApplication.TAG, "Exception: " + ex.getMessage());
+            LogHelper.v("Exception: " + ex.getMessage());
         }
         return wsInfo;
     }

@@ -16,13 +16,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.FaceDetector;
 import android.os.Build;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.thedazzler.droidicon.IconicFontDrawable;
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -165,7 +163,7 @@ public class DrawableHelper {
                     5);
             int numberOfFaceDetected = myFaceDetect.findFaces(
                     bitmapOrg, myFace);
-            Log.v(LiveOkeRemoteApplication.TAG, "Face detected: " + numberOfFaceDetected);
+            LogHelper.v("Face detected: " + numberOfFaceDetected);
             if (numberOfFaceDetected > 0) {
                 PointF myMidPoint = null;
                 FaceDetector.Face face = myFace[0];

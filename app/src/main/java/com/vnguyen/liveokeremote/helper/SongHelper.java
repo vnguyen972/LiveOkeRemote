@@ -55,7 +55,7 @@ public class SongHelper {
                 }
                 //Log.v(LiveOkeRemoteApplication.TAG,"builder.toString = " + builder.toString());
             } else {
-                Log.e(LiveOkeRemoteApplication.TAG, "Failed to search song");
+                LogHelper.e("Failed to search song");
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -104,7 +104,7 @@ public class SongHelper {
                     builder.append(line);
                 }
             } else {
-                Log.e(LiveOkeRemoteApplication.TAG, "Failed to search song");
+                LogHelper.e("Failed to search song");
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -387,7 +387,7 @@ public class SongHelper {
                         ks.key = key;
                         return ks;
                     } catch (Exception e) {
-                        Log.e(LiveOkeRemoteApplication.TAG, e.getLocalizedMessage(),e);
+                        LogHelper.e(e.getLocalizedMessage(),e);
                     }
                     return null;
                 }
@@ -445,7 +445,7 @@ public class SongHelper {
                         Log.d(LiveOkeRemoteApplication.TAG,
                                 "Song: '" + song.title + "' (" +
                                         song.id + ")");
-                        Log.e(LiveOkeRemoteApplication.TAG, e.getLocalizedMessage(),e);
+                        LogHelper.e(e.getLocalizedMessage(),e);
                     }
                     return null;
                 }

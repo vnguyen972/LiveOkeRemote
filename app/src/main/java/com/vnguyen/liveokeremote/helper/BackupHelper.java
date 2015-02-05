@@ -2,7 +2,6 @@ package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
 
 import com.vnguyen.liveokeremote.MainActivity;
 
@@ -38,7 +37,7 @@ public class BackupHelper {
                 String backupDBPath = "songslist.db";
                 File currentDB;
                 File backupDB;
-                Log.d(context.app.TAG, "currentDBPath = " + databaseDir + "/" + currentDBPath);
+                LogHelper.d("currentDBPath = " + databaseDir + "/" + currentDBPath);
                 if (command.equals("export")) {
                     currentDB = new File(databaseDir, currentDBPath);
                     backupDB = new File(sdDir, backupDBPath);
@@ -48,7 +47,7 @@ public class BackupHelper {
                 }
 
                 if (currentDB.exists()) {
-                    Log.d(context.app.TAG,"Copying databases to SD card...");
+                    LogHelper.d("Copying databases to SD card...");
                     FileChannel src = new FileInputStream(currentDB).getChannel();
                     FileChannel dst = new FileOutputStream(backupDB).getChannel();
                     dst.transferFrom(src, 0, src.size());
@@ -57,7 +56,7 @@ public class BackupHelper {
                 }
             }
         } catch (Exception e) {
-            Log.e(context.app.TAG,e.getLocalizedMessage(),e);
+            LogHelper.e(e.getLocalizedMessage(),e);
         }
     }
 

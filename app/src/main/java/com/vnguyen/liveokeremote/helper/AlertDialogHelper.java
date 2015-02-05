@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -26,7 +25,6 @@ import com.google.gson.Gson;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
@@ -313,8 +311,8 @@ public class AlertDialogHelper {
                                 //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                 if (context.liveOkeUDPClient != null) {
                                     String masterCode = PreferencesHelper.getInstance(context).getPreference("MasterCode");
-                                    Log.d(LiveOkeRemoteApplication.TAG, "masterCode = '" + masterCode + "'");
-                                    Log.d(LiveOkeRemoteApplication.TAG, "masterCodeSERVER = '" + context.serverMasterCode + "'");
+                                    LogHelper.d("masterCode = '" + masterCode + "'");
+                                    LogHelper.d("masterCodeSERVER = '" + context.serverMasterCode + "'");
                                     boolean ok2Delete = false;
                                     if (context.serverMasterCode != null) {
                                         if (masterCode != null && !masterCode.equals("") &&

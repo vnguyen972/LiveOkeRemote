@@ -3,13 +3,11 @@ package com.vnguyen.liveokeremote;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.math.BigInteger;
@@ -96,7 +94,7 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
                 }
             }
         } catch (SocketException ex) {
-            Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
+            LogHelper.e(ex.getMessage(),ex);
         }
         return ip;
     }
@@ -116,7 +114,7 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
         try {
             ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
         } catch (UnknownHostException ex) {
-            Log.e(LiveOkeRemoteApplication.TAG, "Unable to get host address:" + ex.getMessage(), ex);
+            LogHelper.e("Unable to get host address:" + ex.getMessage(), ex);
             ipAddressString = "";
         }
 

@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import android.widget.ListView;
 
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class SongListFragment extends Fragment {
         sortedKeys.addAll(ma.pagerTitles.keySet());
         Collections.sort(sortedKeys);
         final String key = sortedKeys.get(getArguments().getInt(ARG_SECTION_NUMBER));
-        Log.v(ma.app.TAG, "SongListFragment.key = " + key);
+        LogHelper.v("SongListFragment.key = " + key);
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
@@ -55,11 +55,11 @@ public class SongListFragment extends Fragment {
                             ma.listingBy.equalsIgnoreCase("CN")) {
                         songsList = db.getSongByKeys(ma.listingBy,key, ma.searchStr);
                     }
-                    Log.i(ma.app.TAG,"SongListFragment-listing by: " + ma.listingBy);
-                    Log.i(ma.app.TAG,"Songs found: " + songsList.size());
+                    LogHelper.i("SongListFragment-listing by: " + ma.listingBy);
+                    LogHelper.i("Songs found: " + songsList.size());
                     adapter = new SongsListAdapter(ma, songsList);
                 } catch (Exception ex) {
-                    Log.e(ma.app.TAG,ex.getMessage(),ex);
+                    LogHelper.e(ex.getMessage(),ex);
                 } finally {
                     db.close();
                 }

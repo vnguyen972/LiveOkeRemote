@@ -1,7 +1,6 @@
 package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,7 +10,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.google.gson.Gson;
 import com.vnguyen.liveokeremote.ChatAdapter;
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
@@ -68,11 +66,11 @@ public class ChatHelper {
                 LiveOkeRemoteBroadcastMsg msg = new LiveOkeRemoteBroadcastMsg("Chat",
                         context.getResources().getString(R.string.app_name), context.me.name);
                 msg.message = str;
-                Log.v(LiveOkeRemoteApplication.TAG, "Message SENT = " + msg.message);
+                LogHelper.v("Message SENT = " + msg.message);
                 chatAdapter.messages.add(msg);
                 chatAdapter.notifyDataSetChanged();
                 context.liveOkeUDPClient.sendMessage((new Gson()).toJson(msg), msg.ipAddress, UDPListenerService.BROADCAST_PORT);
-                Log.v(LiveOkeRemoteApplication.TAG, "CA Size = " + chatAdapter.getCount());
+                LogHelper.v("CA Size = " + chatAdapter.getCount());
                 edTxt.setText("");
             }
         });

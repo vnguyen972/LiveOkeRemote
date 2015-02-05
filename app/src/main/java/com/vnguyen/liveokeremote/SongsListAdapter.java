@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.text.Html;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +25,7 @@ import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.SongResult;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
 import org.json.JSONArray;
@@ -91,7 +91,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         holder.iconImgView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v(LiveOkeRemoteApplication.TAG,"CLICK ON SONG: " + song.title);
+                LogHelper.i("CLICK ON SONG: " + song.title);
                 try {
                     AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                         final AlertDialogHelper adh = new AlertDialogHelper(context);
@@ -107,7 +107,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                         @Override
                         protected Void doInBackground(Void... params) {
                             String json = SongHelper.searchSong(song.title);
-                            Log.v(LiveOkeRemoteApplication.TAG,"JSON = " + json);
+                            LogHelper.i("JSON = " + json);
                             try {
                                 JSONArray jsonArray = new JSONArray(json);
                                 Gson gson = new Gson();
@@ -116,7 +116,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                     SongResult result = gson.fromJson(obj.toString(),SongResult.class);
                                     results.add(result);
                                 }
-                                Log.v(LiveOkeRemoteApplication.TAG, "RESULTS: " + results.size());
+                                LogHelper.i("RESULTS: " + results.size());
                                 adapter = new SongResultsAdapter(context,results);
 
                             } catch (JSONException e) {
@@ -172,7 +172,6 @@ public class SongsListAdapter extends BaseSwipeAdapter {
 //        holder.titleTxtView.setTextSize(21);
         holder.titleTxtView.setText(song.title.trim());
         holder.singerTxtView.setTypeface(font2);
-//        Log.v(LiveOkeRemoteApplication.TAG,"oriented: " + context.app.landscapeOriented);
         if (context.app.landscapeOriented) {
             if (context.listingBy.equalsIgnoreCase("favorites")) {
                 holder.singerTxtView.setText("");
@@ -288,7 +287,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     if (context.liveOkeUDPClient != null) {
                                         String cmd = "reserve," + idNumber.getText() + "," + context.me.name;
-                                        Log.v(context.app.TAG, "cmd = " + cmd);
+                                        LogHelper.v("cmd = " + cmd);
                                         //context.webSocketHelper.sendMessage(cmd);
                                         context.liveOkeUDPClient.sendMessage(cmd,
                                                 context.liveOkeUDPClient.liveOkeIPAddress,
@@ -308,7 +307,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                             // Toast.makeText(listView.getContext(),
                                             // "Ad not ready",
                                             // Toast.LENGTH_SHORT).show();
-                                            Log.d(context.app.TAG,
+                                            LogHelper.i(
                                                     "Ad is not ready to display, getting new Ad...");
                                             context.getNewAd();
                                         }
@@ -365,7 +364,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                 .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
                                     @Override
                                     public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
-                                        Log.v(context.app.TAG, "Selected: " + charSequence);
+                                        LogHelper.i("Selected: " + charSequence);
                                         //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                         if (context.liveOkeUDPClient != null) {
                                             //context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
@@ -386,7 +385,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                                 // Toast.makeText(listView.getContext(),
                                                 // "Ad not ready",
                                                 // Toast.LENGTH_SHORT).show();
-                                                Log.d(context.app.TAG,
+                                                LogHelper.i(
                                                         "Ad is not ready to display, getting new Ad...");
                                                 context.getNewAd();
                                             }
@@ -465,7 +464,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         context.navigationDrawerHelper.refreshDrawer();
                                         context.db.saveDB();
                                     } catch (Exception ex) {
-                                        Log.e(context.app.TAG,ex.getMessage(),ex);
+                                        LogHelper.e(ex.getMessage(),ex);
 
                                     } finally {
                                         context.db.close();
@@ -514,7 +513,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         context.navigationDrawerHelper.refreshDrawer();
                                         context.db.saveDB();
                                     } catch (Exception ex) {
-                                        Log.e(context.app.TAG, ex.getMessage(), ex);
+                                        LogHelper.e(ex.getMessage(), ex);
                                     } finally {
                                         context.db.close();
                                     }

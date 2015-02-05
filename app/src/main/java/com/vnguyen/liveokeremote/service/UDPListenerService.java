@@ -6,9 +6,8 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 
 import java.net.DatagramPacket;
@@ -38,7 +37,7 @@ public class UDPListenerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         shouldRestartSocketListen = true;
         startListenForUDPBroadcast();
-        Log.e(LiveOkeRemoteApplication.TAG,"UDP Listener Service Started.");
+        LogHelper.e("UDP Listener Service Started.");
         return START_STICKY;
     }
 
@@ -72,7 +71,7 @@ public class UDPListenerService extends Service {
                         byte[] sendData = message.getBytes();
 
                         InetAddress address = InetAddress.getByName(ipAddress);
-                        Log.i(LiveOkeRemoteApplication.TAG,"** --> About to cast '" + message + "' to: " + address.getHostAddress() + ":" + port);
+                        LogHelper.i("** --> About to cast '" + message + "' to: " + address.getHostAddress() + ":" + port);
                         DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,address, port);
                         socket.send(sendPacket);
                     } else {
@@ -80,7 +79,7 @@ public class UDPListenerService extends Service {
                         sendMessageBroadcast(message, port);
                     }
                 } catch (Exception ex) {
-                    Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
+                    LogHelper.e(ex.getMessage(),ex);
                 } finally {
                 }
             }
@@ -98,11 +97,11 @@ public class UDPListenerService extends Service {
             byte[] sendData = message.getBytes();
 
             InetAddress address = (new UDPBroadcastHelper()).getBroadcastAddress((WifiManager)getSystemService(Context.WIFI_SERVICE));
-            Log.i(LiveOkeRemoteApplication.TAG,"** --> About to broadcast '" + message + "' to: " + address.getHostAddress() +":"+port);
+            LogHelper.i("** --> About to broadcast '" + message + "' to: " + address.getHostAddress() +":"+port);
             DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,address, port);
             socket.send(sendPacket);
         } catch (Exception ex) {
-            Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
+            LogHelper.e(ex.getMessage(),ex);
         } finally {
 
         }
@@ -133,7 +132,7 @@ public class UDPListenerService extends Service {
                          listenAndWaitAndThrowIntent(broadcastIP);
                     }
                 } catch (Exception e) {
-                    Log.e(LiveOkeRemoteApplication.TAG, "no longer listening for UDP broadcasts cause of error " + e.getMessage());
+                    LogHelper.e("no longer listening for UDP broadcasts cause of error " + e.getMessage());
                 }
             }
         });
@@ -148,7 +147,7 @@ public class UDPListenerService extends Service {
         }
         //socket.setSoTimeout(1000);
         DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
-        //Log.e(LiveOkeRemoteApplication.TAG, "Waiting for UDP broadcast");
+        //LogHelper.e("Waiting for UDP broadcast");
         socket.receive(packet);
 
         final String senderIP = packet.getAddress().getHostAddress();

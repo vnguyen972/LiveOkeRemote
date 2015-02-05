@@ -3,7 +3,6 @@ package com.vnguyen.liveokeremote;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.thedazzler.droidicon.IconicFontDrawable;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class FriendListAdapter extends BaseSwipeAdapter {
 
     public FriendListAdapter(Context context, ArrayList<User> list) {
         this.context = (MainActivity) context;
-        Log.v(LiveOkeRemoteApplication.TAG, "New Adapter!");
+        LogHelper.v("New Adapter!");
         friends = new ArrayList<>();
         friends.addAll(list);
         iconTrash = new IconicFontDrawable(context);

@@ -1,7 +1,6 @@
 package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -10,11 +9,9 @@ import android.widget.ListView;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.vnguyen.liveokeremote.FriendListAdapter;
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.User;
-
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,7 +64,7 @@ public class FriendsListHelper {
 
     public void displayFriendsListPanel() {
         if (context.friendsList != null) {
-            Log.v(LiveOkeRemoteApplication.TAG, "friends.list.here = " + context.friendsList.size());
+            LogHelper.v("friends.list.here = " + context.friendsList.size());
             context.actionBarHelper.pushSub(context.friendsList.size() + " Friends.");
             context.friendsListHelper.initFriendList(context.friendsList);
         } else {

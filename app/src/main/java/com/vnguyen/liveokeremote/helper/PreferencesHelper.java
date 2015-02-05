@@ -7,7 +7,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
@@ -100,16 +99,16 @@ public class PreferencesHelper {
         ArrayList<User> list = new ArrayList<>();
         int total = preferences.getInt("total_friends",0);
         Set<String> set = preferences.getStringSet("friends", new HashSet<String>());
-        Log.v(context.app.TAG, "TOTAL IN FRIEND LIST = " + set.size());
+        LogHelper.v( "TOTAL IN FRIEND LIST = " + set.size());
         for (Iterator<String> it = set.iterator();it.hasNext();) {
             String name = it.next();
-            Log.v(context.app.TAG,"userInfo = " + name);
+            LogHelper.v("userInfo = " + name);
             if (name != null && !name.equals("")) {
                 User u = new User(name);
                 list.add(u);
             }
         }
-        Log.v(context.app.TAG,"TOTAL IN F.LIST = " + list.size());
+        LogHelper.v("TOTAL IN F.LIST = " + list.size());
         return list;
     }
 
@@ -117,17 +116,17 @@ public class PreferencesHelper {
         ArrayList<User> list = new ArrayList<>();
         int total = preferences.getInt("total_friends",0);
         Set<String> set = preferences.getStringSet("friends", new HashSet<String>());
-        Log.v(context.app.TAG, "TOTAL FRIENDS = " + set.size());
+        LogHelper.v( "TOTAL FRIENDS = " + set.size());
         for (Iterator<String> it = set.iterator();it.hasNext();) {
             String name = it.next();
-            Log.v(context.app.TAG,"userInfo = " + name);
+            LogHelper.v("userInfo = " + name);
             if (!name.equals("")) {
                 User u = new User(name);
                 u.avatar = findFriendAvatar(name);
 //                Bitmap _bm;
 //                Bitmap bm;
 //                String avatarURI = PreferencesHelper.getInstance(context).getPreference(u.name+"_avatar");
-//                Log.v(context.app.TAG, "Avatar from Pref. URI: " + avatarURI);
+//                LogHelper.v( "Avatar from Pref. URI: " + avatarURI);
 //                if (avatarURI != null && !avatarURI.equals("")) {
 //                    u.avatarURI = avatarURI;
 //                    Uri imgURI = Uri.parse(avatarURI);
@@ -140,7 +139,7 @@ public class PreferencesHelper {
 //                        }
 //                        u.avatar =  new RoundImgDrawable(bm);
 //                    } else {
-//                        Log.v(context.app.TAG, "bitmap is recycling..");
+//                        LogHelper.v( "bitmap is recycling..");
 //                    }
 //                } else {
 //                    //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));
@@ -150,7 +149,7 @@ public class PreferencesHelper {
                 list.add(u);
             }
         }
-        Log.v(context.app.TAG,"TOTAL IN LIST = " + list.size());
+        LogHelper.v("TOTAL IN LIST = " + list.size());
         return list;
     }
 
@@ -159,7 +158,7 @@ public class PreferencesHelper {
         Bitmap bm;
         Drawable d;
         String avatarURI = PreferencesHelper.getInstance(context).getPreference(name+"_avatar");
-        Log.v(context.app.TAG, "Avatar for '" + name + "' from Pref. URI: " + avatarURI);
+        LogHelper.v( "Avatar for '" + name + "' from Pref. URI: " + avatarURI);
         if (avatarURI != null && !avatarURI.equals("")) {
             //u.avatarURI = avatarURI;
             Uri imgURI = Uri.parse(avatarURI);
@@ -174,7 +173,7 @@ public class PreferencesHelper {
 //                }
 //                u.avatar =  new RoundImgDrawable(bm);
 //            } else {
-//                Log.v(context.app.TAG, "bitmap is recycling..");
+//                LogHelper.v( "bitmap is recycling..");
 //            }
         } else {
             //_bm = context.drawableHelper.drawableToBitmap(context.getResources().getDrawable(R.drawable.default_profile));

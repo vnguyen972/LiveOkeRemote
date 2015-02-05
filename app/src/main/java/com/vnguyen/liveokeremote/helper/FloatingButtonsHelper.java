@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -110,7 +109,7 @@ public class FloatingButtonsHelper {
     }
 
     public void togglePlayBtn() {
-        Log.v(context.app.TAG, "Playbutton TAG = " + playButton.getTag());
+        LogHelper.v("Playbutton TAG = " + playButton.getTag());
         if (playButton.getTag().equals("PLAY")) {
             playButton.setImageDrawable(pauseBtnIcon);
             playButton.setTag("PAUSE");

@@ -33,7 +33,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,6 +66,7 @@ import com.vnguyen.liveokeremote.helper.ChatHelper;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.FloatingButtonsHelper;
 import com.vnguyen.liveokeremote.helper.FriendsListHelper;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.NavigationDrawerHelper;
 import com.vnguyen.liveokeremote.helper.NotificationHelper;
 import com.vnguyen.liveokeremote.helper.NowPlayingHelper;
@@ -182,7 +182,7 @@ public class MainActivity extends ActionBarActivity {
                     getPackageManager().getPackageInfo(getPackageName(),0).versionName
             );
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
+            LogHelper.e(e.getMessage(),e);
         }
         //-- Create AdView ---------------
         AdView adView = (AdView)this.findViewById(R.id.adView);
@@ -212,12 +212,12 @@ public class MainActivity extends ActionBarActivity {
         db = new SongListDataSource(MainActivity.this);
         try {
             String path = Environment.getExternalStorageDirectory().getPath()+"/liveoke-remote/"+db.getDBName();
-            Log.d(LiveOkeRemoteApplication.TAG, "Importing the database (if a backup found): " + path);
+            LogHelper.d("Importing the database (if a backup found): " + path);
             boolean status = false;
             status = db.importDB(path);
-            Log.d(LiveOkeRemoteApplication.TAG,"Done?: " + status);
+            LogHelper.d("Done?: " + status);
         } catch (IOException e) {
-            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
+            LogHelper.e(e.getMessage(),e);
         }
 
         udpListenerServiceIntent = new Intent(this, UDPListenerService.class);
@@ -228,7 +228,7 @@ public class MainActivity extends ActionBarActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 UDPListenerService.MyLocalBinder binder = (UDPListenerService.MyLocalBinder) service;
                 UDPListenerService udpListenerService = binder.getService();
-                Log.v(LiveOkeRemoteApplication.TAG,"Service bound!");
+                LogHelper.v("Service bound!");
                 liveOkeUDPClient = new LiveOkeUDPClient(udpListenerService,MainActivity.this) {
                     @Override
                     public void onReceive(Context context, Intent intent) {
@@ -367,7 +367,7 @@ public class MainActivity extends ActionBarActivity {
         if (intent != null && intent.getAction() != null &&
                 intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.v(LiveOkeRemoteApplication.TAG, "Search QUERY  = " + query);
+            LogHelper.v("Search QUERY  = " + query);
             getPagerSearch(query);
             updateMainDisplay();
         } else {
@@ -400,7 +400,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.v(LiveOkeRemoteApplication.TAG,"*** App PAUSING ***");
+        LogHelper.v("*** App PAUSING ***");
         if (handler != null) {
             handler.removeCallbacks(pingPong);
         }
@@ -411,7 +411,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         easyRatingDialog.showIfNeeded();
-        Log.v(LiveOkeRemoteApplication.TAG, "*** App RESUMING ***");
+        LogHelper.v("*** App RESUMING ***");
         if (liveOkeUDPClient != null) {
             liveOkeUDPClient.initClient();
         }
@@ -434,16 +434,16 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.v(LiveOkeRemoteApplication.TAG,"Intent ACTION = " + intent.getAction());
+        LogHelper.v("Intent ACTION = " + intent.getAction());
         if (intent != null && intent.getAction() != null &&
                 intent.getAction().equalsIgnoreCase("com.google.android.gms.actions.SEARCH_ACTiON")) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.v(LiveOkeRemoteApplication.TAG,"Search QUERY  = " + query);
+            LogHelper.v("Search QUERY  = " + query);
             getPagerSearch(query);
             updateMainDisplay();
         } else {
             String reply = intent.getStringExtra("reply-chat");
-            Log.v(LiveOkeRemoteApplication.TAG, "REPLY = " + reply);
+            LogHelper.v("REPLY = " + reply);
             String chatUsr = intent.getStringExtra("chat-user");
             if (reply != null && reply.equalsIgnoreCase("yes")) {
                 notificationHelper.chatMap.get(chatUsr).clear();
@@ -506,7 +506,7 @@ public class MainActivity extends ActionBarActivity {
             friendsList = PreferencesHelper.getInstance(MainActivity.this).retrieveFriends();
         }
 
-        Log.v(LiveOkeRemoteApplication.TAG,"setupFriendsListPanel is called!!!");
+        LogHelper.v("setupFriendsListPanel is called!!!");
         friendsListHelper.initFriendList(friendsList);
 //        ListView friendList = (ListView) findViewById(R.id.friends_list);
     }
@@ -550,7 +550,7 @@ public class MainActivity extends ActionBarActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         //searchView.setMaxWidth(800);
-        Log.v(LiveOkeRemoteApplication.TAG, searchView + "");
+        LogHelper.v(searchView + "");
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
             searchView.setIconifiedByDefault(true);
@@ -567,7 +567,7 @@ public class MainActivity extends ActionBarActivity {
                 {
                     // this is your adapter that will be filtered
                     //adapter.getFilter().filter(query);
-                    Log.v(LiveOkeRemoteApplication.TAG,"SEARCH FOR = " + query);
+                    LogHelper.v("SEARCH FOR = " + query);
                     getPagerSearch(query);
                     updateMainDisplay();
                     searchView.clearFocus();
@@ -583,7 +583,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        Log.v(LiveOkeRemoteApplication.TAG, "Back button pressed on device");
+        LogHelper.v("Back button pressed on device");
         if (listingBy.equalsIgnoreCase("search")) {
             MenuItem menuSearch = mainMenu.findItem(R.id.menu_search);
             menuSearch.collapseActionView();
@@ -693,7 +693,7 @@ public class MainActivity extends ActionBarActivity {
         Bitmap bm;
         String avatarURI = PreferencesHelper.getInstance(MainActivity.this).getPreference(
                 getResources().getString(R.string.myAvatarURI));
-        Log.v(LiveOkeRemoteApplication.TAG, "Avatar from Pref. URI: " + avatarURI);
+        LogHelper.v("Avatar from Pref. URI: " + avatarURI);
         if (avatarURI != null && !avatarURI.equals("")) {
             imgURI = Uri.parse(avatarURI);
             bm = uriToBitmap(imgURI);
@@ -733,8 +733,8 @@ public class MainActivity extends ActionBarActivity {
             getContentResolver().takePersistableUriPermission(aquiredPhoto.mImageCaptureUri, takeFlags);
         }
         bitmap = uriToBitmap(aquiredPhoto.mImageCaptureUri);
-        Log.v(LiveOkeRemoteApplication.TAG, "URL + " + aquiredPhoto.mImageCaptureUri.toString());
-        Log.v(LiveOkeRemoteApplication.TAG,"Path = " + path);
+        LogHelper.v("URL + " + aquiredPhoto.mImageCaptureUri.toString());
+        LogHelper.v("Path = " + path);
         // Save to SharedPreference
         PreferencesHelper.getInstance(MainActivity.this).setStringPreference(
                 aquiredPhoto.prefKey, aquiredPhoto.mImageCaptureUri.toString());
@@ -785,7 +785,7 @@ public class MainActivity extends ActionBarActivity {
             listingBy = "title";
             pagerTitles = db.getTitleKeysMap();
         } catch (Exception ex) {
-            Log.e(LiveOkeRemoteApplication.TAG,ex.getMessage(),ex);
+            LogHelper.e(ex.getMessage(),ex);
         } finally {
             db.close();
         }
@@ -797,7 +797,7 @@ public class MainActivity extends ActionBarActivity {
             this.searchStr = SongHelper.convertAllChars(searchStr);
             pagerTitles = db.getNewSearchKeysMap(this.searchStr);
         } catch (Exception e) {
-            Log.e(LiveOkeRemoteApplication.TAG,e.getLocalizedMessage(),e);
+            LogHelper.e(e.getLocalizedMessage(),e);
         } finally {
             db.close();
         }
@@ -809,7 +809,7 @@ public class MainActivity extends ActionBarActivity {
             listingBy = "favorites";
             pagerTitles = db.getFavoriteKeysMap();
         } catch (Exception e) {
-            Log.e(LiveOkeRemoteApplication.TAG, e.getLocalizedMessage(),e);
+            LogHelper.e(e.getLocalizedMessage(),e);
         } finally {
             db.close();
         }
@@ -822,7 +822,7 @@ public class MainActivity extends ActionBarActivity {
             listingBy = language;
             pagerTitles = db.getLanguageKeysMapNumber(language);
         } catch (Exception e) {
-            Log.e(LiveOkeRemoteApplication.TAG, e.getLocalizedMessage(),e);
+            LogHelper.e(e.getLocalizedMessage(),e);
         } finally {
             db.close();
         }

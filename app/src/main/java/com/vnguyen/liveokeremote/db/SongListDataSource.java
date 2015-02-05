@@ -6,12 +6,11 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 import com.vnguyen.liveokeremote.helper.SongSQLiteHelper;
 
@@ -116,7 +115,7 @@ public class SongListDataSource {
                     allColumns[20] + "," + allColumns[21] + "," +
                     allColumns[22] + "," + allColumns[23] +
                     ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?)";
-            Log.d(LiveOkeRemoteApplication.TAG, "sql = " + sql);
+            LogHelper.d("sql = " + sql);
             database.beginTransaction();
             //getDatabase().delete(SongListTable.SongList.TABLE_NAME, null, null);
             final SQLiteStatement insert = getDatabase().compileStatement(sql);
@@ -150,7 +149,7 @@ public class SongListDataSource {
             }
             database.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(LiveOkeRemoteApplication.TAG, "Exception on song: " + _song.title);
+            LogHelper.e("Exception on song: " + _song.title);
             throw new Exception(e);
         } finally {
             getDatabase().endTransaction();
@@ -176,7 +175,7 @@ public class SongListDataSource {
     }
     public int queryCurrentK7ConnectionID(String wifiName, String ipAddress) {
         String query = "select _id from k7connection where name = '" + wifiName +":"+ipAddress+"' and ipAddress = '" + ipAddress + "';";
-        Log.d(LiveOkeRemoteApplication.TAG,"queryCurrentK7Connection: " + query);
+        LogHelper.d("queryCurrentK7Connection: " + query);
         return runQueryRetrieveID(query);
     }
 
@@ -200,7 +199,7 @@ public class SongListDataSource {
         int rowsUpdated = database.update(SongListTable.K7Connection.TABLE_NAME, value,
                 SongListTable.K7Connection.COLUMN_NAME_CONNECTION_NAME + " <>'" + wifiName + ":" + ipAddress + "' and " +
                         SongListTable.K7Connection.COLUMN_NAME_IP_ADDRESS + " <> '" + ipAddress + "'", null);
-        Log.d(LiveOkeRemoteApplication.TAG,"deactivating-rows updated: " + rowsUpdated);
+        LogHelper.d("deactivating-rows updated: " + rowsUpdated);
     }
 
     private boolean runExistedQuery(String query) {
@@ -220,7 +219,7 @@ public class SongListDataSource {
     }
     public boolean favoriteExisted(Song song) {
         String query = "select count(*) from favoriteslist where ascii_title = '" + song.convertedTitle.replaceAll("'", "''") + "'";
-        Log.d(LiveOkeRemoteApplication.TAG, query);
+        LogHelper.d(query);
         return runExistedQuery(query);
     }
     public long save2Favorite(Song song) {
@@ -254,18 +253,18 @@ public class SongListDataSource {
     }
 
     public void link2Connection(long favID, long activeK7ConnectionID, String songID) {
-        Log.d(LiveOkeRemoteApplication.TAG, "link2Connection: " + favID + "-" + activeK7ConnectionID + "-" + songID);
+        LogHelper.d("link2Connection: " + favID + "-" + activeK7ConnectionID + "-" + songID);
         if (!favoriteLinkExisted(favID, activeK7ConnectionID, songID)) {
             ContentValues value = new ContentValues();
             value.put(SongListTable.FavoriteSongConnection.COLUMN_NAME_FAVORITE_ID, favID);
             value.put(SongListTable.FavoriteSongConnection.COLUMN_NAME_CONNECTION_ID, activeK7ConnectionID);
             value.put(SongListTable.FavoriteSongConnection.COLUMN_NAME_SONG_ID, songID);
             database.insert(SongListTable.FavoriteSongConnection.TABLE_NAME, null, value);
-            Log.d(LiveOkeRemoteApplication.TAG, "insert new link...");
+            LogHelper.d("insert new link...");
         } else {
             //unFavorite(favID,activeK7ConnectionID,songID);
             long row = updateFavSongCollection(favID, activeK7ConnectionID, songID);
-            Log.d(LiveOkeRemoteApplication.TAG, "update existing link: " + row);
+            LogHelper.d("update existing link: " + row);
         }
     }
 
@@ -274,12 +273,12 @@ public class SongListDataSource {
     }
 
     public void unFavorite(long favID, long activeK7ConnectionID, String songID) {
-        Log.d(LiveOkeRemoteApplication.TAG,"unFavorite: favID = " + favID + ",activeID = " + activeK7ConnectionID + ",songID = " + songID);
+        LogHelper.d("unFavorite: favID = " + favID + ",activeID = " + activeK7ConnectionID + ",songID = " + songID);
         int rows = database.delete(SongListTable.FavoriteSongConnection.TABLE_NAME,
                 "favoriteID = " + favID + " and connectionID = " + activeK7ConnectionID + " and songID = " + songID, null);
-        Log.d(LiveOkeRemoteApplication.TAG,"unFavorite:link:rows deleted: " + rows);
+        LogHelper.d("unFavorite:link:rows deleted: " + rows);
         rows = database.delete(SongListTable.FavoriteList.TABLE_NAME, "_id = " + favID, null);
-        Log.d(LiveOkeRemoteApplication.TAG,"unFavorite:rows deleted: " + rows);
+        LogHelper.d("unFavorite:rows deleted: " + rows);
     }
 
     public long updateFavSongCollection(long favID, long activeK7ConnID, String songID) {
@@ -296,7 +295,7 @@ public class SongListDataSource {
         int numRowUpdated = database.update(SongListTable.K7Connection.TABLE_NAME, values,
                 SongListTable.K7Connection.COLUMN_NAME_CONNECTION_NAME+"='" + wifiName + ":" + ipAddress + "' and " +
                         SongListTable.K7Connection.COLUMN_NAME_IP_ADDRESS + "= '" + ipAddress + "'", null);
-        Log.d(LiveOkeRemoteApplication.TAG, numRowUpdated + " rows updated active status to " + activeStatus);
+        LogHelper.d(numRowUpdated + " rows updated active status to " + activeStatus);
         return numRowUpdated;
     }
 
@@ -415,7 +414,7 @@ public class SongListDataSource {
         } else {
             query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where upper(substr("+field+",1,1)) in " + keys;// + " order by ascii_title asc";
         }
-        Log.d(LiveOkeRemoteApplication.TAG,"Query = " + query);
+        LogHelper.d("Query = " + query);
         Cursor cursor = database.rawQuery(query, null);
         if (cursor != null) {
             //Log.d("K7","cursor size = " + cursor.getCount());
@@ -504,7 +503,7 @@ public class SongListDataSource {
 
     private ConcurrentHashMap<String, String> getTheTitleKeysMap(String query) throws Exception {
         ConcurrentHashMap<String, String> map = new ConcurrentHashMap<String, String>();
-        Log.d(LiveOkeRemoteApplication.TAG,"getTitleKeysMap: " + query);
+        LogHelper.d("getTitleKeysMap: " + query);
         Cursor cursor = database.rawQuery(query, null);
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -541,7 +540,7 @@ public class SongListDataSource {
                 searchStr+"%') or upper(ascii_author) like upper('%"+ searchStr +"%') or upper(quick_title) like upper('" + searchStr + "') " +
                 "or upper(quick_singer) like upper('%" + searchStr + "%') or upper(ascii_producer) like upper('%"+ searchStr +"%') " +
                 "or songId like '%"+searchStr+"%' )";
-        Log.d(LiveOkeRemoteApplication.TAG, "Search Query = " + query);
+        LogHelper.d("Search Query = " + query);
         return queryTotalPages(query);
     }
 
@@ -558,7 +557,7 @@ public class SongListDataSource {
                 } else {
                     numKeys = (total / 100);
                 }
-                Log.d(LiveOkeRemoteApplication.TAG,"value: " + numKeys);
+                LogHelper.d("value: " + numKeys);
             }
             cursor.close();
             int size = 100;
@@ -604,7 +603,7 @@ public class SongListDataSource {
                 "(upper(ascii_singer) like upper('%"+searchStr+"%') or upper(ascii_title) like upper('%"+
                 searchStr+"%') or upper(ascii_author) like upper('%"+ searchStr +"%') or upper(ascii_producer) like upper('%"+ searchStr +"%') " +
                 "or songId like '%"+searchStr+"%' ) " + "group by key";
-        Log.d(LiveOkeRemoteApplication.TAG, "Search Query = " + query);
+        LogHelper.d("Search Query = " + query);
         Cursor cursor = database.rawQuery(query, null);
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -643,7 +642,7 @@ public class SongListDataSource {
     public ConcurrentHashMap<String, String> getLanguageKeysMapNumber(String language) throws Exception {
         //ConcurrentHashMap<String, String> map = new ConcurrentHashMap<String, String>();
         String query = "select count(*) from songslist where language='"+language+"'";
-        Log.v(LiveOkeRemoteApplication.TAG,"query = " + query);
+        LogHelper.d("query = " + query);
         return queryTotalPages(query);
     }
 

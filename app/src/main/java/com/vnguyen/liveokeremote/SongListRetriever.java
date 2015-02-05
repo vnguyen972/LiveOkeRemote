@@ -3,13 +3,13 @@ package com.vnguyen.liveokeremote;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -66,7 +66,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         // we then connect to it.
                         socket = new Socket(context.liveOkeUDPClient.liveOkeIPAddress, SERVER_TCP_PORT);
                         socket.setKeepAlive(false);
-                        Log.v(LiveOkeRemoteApplication.TAG, "Connected to LiveOke-TCP.");
+                        LogHelper.d("Connected to LiveOke-TCP.");
                         byteArrayOutputStream =
                                 new ByteArrayOutputStream(socket.getReceiveBufferSize());
                         byte[] buffer = new byte[socket.getReceiveBufferSize()];
@@ -80,7 +80,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         byteArrayOutputStream.write(buffer, 0, bytesRead);
                         byteArrayOutputStream.flush();
                         response = byteArrayOutputStream.toString("UTF-8");
-                        Log.v(LiveOkeRemoteApplication.TAG,"RESPONSE = " + response);
+                        LogHelper.d("RESPONSE = " + response);
                         onReceived(response);
                         printStream.print("getsong");
                         printStream.flush();
@@ -91,9 +91,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         response = "";
                         // keep reading the stream until the end
                         while (true) {
-                            Log.d(LiveOkeRemoteApplication.TAG, "*** START READING ***");
+                            LogHelper.d("*** START READING ***");
                             bytesRead = inputStream.read(buffer);
-                            Log.d(LiveOkeRemoteApplication.TAG, "*** BYTES READ = " + bytesRead);
+                            LogHelper.d("*** BYTES READ = " + bytesRead);
                             if (bytesRead == -1) {
                                 break;
                             }
@@ -106,16 +106,12 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             printStream.flush();
                             pd.incrementSecondaryProgressBy(1);
                         }
-                        //final String res = response;
-                        //Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i + " - " + res);
-
                         // response string will be a string with delimiter |
                         // parse it and feed it into a processor
                         StringTokenizer stok = new StringTokenizer(response,"|");
-                        Log.d(LiveOkeRemoteApplication.TAG,"Total Tokens = " + stok.countTokens());
+                        LogHelper.d("Total Tokens = " + stok.countTokens());
                         while (stok.hasMoreTokens()) {
                             String rawSong = stok.nextToken().trim();
-                            //Log.d(LiveOkeRemoteApplication.TAG,rawSong);
                             if (!rawSong.startsWith("Finish")) {
                                 songRawDataList.add(rawSong);
                             } else {
@@ -134,7 +130,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                     } finally {
                         if (socket != null) {
                             try {
-                                Log.v(LiveOkeRemoteApplication.TAG, "Closing the socket...");
+                                LogHelper.d("Closing the socket...");
                                 //socket.shutdownInput();
                                 //socket.shutdownOutput();
                                 socket.close();
@@ -156,7 +152,6 @@ public class SongListRetriever implements  LiveOkeTCPClient {
 
     @Override
     public void onReceived(String message) {
-        //Log.v(LiveOkeRemoteApplication.TAG,"message = " + message);
         if (message.startsWith("Songlist:")) {
             // this is no longer valid, LiveOke is no longer sending datat
             // that starts with "Songlist:" anymore (2/2015)
@@ -177,9 +172,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 int cpus = Runtime.getRuntime().availableProcessors();
                 int maxThreads = cpus * 2;
                 maxThreads = (maxThreads > 0 ? maxThreads : 1);
-                Log.d(LiveOkeRemoteApplication.TAG, "CPUs: " + cpus);
-                Log.d(LiveOkeRemoteApplication.TAG, "Max Thread: " + maxThreads);
-                Log.d(LiveOkeRemoteApplication.TAG,"Total RAW = " + songRawDataList.size());
+                LogHelper.d("CPUs: " + cpus);
+                LogHelper.d("Max Thread: " + maxThreads);
+                LogHelper.d("Total RAW = " + songRawDataList.size());
                 executor = new ThreadPoolExecutor(
                         cpus, // core thread pool size
                         maxThreads, // maximum thread pool size
@@ -210,7 +205,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 while (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
                 }
                 if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
-                    Log.v(LiveOkeRemoteApplication.TAG,"TOTAL SONG = " + context.liveOkeUDPClient.songs.size());
+                    LogHelper.d("TOTAL SONG = " + context.liveOkeUDPClient.songs.size());
                     insertDBNow(context.liveOkeUDPClient.songs);
                 }
                 executor = null;
@@ -236,7 +231,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
 
     @Override
     public void onErrored(final Exception exception) {
-        Log.e(LiveOkeRemoteApplication.TAG,exception.getMessage(),exception);
+        LogHelper.e(exception.getMessage(),exception);
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -259,7 +254,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
             db.close();
             //db = null;
         } catch (Exception e) {
-            Log.e(LiveOkeRemoteApplication.TAG,e.getMessage(),e);
+            LogHelper.e(e.getMessage(),e);
             throw new Exception(e);
         }
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
-import android.util.Log;
 
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.db.SongListTable;
@@ -91,11 +90,11 @@ public class SongSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        Log.d("K7", "SongSQLLiteHelper.onCreate");
+        LogHelper.d("SongSQLLiteHelper.onCreate");
         database.execSQL(DATABASE_CREATE);
         database.execSQL(K7CONNECTION_DB_CREATE);
         database.execSQL(FAVORITE_LIST_DB_CREATE);
-        Log.d("K7", "FSC QUERY = " + FAVORITE_SONG_CONNECTION_DB_CREATE);
+        LogHelper.d("FSC QUERY = " + FAVORITE_SONG_CONNECTION_DB_CREATE);
         database.execSQL(FAVORITE_SONG_CONNECTION_DB_CREATE);
         database.execSQL(SQL_CREATE_FAVORITE_INDEX);
         database.execSQL(SQL_CREATE_INDEX);
@@ -118,18 +117,18 @@ public class SongSQLiteHelper extends SQLiteOpenHelper {
             String backupDBPath = "songslist.db";
             File currentDB;
             File backupDB;
-            Log.d(ma.app.TAG,"currentDBPath = " + databaseDir+ "/"+currentDBPath);
+            LogHelper.d("currentDBPath = " + databaseDir+ "/"+currentDBPath);
             currentDB = new File(databaseDir, currentDBPath);
             backupDB = new File(sdDir, backupDBPath);
 
             if (currentDB.exists()) {
-                Log.d(ma.app.TAG, "Copying databases to SD card...");
+                LogHelper.d( "Copying databases to SD card...");
                 FileChannel src = new FileInputStream(currentDB).getChannel();
                 FileChannel dst = new FileOutputStream(backupDB).getChannel();
                 dst.transferFrom(src, 0, src.size());
                 src.close();
                 dst.close();
-                Log.v(ma.app.TAG,"Done copying database.");
+                LogHelper.d("Done copying database.");
             }
         }
     }

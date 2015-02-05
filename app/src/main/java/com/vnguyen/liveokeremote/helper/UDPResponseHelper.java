@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -16,7 +15,6 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
 import com.vnguyen.liveokeremote.ChatAdapter;
-import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
@@ -44,17 +42,17 @@ public class UDPResponseHelper {
             String senderIP = intent.getStringExtra("senderIP");
             int senderPORT = intent.getIntExtra("senderPORT", 0);
             senderMSG = intent.getStringExtra("message");
-            Log.v(LiveOkeRemoteApplication.TAG, "Received msg: " + senderMSG);
+            LogHelper.v( "Received msg: " + senderMSG);
             processMessage(senderIP, senderMSG);
         } else if (intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PLAY) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PAUSE) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_NEXT) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_OFF) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_ON)) {
-            Log.v(LiveOkeRemoteApplication.TAG, "Received intent: " + intent);
+            LogHelper.v( "Received intent: " + intent);
             dumpIntent(intent);
             senderMSG = intent.getStringExtra("command");
-            Log.v(LiveOkeRemoteApplication.TAG, "Received message: " + senderMSG);
+            LogHelper.v( "Received message: " + senderMSG);
             processNotification(senderMSG);
         }
     }
@@ -101,7 +99,7 @@ public class UDPResponseHelper {
                 // Message is a JSON message
                 final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
                 msg.ipAddress = senderIP;
-                Log.v(LiveOkeRemoteApplication.TAG,"msg.ip = " + msg.ipAddress);
+                LogHelper.v("msg.ip = " + msg.ipAddress);
                 // if the message coming from this app
                 if (msg.fromWhere.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
                     // is it really from another client with different IP?
@@ -123,7 +121,7 @@ public class UDPResponseHelper {
                                         .textColor(Color.WHITE)
                                         .color(context.getResources().getColor(R.color.indigo_500))
                                         .text(msg.name + " is online!"));
-                                Log.v(LiveOkeRemoteApplication.TAG,"friends.list = " + context.friendsList.size());
+                                LogHelper.v("friends.list = " + context.friendsList.size());
                                 if (msg.greeting.equalsIgnoreCase("Hi")) {
                                     // only say Hello when receive Hi
                                     LiveOkeRemoteBroadcastMsg bcMsg =
@@ -201,7 +199,7 @@ public class UDPResponseHelper {
                                                             .actionListener(new ActionClickListener() {
                                                                 @Override
                                                                 public void onActionClicked(Snackbar snackbar) {
-                                                                    Log.v(LiveOkeRemoteApplication.TAG,"Reply the message");
+                                                                    LogHelper.v("Reply the message");
                                                                     d.show();
                                                                 }
                                                             })
@@ -211,7 +209,7 @@ public class UDPResponseHelper {
                                 }
                             }
                         } catch (Exception e) {
-                            Log.e(LiveOkeRemoteApplication.TAG, e.getMessage(), e);
+                            LogHelper.e(e.getMessage(), e);
                         }
                     }
                 }
@@ -228,7 +226,7 @@ public class UDPResponseHelper {
                     });
                 } else if (senderMSG.startsWith("MasterCode:")) {
                     String code = senderMSG.substring(11, senderMSG.length());
-                    Log.d(LiveOkeRemoteApplication.TAG,"Server Master Code = " + code);
+                    LogHelper.d("Server Master Code = " + code);
                     if (!code.equalsIgnoreCase("")) {
                         context.serverMasterCode = senderMSG.substring(11, senderMSG.length());
 //                        // test notification
@@ -334,7 +332,7 @@ public class UDPResponseHelper {
                                         if (context.friendsList != null) {
                                             for (User user : context.friendsList) {
                                                 if (user.name.equals(u.name)) {
-                                                    Log.v(LiveOkeRemoteApplication.TAG, "Found requester on friendlist!");
+                                                    LogHelper.v( "Found requester on friendlist!");
                                                     if (user.avatarURI != null && !user.avatarURI.equals("")) {
                                                         u.avatar = user.avatar;
                                                     }
@@ -350,7 +348,7 @@ public class UDPResponseHelper {
                                     context.liveOkeUDPClient.rsvpList.add(rsvpItem);
                                 }
                             } catch (Exception ex) {
-                                Log.e(LiveOkeRemoteApplication.TAG, ex.getMessage(), ex);
+                                LogHelper.e(ex.getMessage(), ex);
                             } finally {
                                 context.db.close();
                             }
@@ -374,12 +372,12 @@ public class UDPResponseHelper {
         if (bundle != null) {
             Set<String> keys = bundle.keySet();
             Iterator<String> it = keys.iterator();
-            Log.v(LiveOkeRemoteApplication.TAG,"Dumping Intent start");
+            LogHelper.v("Dumping Intent start");
             while (it.hasNext()) {
                 String key = it.next();
-                Log.v(LiveOkeRemoteApplication.TAG,"[" + key + "=" + bundle.get(key)+"]");
+                LogHelper.v("[" + key + "=" + bundle.get(key)+"]");
             }
-            Log.v(LiveOkeRemoteApplication.TAG,"Dumping Intent end");
+            LogHelper.v("Dumping Intent end");
         }
     }
 }

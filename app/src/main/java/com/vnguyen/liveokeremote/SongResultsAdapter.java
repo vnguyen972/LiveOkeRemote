@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import com.malinskiy.materialicons.Iconify;
 import com.vnguyen.liveokeremote.data.SongResult;
 import com.vnguyen.liveokeremote.helper.AlertDialogHelper;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
+import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 
 import java.io.IOException;
@@ -135,7 +135,6 @@ public class SongResultsAdapter extends BaseAdapter {
         holder.resultArtist.setText(result.Artist);
         holder.resultHost.setText(result.HostName);
         holder.mp3urlView.setText(result.UrlJunDownload);
-        //Log.v(LiveOkeRemoteApplication.TAG, "Avatar = " + result.Avatar);
         holder.lyricUrlView.setText(result.LyricsUrl);
         final String mp3Url = holder.mp3urlView.getText().toString() + "&code=" + SongHelper.JSEARCH_API_CODE;
         final String lyricUrl = holder.lyricUrlView.getText().toString() + "&code=" + SongHelper.JSEARCH_API_CODE;;
@@ -144,7 +143,7 @@ public class SongResultsAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 try {
-                    Log.v(LiveOkeRemoteApplication.TAG,"play TAG = " + holder.playView.getTag());
+                    LogHelper.d("play TAG = " + holder.playView.getTag());
                     if (holder.playView.getTag().equals("stop")) {
                         //holder.playView.setImageDrawable(stopButton);
                         myHandler = new Handler();
@@ -161,7 +160,7 @@ public class SongResultsAdapter extends BaseAdapter {
                         context.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
-                                Log.v(LiveOkeRemoteApplication.TAG, "DONE PLAYING?");
+                                LogHelper.i("DONE PLAYING?");
                                 mPlayingPosition = NOT_PLAYING;
                                 holder.playView.setBackground(playButton);
                                 holder.playView.setTag("stop");
@@ -209,7 +208,7 @@ public class SongResultsAdapter extends BaseAdapter {
 
                     @Override
                     protected Void doInBackground(Void... params) {
-                        Log.v(LiveOkeRemoteApplication.TAG,"LYRIC URL = " + lyricUrl);
+                        LogHelper.i("LYRIC URL = " + lyricUrl);
                         lyric = SongHelper.getLyric(lyricUrl);
                         return null;
                     }
@@ -217,7 +216,6 @@ public class SongResultsAdapter extends BaseAdapter {
                     @SuppressLint("NewApi")
                     @Override
                     protected void onPostExecute(Void aVoid) {
-                        //Log.v(LiveOkeRemoteApplication.TAG,"LYRIC = " + lyric);
                         adh.dismissProgress();
                         MaterialDialog dialog = new MaterialDialog.Builder(context)
                                 .title(Html.fromHtml("Lyric for <font color='#009688'>" + result.Title + "</font> <font color='#808080'>(" + result.HostName + ")</font>"))
