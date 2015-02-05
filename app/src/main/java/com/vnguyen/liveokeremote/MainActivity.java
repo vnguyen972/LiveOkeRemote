@@ -423,10 +423,12 @@ public class MainActivity extends ActionBarActivity {
         handler.postDelayed(pingPong, 10000);
         isInForegroundMode = true;
         // Say Hi to any "new" friends
-        LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
-                getResources().getString(R.string.app_name), me.name);
-        if (liveOkeUDPClient != null) {
-            liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+        if (me != null) {
+            LiveOkeRemoteBroadcastMsg bcMsg = new LiveOkeRemoteBroadcastMsg("Hi",
+                    getResources().getString(R.string.app_name), me.name);
+            if (liveOkeUDPClient != null) {
+                liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+            }
         }
     }
 
