@@ -88,9 +88,8 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         byteArrayOutputStream.reset();
                         int i = 0;
                         buffer = new byte[1024*1024];
-                        boolean gotFinish = false;
-                        //while (!response.startsWith("Finish")) {
                         response = "";
+                        // keep reading the stream until the end
                         while (true) {
                             Log.d(LiveOkeRemoteApplication.TAG, "*** START READING ***");
                             bytesRead = inputStream.read(buffer);
@@ -99,38 +98,31 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                                 break;
                             }
                             byteArrayOutputStream.write(buffer, 0, bytesRead);
-                            response += byteArrayOutputStream.toString("UTF-8") + "\r\n";
+                            response += byteArrayOutputStream.toString("UTF-8");
                             // clear out the outputstream array
+                            // send 'getsong' until we get everything
                             byteArrayOutputStream.reset();
                             printStream.print("getsong");
                             printStream.flush();
                             pd.incrementSecondaryProgressBy(1);
                         }
-                            final String res = response;
-                            //Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i + " - " + res);
-                            StringTokenizer stok = new StringTokenizer(res,"|");
-                            Log.d(LiveOkeRemoteApplication.TAG,"Total Tokens = " + stok.countTokens());
-                            while (stok.hasMoreTokens()) {
-                                String rawSong = stok.nextToken().trim();
-                                //Log.d(LiveOkeRemoteApplication.TAG,rawSong);
-                                if (!rawSong.startsWith("Finish")) {
-                                    songRawDataList.add(rawSong);
-                                } else {
-                                    onReceived(rawSong);
-                                }
-                                pd.incrementProgressBy(1);
+                        //final String res = response;
+                        //Log.d(LiveOkeRemoteApplication.TAG,"RESPONSE = " + i + " - " + res);
+
+                        // response string will be a string with delimiter |
+                        // parse it and feed it into a processor
+                        StringTokenizer stok = new StringTokenizer(response,"|");
+                        Log.d(LiveOkeRemoteApplication.TAG,"Total Tokens = " + stok.countTokens());
+                        while (stok.hasMoreTokens()) {
+                            String rawSong = stok.nextToken().trim();
+                            //Log.d(LiveOkeRemoteApplication.TAG,rawSong);
+                            if (!rawSong.startsWith("Finish")) {
+                                songRawDataList.add(rawSong);
+                            } else {
+                                onReceived(rawSong);
                             }
-//                            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-//                                @Override
-//                                protected Void doInBackground(Void... params) {
-//                                    onReceived(res);
-//                                    return null;
-//                                }
-//                            };
-//                            task.execute((Void[]) null);
-                        //}
-                        //onReceived(response);
-                        //System.out.println("RESPONSE = " + response);
+                            //pd.incrementProgressBy(1);
+                        }
                     } catch (SocketException e) {
                         onErrored(e);
                     } catch (SocketTimeoutException e) {
@@ -166,6 +158,8 @@ public class SongListRetriever implements  LiveOkeTCPClient {
     public void onReceived(String message) {
         //Log.v(LiveOkeRemoteApplication.TAG,"message = " + message);
         if (message.startsWith("Songlist:")) {
+            // this is no longer valid, LiveOke is no longer sending datat
+            // that starts with "Songlist:" anymore (2/2015)
             String songData = message.substring(9, message.length());
             songRawDataList.add(songData);
         } else if (message.startsWith("totalsong:")) {
@@ -174,6 +168,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
             context.liveOkeUDPClient.gotTotalSongResponse = true;
         } else if (message.startsWith("Finish")) {
             // done receiving songs list
+            // now it's time to process them
             try {
                 if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
                     context.liveOkeUDPClient.songs.clear();
@@ -197,8 +192,8 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                     pool.submit(new Callable<Song>() {
                         @Override
                         public Song call() throws Exception {
+                            pd.incrementProgressBy(1);
                             return SongHelper.buildSong(rawData);
-
                         }
                     });
                 }
@@ -225,6 +220,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                     db.saveDB();
                 }
                 songRawDataList.clear();
+                // now update the display
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
