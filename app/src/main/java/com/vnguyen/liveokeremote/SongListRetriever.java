@@ -2,11 +2,7 @@ package com.vnguyen.liveokeremote;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.SnackbarManager;
-import com.nispok.snackbar.enums.SnackbarType;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.LogHelper;
@@ -32,12 +28,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class SongListRetriever implements  LiveOkeTCPClient {
-    public boolean doneGettingData;
-    public boolean invalidConnection = true;
     private ArrayList<String> songRawDataList;
     private MainActivity context;
-    public SongListDataSource db;
     private ProgressDialog pd;
+    public SongListDataSource db;
+    public Exception exception;
+    public int bytesRead;
 
     public SongListRetriever(Context context, ProgressDialog pd) {
         this.context = (MainActivity) context;
@@ -51,7 +47,6 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 if (context.liveOkeUDPClient != null &&
                         context.liveOkeUDPClient.liveOkeIPAddress != null &&
                         !context.liveOkeUDPClient.liveOkeIPAddress.equals("")) {
-                    doneGettingData = false;
                     Socket socket = null;
                     ByteArrayOutputStream byteArrayOutputStream = null;
                     InputStream inputStream = null;
@@ -70,33 +65,37 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         byteArrayOutputStream =
                                 new ByteArrayOutputStream(socket.getReceiveBufferSize());
                         byte[] buffer = new byte[socket.getReceiveBufferSize()];
-                        int bytesRead;
                         inputStream = socket.getInputStream();
                         OutputStream outputStream = socket.getOutputStream();
                         PrintStream printStream = new PrintStream(outputStream);
                         // after connect, LiveOke sends "totalsongs"
                         bytesRead = inputStream.read(buffer);
-                        invalidConnection = false;
                         byteArrayOutputStream.write(buffer, 0, bytesRead);
                         byteArrayOutputStream.flush();
                         response = byteArrayOutputStream.toString("UTF-8");
-                        LogHelper.d("RESPONSE = " + response);
+                        LogHelper.v("RESPONSE = " + response);
                         onReceived(response);
                         printStream.print("getsong");
                         printStream.flush();
                         // clear out the outputstream array
                         byteArrayOutputStream.reset();
                         int i = 0;
-                        buffer = new byte[1024*1024];
+                        buffer = new byte[1024*1024*5];
                         response = "";
                         // keep reading the stream until the end
                         while (true) {
-                            LogHelper.d("*** START READING ***");
+                            LogHelper.v("*** START READING ***");
                             bytesRead = inputStream.read(buffer);
-                            LogHelper.d("*** BYTES READ = " + bytesRead);
+                            LogHelper.v("*** BYTES READ = " + bytesRead);
                             if (bytesRead == -1) {
                                 break;
                             }
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pd.setMessage("Reading from LiveOke... " + bytesRead + " bytes.");
+                                }
+                            });
                             byteArrayOutputStream.write(buffer, 0, bytesRead);
                             response += byteArrayOutputStream.toString("UTF-8");
                             // clear out the outputstream array
@@ -109,16 +108,21 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         // response string will be a string with delimiter |
                         // parse it and feed it into a processor
                         StringTokenizer stok = new StringTokenizer(response,"|");
-                        LogHelper.d("Total Tokens = " + stok.countTokens());
+                        LogHelper.v("Total Tokens = " + stok.countTokens());
                         while (stok.hasMoreTokens()) {
                             String rawSong = stok.nextToken().trim();
                             if (!rawSong.startsWith("Finish")) {
                                 songRawDataList.add(rawSong);
-                            } else {
-                                onReceived(rawSong);
                             }
                             //pd.incrementProgressBy(1);
                         }
+                        context.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pd.setMessage("Processing...");
+                            }
+                        });
+                        onReceived("Finish");
                     } catch (SocketException e) {
                         onErrored(e);
                     } catch (SocketTimeoutException e) {
@@ -130,16 +134,14 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                     } finally {
                         if (socket != null) {
                             try {
-                                LogHelper.d("Closing the socket...");
+                                LogHelper.v("Closing the socket...");
                                 //socket.shutdownInput();
                                 //socket.shutdownOutput();
                                 socket.close();
                                 byteArrayOutputStream.close();
                                 inputStream.close();
-                                doneGettingData = true;
-                                invalidConnection = true;
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                onErrored(e);
                             }
                         }
                     }
@@ -164,17 +166,17 @@ public class SongListRetriever implements  LiveOkeTCPClient {
         } else if (message.startsWith("Finish")) {
             // done receiving songs list
             // now it's time to process them
+            ExecutorService executor = null;
             try {
                 if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
                     context.liveOkeUDPClient.songs.clear();
                 }
-                ExecutorService executor;
                 int cpus = Runtime.getRuntime().availableProcessors();
                 int maxThreads = cpus * 2;
                 maxThreads = (maxThreads > 0 ? maxThreads : 1);
-                LogHelper.d("CPUs: " + cpus);
-                LogHelper.d("Max Thread: " + maxThreads);
-                LogHelper.d("Total RAW = " + songRawDataList.size());
+                LogHelper.v("CPUs: " + cpus);
+                LogHelper.v("Max Thread: " + maxThreads);
+                LogHelper.v("Total RAW = " + songRawDataList.size());
                 executor = new ThreadPoolExecutor(
                         cpus, // core thread pool size
                         maxThreads, // maximum thread pool size
@@ -183,19 +185,21 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         new ArrayBlockingQueue<Runnable>(maxThreads, false),
                         new ThreadPoolExecutor.CallerRunsPolicy());
                 CompletionService<Song> pool = new ExecutorCompletionService<>(executor);
+                context.totalSong = songRawDataList.size();
                 for (final String rawData : songRawDataList) {
                     pool.submit(new Callable<Song>() {
                         @Override
                         public Song call() throws Exception {
                             pd.incrementProgressBy(1);
-                            return SongHelper.buildSong(rawData);
+                            final Song song = SongHelper.buildSong(rawData);
+                            return song;
                         }
                     });
                 }
                 // process the result from the threads
                 int mSize = songRawDataList.size();
                 for (int i = 0; i < mSize; i++) {
-                    Song song = pool.take().get();
+                    final Song song = pool.take().get();
                     if (context.liveOkeUDPClient.songs == null) {
                         context.liveOkeUDPClient.songs = new ArrayList<>();
                     }
@@ -205,17 +209,31 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 while (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
                 }
                 if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
-                    LogHelper.d("TOTAL SONG = " + context.liveOkeUDPClient.songs.size());
+                    LogHelper.v("TOTAL SONG = " + context.liveOkeUDPClient.songs.size());
                     insertDBNow(context.liveOkeUDPClient.songs);
                 }
                 executor = null;
                 pool = null;
-                context.liveOkeUDPClient.doneGettingSongList = true;
+
                 if (db != null) {
                     db.saveDB();
                 }
                 songRawDataList.clear();
                 // now update the display
+            } catch (Exception ex) {
+                LogHelper.e(ex.getMessage(), ex);
+                exception = ex;
+            } finally {
+                context.liveOkeUDPClient.doneGettingSongList = true;
+                if (executor != null) {
+                    executor.shutdown();
+                    try {
+                        while (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -223,8 +241,6 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         context.updateMainDisplay();
                     }
                 });
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
         }
     }
@@ -232,17 +248,8 @@ public class SongListRetriever implements  LiveOkeTCPClient {
     @Override
     public void onErrored(final Exception exception) {
         LogHelper.e(exception.getMessage(),exception);
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                SnackbarManager.show(Snackbar.with(context)
-                        .type(SnackbarType.MULTI_LINE)
-                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                        .textColor(Color.WHITE)
-                        .color(Color.RED)
-                        .text("ERROR: " + exception.getMessage()));
-            }
-        });
+        context.liveOkeUDPClient.doneGettingSongList = true;
+        this.exception = exception;
     }
 
     public void insertDBNow(ArrayList<Song> songsList) throws Exception {

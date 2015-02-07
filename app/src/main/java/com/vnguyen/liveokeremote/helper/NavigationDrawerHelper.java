@@ -139,9 +139,12 @@ public class NavigationDrawerHelper {
                                         final ProgressDialog pd = new ProgressDialog(context,R.style.MyProgressTheme);
                                         pd.setProgressDrawable(context.getResources().getDrawable(R.drawable.my_progress_bar));
                                         pd.setTitle("Please Wait...");
+                                        pd.setMessage("...");
                                         pd.setProgressStyle(pd.STYLE_HORIZONTAL);
-                                        pd.setInverseBackgroundForced(true);
+                                        pd.setCancelable(false);
+                                        pd.setCanceledOnTouchOutside(false);
                                         pd.setProgress(0);
+                                        pd.show();
                                         final SongListRetriever slRetriever = new SongListRetriever(context,pd);;
                                         AsyncTask<Void, Integer, Void> task = new AsyncTask<Void, Integer, Void>() {
                                             @Override
@@ -182,7 +185,7 @@ public class NavigationDrawerHelper {
                                                             public void run() {
                                                                 pd.setMax(context.totalSong);
                                                                 pd.setMessage("Downloading songbook of " + context.totalSong + " songs...");
-                                                                pd.show();
+
                                                             }
                                                         });
                                                     }
@@ -207,12 +210,21 @@ public class NavigationDrawerHelper {
                                                 SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                                                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                                                 pd.dismiss();
-                                                SnackbarManager.show(Snackbar.with(context)
-                                                        .type(SnackbarType.MULTI_LINE)
-                                                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
-                                                        .textColor(Color.WHITE)
-                                                        .color(Color.BLACK)
-                                                        .text(context.totalSong + " songs loaded in " + dateFormat.format(new Date(total))));
+                                                if (slRetriever.exception != null) {
+                                                    SnackbarManager.show(Snackbar.with(context)
+                                                            .type(SnackbarType.MULTI_LINE)
+                                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                            .textColor(Color.WHITE)
+                                                            .color(Color.RED)
+                                                            .text("Exception: " + slRetriever.exception.getMessage()));
+                                                } else {
+                                                    SnackbarManager.show(Snackbar.with(context)
+                                                            .type(SnackbarType.MULTI_LINE)
+                                                            .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                            .textColor(Color.WHITE)
+                                                            .color(Color.BLACK)
+                                                            .text(context.totalSong + " songs loaded in " + dateFormat.format(new Date(total))));
+                                                }
                                             }
                                         };
                                         LogHelper.v("Exec: getsonglist");
