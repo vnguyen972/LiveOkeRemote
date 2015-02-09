@@ -16,12 +16,19 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.FaceDetector;
 import android.os.Build;
+import android.util.Base64;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.google.gson.Gson;
 import com.thedazzler.droidicon.IconicFontDrawable;
+import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
+import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,6 +40,17 @@ public class DrawableHelper {
     }
 
 
+    public byte[] encodeAvatar(User me) {
+        Bitmap bm = ((BitmapDrawable) me.avatar).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        try {
+            baos.close();
+        } catch (IOException e) {
+        }
+        return imageBytes;
+    }
     public Drawable LoadImageFromWebOperations(String url) {
         try {
             InputStream is = (InputStream) new URL(url).getContent();

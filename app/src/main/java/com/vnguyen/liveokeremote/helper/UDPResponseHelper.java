@@ -3,9 +3,13 @@ package com.vnguyen.liveokeremote.helper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Base64;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -21,6 +25,7 @@ import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
+import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -100,8 +105,16 @@ public class UDPResponseHelper {
                 final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
                 msg.ipAddress = senderIP;
                 LogHelper.v("msg.ip = " + msg.ipAddress);
-                // if the message coming from this app
-                if (msg.fromWhere.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
+                if (msg.greeting.equalsIgnoreCase("my.avatar")) {
+                    // fromWhere will have the name that this avatar belongs
+                    User u = context.friendsListHelper.findFriend(msg.fromWhere);
+                    if (u != null) {
+                        byte[] byteArray = Base64.decode(msg.name, Base64.DEFAULT);
+                        Bitmap breceived = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                        u.avatar = new BitmapDrawable(breceived);
+                    }
+                } else if (msg.fromWhere.equalsIgnoreCase(context.getResources().getString(R.string.app_name))) {
+                    // if the message coming from this app
                     // is it really from another client with different IP?
                     if (!context.liveOkeUDPClient.isMine(senderIP)) {
                         try {
@@ -129,6 +142,9 @@ public class UDPResponseHelper {
                                                     context.getResources().getString(R.string.app_name), context.me.name);
                                     if (context.liveOkeUDPClient != null) {
                                         context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), senderIP, BROADCAST_PORT);
+                                        byte[] imageBytes = context.drawableHelper.encodeAvatar(context.me);
+                                        bcMsg = new LiveOkeRemoteBroadcastMsg("my.avatar",context.me.name, Base64.encodeToString(imageBytes,Base64.DEFAULT));
+                                        context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null, UDPListenerService.BROADCAST_PORT);
                                     }
                                 }
                                 final User usr = u;

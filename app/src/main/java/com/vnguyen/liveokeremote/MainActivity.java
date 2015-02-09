@@ -33,6 +33,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,6 +77,7 @@ import com.vnguyen.liveokeremote.helper.SongHelper;
 import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
@@ -428,6 +430,19 @@ public class MainActivity extends ActionBarActivity {
                     getResources().getString(R.string.app_name), me.name);
             if (liveOkeUDPClient != null) {
                 liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
+                if (me.avatar != null) {
+                    byte[] imageBytes = drawableHelper.encodeAvatar(me);
+//                    Bitmap bm = ((BitmapDrawable) me.avatar).getBitmap();
+//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                    bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                    byte[] imageBytes = baos.toByteArray();
+                    bcMsg = new LiveOkeRemoteBroadcastMsg("my.avatar",me.name, Base64.encodeToString(imageBytes,Base64.DEFAULT));
+                    liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null,UDPListenerService.BROADCAST_PORT);
+//                    try {
+//                        baos.close();
+//                    } catch (IOException e) {
+//                    }
+                }
             }
         }
     }
