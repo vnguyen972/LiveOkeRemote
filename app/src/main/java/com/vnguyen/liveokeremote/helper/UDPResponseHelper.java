@@ -142,9 +142,9 @@ public class UDPResponseHelper {
                                                     context.getResources().getString(R.string.app_name), context.me.name);
                                     if (context.liveOkeUDPClient != null) {
                                         context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), senderIP, BROADCAST_PORT);
-                                        byte[] imageBytes = context.drawableHelper.encodeAvatar(context.me);
-                                        bcMsg = new LiveOkeRemoteBroadcastMsg("my.avatar",context.me.name, Base64.encodeToString(imageBytes,Base64.DEFAULT));
-                                        context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null, UDPListenerService.BROADCAST_PORT);
+//                                        byte[] imageBytes = context.drawableHelper.encodeAvatar(context.me);
+//                                        bcMsg = new LiveOkeRemoteBroadcastMsg("my.avatar",context.me.name, Base64.encodeToString(imageBytes,Base64.DEFAULT));
+//                                        context.liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null, UDPListenerService.BROADCAST_PORT);
                                     }
                                 }
                                 final User usr = u;

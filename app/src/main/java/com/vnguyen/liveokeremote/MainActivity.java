@@ -430,19 +430,19 @@ public class MainActivity extends ActionBarActivity {
                     getResources().getString(R.string.app_name), me.name);
             if (liveOkeUDPClient != null) {
                 liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg), null, UDPListenerService.BROADCAST_PORT);
-                if (me.avatar != null) {
-                    byte[] imageBytes = drawableHelper.encodeAvatar(me);
-//                    Bitmap bm = ((BitmapDrawable) me.avatar).getBitmap();
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                    bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                    byte[] imageBytes = baos.toByteArray();
-                    bcMsg = new LiveOkeRemoteBroadcastMsg("my.avatar",me.name, Base64.encodeToString(imageBytes,Base64.DEFAULT));
-                    liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null,UDPListenerService.BROADCAST_PORT);
-//                    try {
-//                        baos.close();
-//                    } catch (IOException e) {
-//                    }
-                }
+//                if (me.avatar != null) {
+//                    byte[] imageBytes = drawableHelper.encodeAvatar(me);
+////                    Bitmap bm = ((BitmapDrawable) me.avatar).getBitmap();
+////                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+////                    bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+////                    byte[] imageBytes = baos.toByteArray();
+//                    bcMsg = new LiveOkeRemoteBroadcastMsg("my.avatar",me.name, Base64.encodeToString(imageBytes,Base64.DEFAULT));
+//                    liveOkeUDPClient.sendMessage((new Gson()).toJson(bcMsg),null,UDPListenerService.BROADCAST_PORT);
+////                    try {
+////                        baos.close();
+////                    } catch (IOException e) {
+////                    }
+//                }
             }
         }
     }
