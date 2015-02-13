@@ -379,6 +379,9 @@ public class UDPResponseHelper {
                             context.notificationHelper.addNotification();
                         }
                     });
+                } else if (senderMSG.startsWith("CurrentVolume:")) {
+                    String volume = senderMSG.substring(14, senderMSG.length());
+                    PreferencesHelper.getInstance(context).setStringPreference("volume",volume);
                 }
             }
     }

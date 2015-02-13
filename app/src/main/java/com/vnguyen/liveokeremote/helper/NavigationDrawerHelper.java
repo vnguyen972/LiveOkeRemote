@@ -264,6 +264,11 @@ public class NavigationDrawerHelper {
                         @Override
                         public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                             PreferencesHelper.getInstance(context).setStringPreference("volume",value+"");
+                            if (context.liveOkeUDPClient != null) {
+                                context.liveOkeUDPClient.sendMessage("volume," + value,
+                                        context.liveOkeUDPClient.liveOkeIPAddress,
+                                        LiveOkeUDPClient.LIVEOKE_UDP_PORT);
+                            }
                         }
                     });
                     dialog.show();
