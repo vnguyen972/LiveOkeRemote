@@ -30,6 +30,8 @@ import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.SongListRetriever;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
 
+import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,18 +54,19 @@ public class NavigationDrawerHelper {
     public static final int EN_SONGS = 4;
     public static final int CN_SONGS = 5;
     public static final int HEADER_2 = 6;
-    public static final int COMMENT_TO_SCREEN = 7;
-    public static final int TOGGLE_FULL_SCREEN = 8;
-    public static final int BACKUP_TO_SD = 9;
-    public static final int UPDATE_SONGS_LIST = 10;
-    public static final int HEADER_3 = 11;
-    public static final int FRIENDS_LIST = 12;
-    public static final int YOUR_PHOTO = 13;
-    public static final int IP_ADDRESS = 14;
-    public static final int MASTER_CODE = 15;
-    public static final int SONG_INITIAL_ICON_BY = 16;
-    public static final int DISPLAY_SONG_DESC_WITH = 17;
-    public static final int HELP = 18;
+    public static final int ADJUST_VOLUME = 7;
+    public static final int COMMENT_TO_SCREEN = 8;
+    public static final int TOGGLE_FULL_SCREEN = 9;
+    public static final int BACKUP_TO_SD = 10;
+    public static final int UPDATE_SONGS_LIST = 11;
+    public static final int HEADER_3 = 12;
+    public static final int FRIENDS_LIST = 13;
+    public static final int YOUR_PHOTO = 14;
+    public static final int IP_ADDRESS = 15;
+    public static final int MASTER_CODE = 16;
+    public static final int SONG_INITIAL_ICON_BY = 17;
+    public static final int DISPLAY_SONG_DESC_WITH = 18;
+    public static final int HELP = 19;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -136,7 +139,7 @@ public class NavigationDrawerHelper {
                                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     if (context.liveOkeUDPClient != null) {
                                         final long startTime = System.currentTimeMillis();
-                                        final ProgressDialog pd = new ProgressDialog(context,R.style.MyProgressTheme);
+                                        final ProgressDialog pd = new ProgressDialog(context, R.style.MyProgressTheme);
                                         pd.setProgressDrawable(context.getResources().getDrawable(R.drawable.my_progress_bar));
                                         pd.setTitle("Please Wait...");
                                         pd.setMessage("...");
@@ -145,7 +148,8 @@ public class NavigationDrawerHelper {
                                         pd.setCanceledOnTouchOutside(false);
                                         pd.setProgress(0);
                                         pd.show();
-                                        final SongListRetriever slRetriever = new SongListRetriever(context,pd);;
+                                        final SongListRetriever slRetriever = new SongListRetriever(context, pd);
+                                        ;
                                         AsyncTask<Void, Integer, Void> task = new AsyncTask<Void, Integer, Void>() {
                                             @Override
                                             protected void onPreExecute() {
@@ -228,7 +232,7 @@ public class NavigationDrawerHelper {
                                             }
                                         };
                                         LogHelper.v("Exec: getsonglist");
-                                        task.execute((Void[])null);
+                                        task.execute((Void[]) null);
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
@@ -240,8 +244,30 @@ public class NavigationDrawerHelper {
                                 }
                             })
                             .show();
-                    mDrawerList.setItemChecked(UPDATE_SONGS_LIST,false);
-
+                    mDrawerList.setItemChecked(UPDATE_SONGS_LIST, false);
+                } else if (mDrawerList.getCheckedItemPosition() == ADJUST_VOLUME) {
+                    MaterialDialog dialog = new MaterialDialog.Builder(context)
+                        .title("Adjust LiveOke Volume")
+                        .theme(Theme.LIGHT)
+                        .titleColor(R.color.primary)
+                        .customView(R.layout.volume_control,false)
+                        .autoDismiss(false)
+                        .build()
+                        ;
+                    DiscreteSeekBar volBar = (DiscreteSeekBar) dialog.getCustomView().findViewById(R.id.vol_control_bar);
+                    String vol = PreferencesHelper.getInstance(context).getPreference("volume");
+                    if (vol == null || vol.equals("")) {
+                        vol = "0";
+                    }
+                    volBar.setProgress(Integer.parseInt(vol));
+                    volBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+                        @Override
+                        public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                            PreferencesHelper.getInstance(context).setStringPreference("volume",value+"");
+                        }
+                    });
+                    dialog.show();
+                    mDrawerList.setItemChecked(ADJUST_VOLUME, false);
                 } else if (mDrawerList.getCheckedItemPosition() == COMMENT_TO_SCREEN) {
                     // send comment to screen
                     final EditText input = new EditText(context);
@@ -524,6 +550,14 @@ public class NavigationDrawerHelper {
                     updateSongsListIcon.setIcon("gmd-assignment-turned-in");
                     updateSongsListIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = updateSongsListIcon;
+                    showCounter = false;
+                    break;
+                case ADJUST_VOLUME:
+                    // adjust the volume
+                    IconicFontDrawable volumeIcon = new IconicFontDrawable(context.getApplicationContext());
+                    volumeIcon.setIcon("gmd-volume-up");
+                    volumeIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = volumeIcon;
                     showCounter = false;
                     break;
                 case COMMENT_TO_SCREEN:

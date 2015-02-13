@@ -55,4 +55,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     //compile files('libs/jMusixMatch-1.1.2.jar')
+    compile project (':discrete-seek-bar-library')
 }
