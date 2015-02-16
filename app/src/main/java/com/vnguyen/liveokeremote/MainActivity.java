@@ -33,7 +33,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +54,7 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.gson.Gson;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vnguyen.liveokeremote.data.AquiredPhoto;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
@@ -77,7 +78,6 @@ import com.vnguyen.liveokeremote.helper.SongHelper;
 import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,6 +130,7 @@ public class MainActivity extends ActionBarActivity {
     public SlidingUpPanelLayout mSlidingPanel;
     public ImageView mReservedCountImgView;
     public TextView mNowPlayingTxtView;
+    public BadgeView badge;
     public MenuItem onOffSwitch;
     public ViewPager mViewPager;
     public SongsListPageAdapter mSongsListPagerAdapter;
@@ -660,19 +661,19 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void updateRsvpCounter(int count) {
+        Log.v(LiveOkeRemoteApplication.TAG, "count = " + count);
         if (count != 0) {
-            if (backupDrawable == null) {
-                backupDrawable = mReservedCountImgView.getDrawable();
-            }
-            mReservedCountImgView.setImageDrawable(drawableHelper.buildDrawable(count + "", "round"));
+            badge.setText(count+"");
+            badge.show(true);
         } else {
-            if (backupDrawable != null) {
-                mReservedCountImgView.setImageDrawable(backupDrawable);
-            }
+            badge.setVisibility(View.INVISIBLE);
         }
     }
 
     public void setupReservedPanel() {
+        View badgeView = (View) findViewById(R.id.invisible_for_badge_view);
+        badge = new BadgeView(this, badgeView);
+        badge.setBackgroundResource(R.drawable.badge_ifaux);
         mNowPlayingTxtView = (TextView) findViewById(R.id.now_playing_text_view);
         mNowPlayingTxtView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/NotoSans/NotoSans-Regular.ttf"));
         //mNowPlayingTxtView.setTextSize(20);

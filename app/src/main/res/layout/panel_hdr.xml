@@ -25,6 +25,14 @@
             shapeimgview:siBorderWidth="2dp"
             shapeimgview:siBorderColor="@color/white"
             />
+        <View
+            android:id="@+id/invisible_for_badge_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/now_playing_image_view"
+            android:layout_alignLeft="@+id/now_playing_image_view"
+            android:layout_alignRight="@+id/now_playing_image_view"
+            android:layout_alignTop="@+id/now_playing_image_view" />
         <TextView
             android:id="@+id/rsvpCounter"
             android:layout_width="wrap_content"
