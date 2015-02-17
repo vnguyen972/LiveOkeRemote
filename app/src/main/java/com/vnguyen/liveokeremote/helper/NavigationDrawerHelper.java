@@ -257,7 +257,7 @@ public class NavigationDrawerHelper {
                     DiscreteSeekBar volBar = (DiscreteSeekBar) dialog.getCustomView().findViewById(R.id.vol_control_bar);
                     String vol = PreferencesHelper.getInstance(context).getPreference("volume");
                     if (vol == null || vol.equals("")) {
-                        vol = "0";
+                        vol = "-68";
                     }
                     volBar.setProgress(Integer.parseInt(vol));
                     volBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
