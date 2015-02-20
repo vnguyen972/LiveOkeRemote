@@ -25,7 +25,6 @@ import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -231,7 +230,9 @@ public class UDPResponseHelper {
                 }
             } else {
                 // Process LiveOke Msg here
-                context.liveOkeUDPClient.liveOkeIPAddress = senderIP;
+                if (context.liveOkeUDPClient.liveOkeIPAddress == null) {
+                    context.liveOkeUDPClient.liveOkeIPAddress = senderIP;
+                }
                 if (senderMSG.equalsIgnoreCase("Pong")) {
                     context.liveOkeUDPClient.pingCount = 0;
                     context.runOnUiThread(new Runnable() {
