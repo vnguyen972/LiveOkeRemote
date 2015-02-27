@@ -228,7 +228,9 @@ public class AlertDialogHelper {
                                 item.title = item.title + " (" + value + ")";
                             }
                         } else {
-                            item.title = item.title.substring(0, item.title.indexOf(" ("));
+                            if (item.title.indexOf(" (") != -1) {
+                                item.title = item.title.substring(0, item.title.indexOf(" ("));
+                            }
                         }
                         // update the list
                         context.runOnUiThread(new Runnable() {

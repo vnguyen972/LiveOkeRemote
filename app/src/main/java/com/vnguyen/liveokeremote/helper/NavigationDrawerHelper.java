@@ -661,6 +661,7 @@ public class NavigationDrawerHelper {
                         (new AlertDialogHelper(context)).
                                 popupIPAddressDialog("LiveOke IP Address", "Enter IP Address",
                                         adapter.getItem(position),adapter);
+                        mDrawerList.setItemChecked(IP_ADDRESS, false);
                         break;
                     case YOUR_PHOTO:
                         // your photo
