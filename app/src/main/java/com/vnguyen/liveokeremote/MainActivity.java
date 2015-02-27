@@ -385,9 +385,13 @@ public class MainActivity extends ActionBarActivity {
                 if (liveOkeUDPClient != null) {
                     if (liveOkeUDPClient.doneGettingSongList) {
                         toggleOff();
-                        if (liveOkeUDPClient.pingCount > 5) {
+                        String ip = PreferencesHelper.getInstance(MainActivity.this).getPreference("ipAddress");
+                        if (liveOkeUDPClient.pingCount > 0) {
                             // after about 10 pings without pong, reset the address
-                            liveOkeUDPClient.liveOkeIPAddress = null;
+                            // only if no ipAddress in Preference.
+                            if (ip == null || ip.equals("")) {
+                                liveOkeUDPClient.liveOkeIPAddress = null;
+                            }
                         }
                         liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress, LiveOkeUDPClient.LIVEOKE_UDP_PORT);
                         liveOkeUDPClient.pingCount++;

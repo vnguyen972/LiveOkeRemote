@@ -8,6 +8,7 @@ import android.net.wifi.WifiManager;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.helper.LogHelper;
+import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.math.BigInteger;
@@ -38,6 +39,7 @@ public abstract class LiveOkeUDPClient extends BroadcastReceiver {
         this.udpListenerService = udpListenerService;
         doneGettingSongList = true;
         rsvpList = new ArrayList<>();
+        liveOkeIPAddress = PreferencesHelper.getInstance(this.context).getPreference("ipAddress");
         initClient();
     }
 

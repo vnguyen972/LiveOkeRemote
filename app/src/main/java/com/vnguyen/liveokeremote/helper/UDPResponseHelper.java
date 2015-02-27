@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -19,13 +20,13 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
 import com.vnguyen.liveokeremote.ChatAdapter;
+import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.data.LiveOkeRemoteBroadcastMsg;
 import com.vnguyen.liveokeremote.data.ReservedListItem;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.data.User;
-import com.vnguyen.liveokeremote.service.UDPListenerService;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -231,8 +232,14 @@ public class UDPResponseHelper {
                 }
             } else {
                 // Process LiveOke Msg here
-                context.liveOkeUDPClient.liveOkeIPAddress = senderIP;
+                String ipSet = PreferencesHelper.getInstance(context).getPreference("ipAddress");
+                if (ipSet == null || ipSet.equals("")) {
+                    context.liveOkeUDPClient.liveOkeIPAddress = senderIP;
+                } else {
+                    context.liveOkeUDPClient.liveOkeIPAddress = ipSet;
+                }
                 if (senderMSG.equalsIgnoreCase("Pong")) {
+                    Log.v(LiveOkeRemoteApplication.TAG, "Received Pong.");
                     context.liveOkeUDPClient.pingCount = 0;
                     context.runOnUiThread(new Runnable() {
                         @Override

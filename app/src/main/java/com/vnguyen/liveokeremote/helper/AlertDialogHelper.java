@@ -216,7 +216,8 @@ public class AlertDialogHelper {
                         // store into Preference
                         PreferencesHelper.getInstance(context).setStringPreference(
                                 context.getResources().getString(R.string.ip_adress), value);
-                        context.wsInfo.ipAddress = value;
+                        context.liveOkeUDPClient.liveOkeIPAddress = value;
+                        context.liveOkeUDPClient.pingCount = 0;
                         Toast.makeText(context, "IP Address Set To: " + value, Toast.LENGTH_LONG).show();
                         // Change the list item by appending the IP to it
                         if (value != null && !value.equals("")) {
