@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -407,8 +408,15 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         swipeLayout.toggle();
                                     }
                                 })
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onNeutral(MaterialDialog dialog) {
+                                        context.friendsListHelper.displayFriendsListPanel();
+                                    }
+                                })
                                 .positiveText("Choose")
                                 .negativeText("Cancel")
+                                .neutralText("Add New Friend")
                                 .show();
                     } else {
                         // no friends yet
