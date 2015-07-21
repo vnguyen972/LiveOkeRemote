@@ -165,12 +165,6 @@ public class NotificationHelper {
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(context,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         expandedView.setOnClickPendingIntent(R.id.nextIcon, pendingNextIntent);
 
-        // quit button
-        Intent quitIntent = new Intent(LIVEOKE_NOTIFICATION_QUIT);
-        quitIntent.putExtra("command", "quit");
-        PendingIntent pendingQuitIntent = PendingIntent.getBroadcast(context,0,quitIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        expandedView.setOnClickPendingIntent(R.id.nextIcon, pendingQuitIntent);
-
         //expandedView.setOnClickPendingIntent(R.id.notification_msg,pendingAppIntent);
 
         notificationBuilder.setContent(expandedView);
