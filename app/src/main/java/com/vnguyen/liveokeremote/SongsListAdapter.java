@@ -129,9 +129,15 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                         @SuppressLint("NewApi")
                         @Override
                         protected void onPostExecute(Void aVoid) {
+                            // @todo: research to fix this July 2015
                             dialog = new MaterialDialog.Builder(context)
                                     .title(Html.fromHtml("Found <font color='#009688'>" + song.title + "</font> Online: "))
-                                    .adapter(adapter)
+                                    .adapter(adapter, new MaterialDialog.ListCallback() {
+                                        @Override
+                                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+
+                                        }
+                                    })
                                     .build();
                             dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
                                 @Override
@@ -362,9 +368,9 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                         new MaterialDialog.Builder(context)
                                 .title("Reserve for a friend")
                                 .items(frNames)
-                                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                                     @Override
-                                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                    public boolean onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                                         LogHelper.i("Selected: " + charSequence);
                                         //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                         if (context.liveOkeUDPClient != null) {
@@ -406,6 +412,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                                     .text("ERROR: Not Connected"));
                                         }
                                         swipeLayout.toggle();
+                                        return true;
                                     }
                                 })
                                 .callback(new MaterialDialog.ButtonCallback() {

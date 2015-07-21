@@ -276,10 +276,10 @@ public class NavigationDrawerHelper {
                 } else if (mDrawerList.getCheckedItemPosition() == COMMENT_TO_SCREEN) {
                     // send comment to screen
                     final EditText input = new EditText(context);
-                    new MaterialDialog.Builder(context)
+                    MaterialDialog show = new MaterialDialog.Builder(context)
                             .title("Send your comment to TV Screen:")
                             .theme(Theme.LIGHT)  // the default is light, so you don't need this line
-                            .customView(input)
+                            .customView(input,true)
                             .positiveText("OK")
                             .negativeText("CANCEL")
                             .callback(new MaterialDialog.ButtonCallback() {
@@ -319,15 +319,16 @@ public class NavigationDrawerHelper {
                     new MaterialDialog.Builder(context)
                             .title("Display Song Initial Icon By")
                             .items(options)
-                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                                 @Override
-                                public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                public boolean onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                                     //LogHelper.e("Selected: " + charSequence);
                                     context.app.songInitialIconBy = charSequence+"";
                                     PreferencesHelper.getInstance(context).setStringPreference(
                                             context.getResources().getString(R.string.song_initial_icon), charSequence+"");
                                     context.getPagerTitles();
                                     context.updateMainDisplay();
+                                    return true;
                                 }
                             })
                             .positiveText("Choose")
@@ -358,9 +359,9 @@ public class NavigationDrawerHelper {
                     new MaterialDialog.Builder(context)
                             .title("Display Song Description With")
                             .items(options)
-                            .itemsCallbackMultiChoice(selectedIdx, new MaterialDialog.ListCallbackMulti() {
+                            .itemsCallbackMultiChoice(selectedIdx, new MaterialDialog.ListCallbackMultiChoice() {
                                 @Override
-                                public void onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                                public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
                                     context.app.displaySongDescFrom = new ArrayList<>();
                                     for (CharSequence charSeq : charSequences) {
                                         //LogHelper.v("Selected: " + charSeq);
@@ -370,6 +371,7 @@ public class NavigationDrawerHelper {
                                     PreferencesHelper.getInstance(context).addSongDescDisplay(context.app.displaySongDescFrom);
                                     context.getPagerTitles();
                                     context.updateMainDisplay();
+                                    return true;
                                 }
                             })
                             .positiveText("Choose")
@@ -675,10 +677,10 @@ public class NavigationDrawerHelper {
                         new MaterialDialog.Builder(context)
                                 .title("Reserve for a friend")
                                 .items(choices)
-                                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallback() {
+                                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                                     @SuppressLint("NewApi")
                                     @Override
-                                    public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
+                                    public boolean onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                                         LogHelper.e("Selected: " + charSequence);
                                         if (charSequence.toString().equalsIgnoreCase("Set new avatar")) {
                                             (new AlertDialogHelper(context)).popupFileChooser(
@@ -692,6 +694,7 @@ public class NavigationDrawerHelper {
                                             context.me.avatar =  bd;
                                             PreferencesHelper.getInstance(context).remoteMyAvatar();
                                         }
+                                        return true;
                                     }
 
                                 })

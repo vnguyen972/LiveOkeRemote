@@ -67,7 +67,7 @@ public class FloatingButtonsHelper {
                 new MaterialDialog.Builder(context)
                         .title("Add a new friend")
                         .theme(Theme.LIGHT)
-                        .customView(input)
+                        .customView(input,true)
                         .positiveText("OK")
                         .titleColor(R.color.half_black)
                         .negativeText("Cancel")

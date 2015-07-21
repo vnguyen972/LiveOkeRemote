@@ -58,7 +58,7 @@ public class AlertDialogHelper {
             if (splashDialog == null) {
                 splashDialog = new MaterialDialog.Builder(context)
                         .title("Loading Application...")
-                        .customView(R.layout.splash_dialog)
+                        .customView(R.layout.splash_dialog,true)
                         .build();
             }
         splashDialog.show();
@@ -74,7 +74,7 @@ public class AlertDialogHelper {
         if (progressDialog == null) {
             progressDialog = new MaterialDialog.Builder(context)
                     .title("Please wait")
-                    .customView(R.layout.progress_dialog)
+                    .customView(R.layout.progress_dialog,true)
                     .build();
         }
         View customView = progressDialog.getCustomView();
@@ -103,7 +103,7 @@ public class AlertDialogHelper {
                 .title("Hello, what is your name?")
                 .theme(Theme.LIGHT)
                 .positiveText("OK")
-                .customView(input)
+                .customView(input,true)
                 .titleColor(R.color.half_black)
                 .callback(new MaterialDialog.ButtonCallback(){
                     @Override
@@ -139,7 +139,7 @@ public class AlertDialogHelper {
                 .content("Enter IP Address")
                 .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                 .positiveText("OK")
-                .customView(input)
+                .customView(input,true)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
                 .callback(new MaterialDialog.ButtonCallback() {
@@ -171,7 +171,7 @@ public class AlertDialogHelper {
                 .title(title)
                 .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                 .positiveText("OK")
-                .customView(input)
+                .customView(input,true)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
                 .callback(new MaterialDialog.ButtonCallback() {
@@ -201,7 +201,7 @@ public class AlertDialogHelper {
                 .content(dialogMsg)
                 .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                 .positiveText("OK")
-                .customView(input)
+                .customView(input,true)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
                 .callback(new MaterialDialog.ButtonCallback() {
