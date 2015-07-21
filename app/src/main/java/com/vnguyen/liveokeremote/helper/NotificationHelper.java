@@ -28,6 +28,7 @@ public class NotificationHelper {
     public static String LIVEOKE_NOTIFICATION_NEXT = "Notification-Next";
     public static String LIVEOKE_NOTIFICATION_MIC_ON = "Notification-Mic-On";
     public static String LIVEOKE_NOTIFICATION_MIC_OFF = "Notification-Mic-Off";
+    public static String LIVEOKE_NOTIFICATION_QUIT = "Notification-Quit";
     public static String LIVEOKE_NOTIFICATION_APP = "Notification-App";
 
     // flag to control icon switch logic
@@ -107,7 +108,7 @@ public class NotificationHelper {
                 new NotificationCompat.Builder(context)
                         .setDefaults(Notification.DEFAULT_LIGHTS)
                         .setSmallIcon(R.drawable.microphone_icon)
-                        .setOngoing(true) // cannot swipe to remove, only to be removed by app
+                        .setOngoing(false) // can swipe to remove
                         .setAutoCancel(false)
                         .setVibrate(null) // no vibration on this notification -> not annoying
                         .setContentIntent(pendingAppIntent)
@@ -163,6 +164,12 @@ public class NotificationHelper {
         nextIntent.putExtra("command", "next");
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(context,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         expandedView.setOnClickPendingIntent(R.id.nextIcon, pendingNextIntent);
+
+        // quit button
+        Intent quitIntent = new Intent(LIVEOKE_NOTIFICATION_QUIT);
+        quitIntent.putExtra("command", "quit");
+        PendingIntent pendingQuitIntent = PendingIntent.getBroadcast(context,0,quitIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        expandedView.setOnClickPendingIntent(R.id.nextIcon, pendingQuitIntent);
 
         //expandedView.setOnClickPendingIntent(R.id.notification_msg,pendingAppIntent);
 

@@ -54,7 +54,8 @@ public class UDPResponseHelper {
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PAUSE) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_NEXT) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_OFF) ||
-                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_ON)) {
+                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_MIC_ON) ||
+                intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_QUIT)) {
             LogHelper.v( "Received intent: " + intent);
             dumpIntent(intent);
             senderMSG = intent.getStringExtra("command");
@@ -93,6 +94,9 @@ public class UDPResponseHelper {
 //                    context.notificationHelper.micOn = true;
 //                    context.notificationHelper.addNotification();
 //                }
+                break;
+            case "quit":
+                context.onBackPressed();
                 break;
             default:
                 break;
