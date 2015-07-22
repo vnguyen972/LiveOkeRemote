@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import com.vnguyen.liveokeremote.MainActivity;
 import com.vnguyen.liveokeremote.data.Song;
@@ -269,7 +270,7 @@ public class SongListDataSource {
     }
 
     public void deleteFavorite(String asciiTitle) {
-        int rows = database.delete(SongListTable.FavoriteList.TABLE_NAME,"ascii_title = '" + asciiTitle + "'", null);
+        int rows = database.delete(SongListTable.FavoriteList.TABLE_NAME, "ascii_title = '" + asciiTitle + "'", null);
     }
 
     public void unFavorite(long favID, long activeK7ConnectionID, String songID) {
@@ -412,9 +413,13 @@ public class SongListDataSource {
             //query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type from songslist where upper(substr(title,1,1)) in " + keys + " and language='"+field+"'";// order by ascii_title asc";
             query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where language='"+field+"' limit 100 offset " + offset;
         } else {
+            LogHelper.i("KEY = " + keys);
+            if (keys != null) {
+                keys = keys.replace("?Unavailable", "");
+            }
             query = "select songId,title,ascii_title,singer,ascii_singer,songPath,type,author,producer from songslist where upper(substr("+field+",1,1)) in " + keys;// + " order by ascii_title asc";
         }
-        LogHelper.d("Query = " + query);
+        LogHelper.i("Query = " + query);
         Cursor cursor = database.rawQuery(query, null);
         if (cursor != null) {
             //Log.d("K7","cursor size = " + cursor.getCount());
@@ -429,7 +434,12 @@ public class SongListDataSource {
                     if (context.app.songInitialIconBy.equalsIgnoreCase("Title")) {
                         song.icon = (new DrawableHelper()).buildDrawable(song.title.substring(0, 1), "round");
                     } else if (context.app.songInitialIconBy.equalsIgnoreCase("Singer")) {
-                        song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
+                        if (song.singer != null && song.singer.length() > 0) {
+                            song.icon = (new DrawableHelper()).buildDrawable(song.singer.substring(0, 1), "round");
+                        } else {
+                            LogHelper.i("SONG WITH NO SINGER: " + song.title);
+                            song.icon = (new DrawableHelper()).buildDrawable("?", "round");
+                        }
                     } else if (context.app.songInitialIconBy.equalsIgnoreCase("Author")) {
                         if (song.author != null && !song.author.equals("")) {
                             song.icon = (new DrawableHelper()).buildDrawable(song.author.substring(0, 1), "round");
