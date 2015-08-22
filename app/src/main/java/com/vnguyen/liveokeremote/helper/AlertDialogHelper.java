@@ -198,7 +198,6 @@ public class AlertDialogHelper {
         }
         new MaterialDialog.Builder(context)
                 .title(title)
-                .content(dialogMsg)
                 .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                 .positiveText("OK")
                 .customView(input,true)
