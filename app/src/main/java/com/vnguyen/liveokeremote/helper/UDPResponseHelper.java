@@ -48,7 +48,7 @@ public class UDPResponseHelper {
             String senderIP = intent.getStringExtra("senderIP");
             int senderPORT = intent.getIntExtra("senderPORT", 0);
             senderMSG = intent.getStringExtra("message");
-            LogHelper.v( "Received msg: " + senderMSG);
+            LogHelper.i( "Received msg: " + senderMSG);
             processMessage(senderIP, senderMSG);
         } else if (intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PLAY) ||
                 intent.getAction().equalsIgnoreCase(NotificationHelper.LIVEOKE_NOTIFICATION_PAUSE) ||
@@ -59,7 +59,7 @@ public class UDPResponseHelper {
             LogHelper.v( "Received intent: " + intent);
             dumpIntent(intent);
             senderMSG = intent.getStringExtra("command");
-            LogHelper.v( "Received message: " + senderMSG);
+            LogHelper.i( "Received message: " + senderMSG);
             processNotification(senderMSG);
         }
     }
@@ -237,6 +237,7 @@ public class UDPResponseHelper {
             } else {
                 // Process LiveOke Msg here
                 String ipSet = PreferencesHelper.getInstance(context).getPreference("ipAddress");
+                LogHelper.i("senderMsg = " + senderMSG);
                 if (ipSet == null || ipSet.equals("")) {
                     context.liveOkeUDPClient.liveOkeIPAddress = senderIP;
                 } else {
@@ -342,7 +343,9 @@ public class UDPResponseHelper {
                         context.liveOkeUDPClient.rsvpList.clear();
                     }
                     String msgList = senderMSG.substring(8, senderMSG.length());
+                    LogHelper.v("msgList = " + msgList);
                     StringTokenizer stok = new StringTokenizer(msgList, " ");
+
                     while (stok.hasMoreTokens()) {
                         StringTokenizer reqTok = new StringTokenizer(stok.nextToken(), ".");
                         if (reqTok.hasMoreTokens()) {
