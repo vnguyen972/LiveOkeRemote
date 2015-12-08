@@ -7,8 +7,10 @@ android {
         applicationId 'com.vnguyen.liveokeremote'
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 26
-        versionName "1.3.9"
+        versionCode 27
+        versionName "1.4.0"
+        // Enabling multidex support.
+        multiDexEnabled true
     }
     repositories {
         maven {
@@ -57,4 +59,8 @@ dependencies {
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     //compile files('libs/jMusixMatch-1.1.2.jar')
     compile project (':discrete-seek-bar-library')
+    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.google.apis:google-api-services-youtube:v3-rev155-1.21.0'
+    compile files('libs/google-oauth-client-java6-1.21.0.jar')
+    compile files('libs/google-oauth-client-jetty-1.21.0.jar')
 }

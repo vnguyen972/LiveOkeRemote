@@ -139,7 +139,7 @@ public class AlertDialogHelper {
                 .content("Enter IP Address")
                 .theme(Theme.LIGHT)  // the default is light, so you don't need this line
                 .positiveText("OK")
-                .customView(input,true)
+                .customView(input, true)
                 .titleColor(R.color.half_black)
                 .negativeText("CANCEL")
                 .callback(new MaterialDialog.ButtonCallback() {
@@ -160,6 +160,31 @@ public class AlertDialogHelper {
                     }
                 })
                 .show();
+    }
+
+    public void popupSearchYouTube(String title) {
+        final EditText input = new EditText(context);
+        new MaterialDialog.Builder(context)
+                .title(title)
+                .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                .positiveText("OK")
+                .customView(input,true)
+                .titleColor(R.color.half_black)
+                .negativeText("CANCEL")
+                .callback(new MaterialDialog.ButtonCallback() {
+
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                    }
+
+                    @Override
+                    public void onPositive(MaterialDialog materialDialog) {
+                        String value = input.getEditableText().toString().trim();
+
+                    }
+                })
+                .show();
+
     }
     public void popupMasterCode(String title) {
         final EditText input = new EditText(context);

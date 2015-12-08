@@ -29,6 +29,7 @@ import com.vnguyen.liveokeremote.NavDrawerListAdapter;
 import com.vnguyen.liveokeremote.R;
 import com.vnguyen.liveokeremote.SongListRetriever;
 import com.vnguyen.liveokeremote.data.NavDrawerItem;
+import com.vnguyen.liveokeremote.youtube.YTVideoItem;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -46,6 +48,7 @@ public class NavigationDrawerHelper {
     private Handler mHandler = new Handler();
     public NavDrawerListAdapter navAdapter;
 
+
     // MUST match the order of the text on strings.xml (nav_menu_items)
     public static final int HOME = 0;
     public static final int HEADER_1 = 1;
@@ -54,19 +57,20 @@ public class NavigationDrawerHelper {
     public static final int EN_SONGS = 4;
     public static final int CN_SONGS = 5;
     public static final int HEADER_2 = 6;
-    public static final int ADJUST_VOLUME = 7;
-    public static final int COMMENT_TO_SCREEN = 8;
-    public static final int TOGGLE_FULL_SCREEN = 9;
-    public static final int BACKUP_TO_SD = 10;
-    public static final int UPDATE_SONGS_LIST = 11;
-    public static final int HEADER_3 = 12;
-    public static final int FRIENDS_LIST = 13;
-    public static final int YOUR_PHOTO = 14;
-    public static final int IP_ADDRESS = 15;
-    public static final int MASTER_CODE = 16;
-    public static final int SONG_INITIAL_ICON_BY = 17;
-    public static final int DISPLAY_SONG_DESC_WITH = 18;
-    public static final int HELP = 19;
+    public static final int SEARCH_YOUTUBE = 7;
+    public static final int ADJUST_VOLUME = 8;
+    public static final int COMMENT_TO_SCREEN = 9;
+    public static final int TOGGLE_FULL_SCREEN = 10;
+    public static final int BACKUP_TO_SD = 11;
+    public static final int UPDATE_SONGS_LIST = 12;
+    public static final int HEADER_3 = 13;
+    public static final int FRIENDS_LIST = 14;
+    public static final int YOUR_PHOTO = 15;
+    public static final int IP_ADDRESS = 16;
+    public static final int MASTER_CODE = 17;
+    public static final int SONG_INITIAL_ICON_BY = 18;
+    public static final int DISPLAY_SONG_DESC_WITH = 19;
+    public static final int HELP = 20;
 
     public NavigationDrawerHelper(Context context) {
         this.context = (MainActivity)context;
@@ -247,13 +251,12 @@ public class NavigationDrawerHelper {
                     mDrawerList.setItemChecked(UPDATE_SONGS_LIST, false);
                 } else if (mDrawerList.getCheckedItemPosition() == ADJUST_VOLUME) {
                     MaterialDialog dialog = new MaterialDialog.Builder(context)
-                        .title("Adjust LiveOke Volume")
-                        .theme(Theme.LIGHT)
-                        .titleColor(R.color.primary)
-                        .customView(R.layout.volume_control,false)
-                        .autoDismiss(false)
-                        .build()
-                        ;
+                            .title("Adjust LiveOke Volume")
+                            .theme(Theme.LIGHT)
+                            .titleColor(R.color.primary)
+                            .customView(R.layout.volume_control, false)
+                            .autoDismiss(false)
+                            .build();
                     DiscreteSeekBar volBar = (DiscreteSeekBar) dialog.getCustomView().findViewById(R.id.vol_control_bar);
                     String vol = PreferencesHelper.getInstance(context).getPreference("volume");
                     if (vol == null || vol.equals("")) {
@@ -263,7 +266,7 @@ public class NavigationDrawerHelper {
                     volBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
                         @Override
                         public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                            PreferencesHelper.getInstance(context).setStringPreference("volume",value+"");
+                            PreferencesHelper.getInstance(context).setStringPreference("volume", value + "");
                             if (context.liveOkeUDPClient != null) {
                                 context.liveOkeUDPClient.sendMessage("volume," + value,
                                         context.liveOkeUDPClient.liveOkeIPAddress,
@@ -273,6 +276,30 @@ public class NavigationDrawerHelper {
                     });
                     dialog.show();
                     mDrawerList.setItemChecked(ADJUST_VOLUME, false);
+                } else if (mDrawerList.getCheckedItemPosition() == SEARCH_YOUTUBE) {
+                    // search YouTube
+                    final EditText input = new EditText(context);
+                    MaterialDialog show = new MaterialDialog.Builder(context)
+                            .title("Search On YouTube:")
+                            .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                            .customView(input,true)
+                            .positiveText("OK")
+                            .negativeText("CANCEL")
+                            .callback(new MaterialDialog.ButtonCallback() {
+
+                                @Override
+                                public void onNegative(MaterialDialog materialDialog) {
+                                }
+
+                                @Override
+                                public void onPositive(MaterialDialog materialDialog) {
+                                    String value = input.getEditableText().toString().trim();
+                                    LogHelper.i("Search On YouTube for: " + value);
+                                    context.searchOnYoutube(value);
+                                }
+                            })
+                            .show();
+                    mDrawerList.setItemChecked(SEARCH_YOUTUBE,false);
                 } else if (mDrawerList.getCheckedItemPosition() == COMMENT_TO_SCREEN) {
                     // send comment to screen
                     final EditText input = new EditText(context);
@@ -557,6 +584,14 @@ public class NavigationDrawerHelper {
                     updateSongsListIcon.setIcon("gmd-assignment-turned-in");
                     updateSongsListIcon.setIconColor(context.getResources().getColor(R.color.primary));
                     iconDrawable = updateSongsListIcon;
+                    showCounter = false;
+                    break;
+                case SEARCH_YOUTUBE:
+                    // enable search youtube?
+                    IconicFontDrawable youtubeIcon = new IconicFontDrawable(context.getApplicationContext());
+                    youtubeIcon.setIcon("fa-youtube-play");
+                    youtubeIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    iconDrawable = youtubeIcon;
                     showCounter = false;
                     break;
                 case ADJUST_VOLUME:

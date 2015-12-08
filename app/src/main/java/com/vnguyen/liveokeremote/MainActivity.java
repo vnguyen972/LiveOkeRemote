@@ -76,7 +76,10 @@ import com.vnguyen.liveokeremote.helper.PreferencesHelper;
 import com.vnguyen.liveokeremote.helper.RsvpPanelHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
 import com.vnguyen.liveokeremote.helper.UDPResponseHelper;
+import com.vnguyen.liveokeremote.helper.YouTubeHelper;
 import com.vnguyen.liveokeremote.service.UDPListenerService;
+import com.vnguyen.liveokeremote.youtube.YTConnector;
+import com.vnguyen.liveokeremote.youtube.YTVideoItem;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -84,6 +87,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -156,6 +160,10 @@ public class MainActivity extends ActionBarActivity {
     public NotificationHelper notificationHelper;
     public boolean isInForegroundMode;
 
+    // YouTube
+    public YTConnector youtube;
+    List<YTVideoItem> ytSearchResults;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -176,6 +184,7 @@ public class MainActivity extends ActionBarActivity {
         chatHelper = new ChatHelper(this);
         easyRatingDialog = new EasyRatingDialog(this);
         mediaPlayer = new MediaPlayer();
+        youtube = new YTConnector(this);
         notificationHelper = new NotificationHelper(MainActivity.this);
 
         setContentView(R.layout.activity_main);
@@ -664,6 +673,23 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void searchOnYoutube(final String keywords){
+        new Thread(){
+            public void run(){
+                youtube = new YTConnector(MainActivity.this);
+                ytSearchResults = youtube.search(keywords);
+                handler.post(new Runnable(){
+                    public void run(){
+                        //updateVideosFound();
+                        LogHelper.i("Youtube videos found: " + ytSearchResults.size());
+                        getPagerYouTube();
+                        updateMainDisplay();
+                    }
+                });
+            }
+        }.start();
+    }
+
     public void updateRsvpCounter(int count) {
         Log.v(LiveOkeRemoteApplication.TAG, "count = " + count);
         if (count != 0) {
@@ -810,6 +836,12 @@ public class MainActivity extends ActionBarActivity {
             db.close();
         }
     }
+
+    public void getPagerYouTube() {
+        listingBy = "youtube";
+        pagerTitles = YouTubeHelper.ytNumPages(ytSearchResults.size(), youtube.maxResults);
+    }
+
     public void getPagerSearch(String searchStr) {
         try {
             db.open();

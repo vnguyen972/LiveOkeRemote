@@ -12,8 +12,10 @@ import android.widget.ListView;
 
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
+import com.vnguyen.liveokeremote.helper.DrawableHelper;
 import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.SongHelper;
+import com.vnguyen.liveokeremote.youtube.YTVideoItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +37,7 @@ public class SongListFragment extends Fragment {
         sortedKeys.addAll(ma.pagerTitles.keySet());
         Collections.sort(sortedKeys);
         final String key = sortedKeys.get(getArguments().getInt(ARG_SECTION_NUMBER));
-        LogHelper.v("SongListFragment.key = " + key);
+        LogHelper.i("SongListFragment.key = " + key);
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
@@ -54,6 +56,8 @@ public class SongListFragment extends Fragment {
                             ma.listingBy.equalsIgnoreCase("EN") ||
                             ma.listingBy.equalsIgnoreCase("CN")) {
                         songsList = db.getSongByKeys(ma.listingBy,key, ma.searchStr);
+                    } else if (ma.listingBy.equalsIgnoreCase("youtube")) {
+                        songsList = getYTSongByKeys(ma,key);
                     }
                     LogHelper.i("SongListFragment-listing by: " + ma.listingBy);
                     LogHelper.i("Songs found: " + songsList.size());
@@ -86,6 +90,21 @@ public class SongListFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    private ArrayList<Song> getYTSongByKeys(MainActivity ma, String key) {
+        ArrayList<Song> ytList = new ArrayList<Song>();
+        for (YTVideoItem ytVideo : ma.ytSearchResults) {
+            Song song = new Song();
+            song.title = ytVideo.getTitle();
+            song.id = ytVideo.getId();
+            song.icon = (new DrawableHelper()).buildDrawable(song.id.substring(0, 1), "round");
+            song.singer = "YouTube";
+            song.producer = "YouTube";
+            song.type = "online";
+            ytList.add(song);
+        }
+        return ytList;
     }
 
 }
