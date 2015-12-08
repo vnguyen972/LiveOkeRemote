@@ -30,7 +30,7 @@ public class SongListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = (View) inflater.inflate(R.layout.song_list_fragment,container,false);
+        View rootView = (View) inflater.inflate(R.layout.song_list_fragment, container, false);
         final MainActivity ma = (MainActivity) getActivity();
         songListView = (ListView) rootView.findViewById(R.id.songs_list);
         ArrayList<String> sortedKeys = new ArrayList<>();
@@ -94,6 +94,7 @@ public class SongListFragment extends Fragment {
 
     private ArrayList<Song> getYTSongByKeys(MainActivity ma, String key) {
         ArrayList<Song> ytList = new ArrayList<Song>();
+        ma.ytSearchResults = ma.youtube.search(ma.searchStr);
         for (YTVideoItem ytVideo : ma.ytSearchResults) {
             Song song = new Song();
             song.title = ytVideo.getTitle();

@@ -21,8 +21,11 @@ import java.util.List;
  */
 public class YTConnector {
     private YouTube youtube;
-    private YouTube.Search.List query;
+    public YouTube.Search.List query;
     public int maxResults = 50;
+    public String nextPageToken = null;
+    public String prevPageToken = null;
+    public int totalResults = 0;
 
     // Your developer key goes here
     public static final String KEY
@@ -39,7 +42,7 @@ public class YTConnector {
             query = youtube.search().list("id,snippet");
             query.setKey(KEY);
             query.setType("video");
-            query.setFields("items(id/videoId,snippet/title,snippet/description,snippet/thumbnails/default/url)");
+            //query.setFields("items(id/videoId,snippet/title,snippet/description,snippet/thumbnails/default/url)");
             query.setMaxResults(new Long(maxResults));
         }catch(Exception e){
             LogHelper.e("YTConnector: ",e);
@@ -51,7 +54,12 @@ public class YTConnector {
         try{
             SearchListResponse response = query.execute();
             List<SearchResult> results = response.getItems();
-
+            nextPageToken = response.getNextPageToken();
+            prevPageToken = response.getPrevPageToken();
+            LogHelper.i("Next Page Token = " + nextPageToken);
+            LogHelper.i("Previous Page Token = " + prevPageToken);
+            totalResults = response.getPageInfo().getTotalResults().intValue();
+            LogHelper.i("Total Results: " + totalResults);
             List<YTVideoItem> items = new ArrayList<YTVideoItem>();
             for(SearchResult result:results){
                 YTVideoItem item = new YTVideoItem();
