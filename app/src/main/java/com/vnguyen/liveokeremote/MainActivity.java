@@ -137,14 +137,6 @@ public class MainActivity extends ActionBarActivity {
     public BadgeView badge;
     public MenuItem onOffSwitch;
     public ViewPager mViewPager;
-    // left: -1 right: +1 center: 0
-    public int scroll = 0;
-    // set only on 'onPageSelected' use it in 'onPageScrolled'
-    // if currentpage < page : swipe right
-    // if currentpage > page : swipe left or centered
-    public int currentPage = 0;
-    public int currentOffset = 0;
-    public float currentScale = 0;
     public SongsListPageAdapter mSongsListPagerAdapter;
     public Menu mainMenu;
 
@@ -171,6 +163,7 @@ public class MainActivity extends ActionBarActivity {
     // YouTube
     public YTConnector youtube;
     List<YTVideoItem> ytSearchResults;
+    ConcurrentHashMap<String,String> tokenMap = new ConcurrentHashMap<>();
 
     @Override
     protected void onStart() {
@@ -293,47 +286,6 @@ public class MainActivity extends ActionBarActivity {
         getPagerTitles();
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (positionOffset != 0 && positionOffsetPixels > 10) {
-                    if (currentOffset > positionOffsetPixels && currentScale > positionOffset && (position + 1) == currentPage) {
-                        if (scroll != -1) {
-                            scroll = -1;
-                            if (youtube.prevPageToken != null) {
-                                youtube.query.setPageToken(youtube.prevPageToken);
-                            }
-                            LogHelper.i("Scroll: left");
-                        }
-                    } else if (currentOffset < positionOffsetPixels && currentScale < positionOffset && position == currentPage) {
-                        if (scroll != 1) {
-                            scroll = 1;
-                            if (youtube.nextPageToken != null) {
-                                youtube.query.setPageToken(youtube.nextPageToken);
-                            }
-                            LogHelper.i("Scroll: right");
-                        }
-                    }
-                    currentOffset = positionOffsetPixels;
-                    currentScale = positionOffset;
-                }
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                LogHelper.i("selected: center");
-                // we are centered, reset class variables
-                currentPage = position;
-                currentScale = 0;
-                currentOffset = 0;
-                scroll = 0;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
         // Load Shared Preference
         String initialIconBy = PreferencesHelper.getInstance(this).getPreference(getResources().getString(R.string.song_initial_icon));
@@ -727,9 +679,13 @@ public class MainActivity extends ActionBarActivity {
         new Thread(){
             public void run(){
                 youtube = new YTConnector(MainActivity.this);
+                youtube.query.setFields("pageInfo,nextPageToken,prevPageToken");
                 ytSearchResults = youtube.search(keywords);
                 handler.post(new Runnable(){
                     public void run(){
+                        // inititalize the 1st two pages
+                        tokenMap.put("01", "");
+                        tokenMap.put("02", youtube.nextPageToken);
                         LogHelper.i("Youtube videos found: " + ytSearchResults.size());
                         getPagerYouTube();
                         updateMainDisplay();

@@ -15,7 +15,7 @@ public class YouTubeHelper {
         } else {
             numKeys = (total / maxSize);
         }
-        LogHelper.d("value: " + numKeys);
+        LogHelper.i("numKeys: " + numKeys);
         int size = maxSize;
         int num = total;
         for (int i = 1; i <= numKeys; i++)  {

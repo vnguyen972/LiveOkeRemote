@@ -19,6 +19,8 @@ import com.vnguyen.liveokeremote.youtube.YTVideoItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 
 
 public class SongListFragment extends Fragment {
@@ -37,7 +39,7 @@ public class SongListFragment extends Fragment {
         sortedKeys.addAll(ma.pagerTitles.keySet());
         Collections.sort(sortedKeys);
         final String key = sortedKeys.get(getArguments().getInt(ARG_SECTION_NUMBER));
-        LogHelper.i("SongListFragment.key = " + key);
+        //LogHelper.i("SongListFragment.key = " + key);
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
@@ -94,7 +96,37 @@ public class SongListFragment extends Fragment {
 
     private ArrayList<Song> getYTSongByKeys(MainActivity ma, String key) {
         ArrayList<Song> ytList = new ArrayList<Song>();
+        ma.youtube.query.setFields(null);
+        String token = ma.tokenMap.get(key);
+        if (token != null) {
+            if (token.equals("")) {
+                ma.youtube.query.setPageToken(null);
+            } else {
+                ma.youtube.query.setPageToken(ma.tokenMap.get(key));
+            }
+        }
+        LogHelper.i("YT Query = " + ma.youtube.query + "- Key = " + key);
         ma.ytSearchResults = ma.youtube.search(ma.searchStr);
+        int nextKey = Integer.parseInt(key) + 1;
+        String nextKeyStr = (nextKey < 10 ? "0"+nextKey : ""+nextKey);
+        int prevKey = Integer.parseInt(key) - 1;
+        String prevKeyStr = (prevKey < 10 ? "0"+prevKey : ""+prevKey);
+        LogHelper.i("prevKey = " + prevKeyStr + " - nextKey = " + nextKeyStr);
+        if (!ma.tokenMap.containsKey(nextKeyStr)) {
+            ma.tokenMap.put(nextKeyStr, ma.youtube.nextPageToken);
+        }
+        if (prevKey > 0) {
+            if (ma.tokenMap.containsKey(prevKeyStr)) {
+                //LogHelper.i("In here?");
+                ma.tokenMap.put(prevKeyStr, ma.youtube.prevPageToken);
+            }
+        }
+//        Set keySet = ma.tokenMap.keySet();
+//        for (Iterator<String> it = keySet.iterator();it.hasNext();) {
+//            String k = it.next();
+//            String val = ma.tokenMap.get(k);
+//            LogHelper.i("k = " + k + "- v = " + val);
+//        }
         for (YTVideoItem ytVideo : ma.ytSearchResults) {
             Song song = new Song();
             song.title = ytVideo.getTitle();

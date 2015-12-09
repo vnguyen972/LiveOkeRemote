@@ -61,13 +61,17 @@ public class YTConnector {
             totalResults = response.getPageInfo().getTotalResults().intValue();
             LogHelper.i("Total Results: " + totalResults);
             List<YTVideoItem> items = new ArrayList<YTVideoItem>();
-            for(SearchResult result:results){
-                YTVideoItem item = new YTVideoItem();
-                item.setTitle(result.getSnippet().getTitle());
-                item.setDescription(result.getSnippet().getDescription());
-                item.setThumbnailURL(result.getSnippet().getThumbnails().getDefault().getUrl());
-                item.setId(result.getId().getVideoId());
-                items.add(item);
+            if (results != null) {
+                for (SearchResult result : results) {
+                    YTVideoItem item = new YTVideoItem();
+                    if (result.getSnippet() != null) {
+                        item.setTitle(result.getSnippet().getTitle());
+                        item.setDescription(result.getSnippet().getDescription());
+                        item.setThumbnailURL(result.getSnippet().getThumbnails().getDefault().getUrl());
+                    }
+                    item.setId(result.getId().getVideoId());
+                    items.add(item);
+                }
             }
             return items;
         }catch(Exception e){

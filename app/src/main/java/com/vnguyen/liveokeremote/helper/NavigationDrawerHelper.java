@@ -590,7 +590,7 @@ public class NavigationDrawerHelper {
                     // enable search youtube?
                     IconicFontDrawable youtubeIcon = new IconicFontDrawable(context.getApplicationContext());
                     youtubeIcon.setIcon("fa-youtube-play");
-                    youtubeIcon.setIconColor(context.getResources().getColor(R.color.primary));
+                    youtubeIcon.setIconColor(Color.RED);
                     iconDrawable = youtubeIcon;
                     showCounter = false;
                     break;
