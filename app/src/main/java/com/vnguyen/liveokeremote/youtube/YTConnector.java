@@ -25,7 +25,8 @@ public class YTConnector {
     public int maxResults = 50;
     public String nextPageToken = null;
     public String prevPageToken = null;
-    public int totalResults = 0;
+    // youtube API only allows 500 videos to return in all cases
+    public int totalResults = 500;
 
     // Your developer key goes here
     public static final String KEY
@@ -58,7 +59,7 @@ public class YTConnector {
             prevPageToken = response.getPrevPageToken();
             LogHelper.i("Next Page Token = " + nextPageToken);
             LogHelper.i("Previous Page Token = " + prevPageToken);
-            totalResults = response.getPageInfo().getTotalResults().intValue();
+            //totalResults = response.getPageInfo().getTotalResults().intValue();
             LogHelper.i("Total Results: " + totalResults);
             List<YTVideoItem> items = new ArrayList<YTVideoItem>();
             if (results != null) {

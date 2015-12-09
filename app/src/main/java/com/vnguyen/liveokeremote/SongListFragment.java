@@ -112,8 +112,10 @@ public class SongListFragment extends Fragment {
         int prevKey = Integer.parseInt(key) - 1;
         String prevKeyStr = (prevKey < 10 ? "0"+prevKey : ""+prevKey);
         LogHelper.i("prevKey = " + prevKeyStr + " - nextKey = " + nextKeyStr);
-        if (!ma.tokenMap.containsKey(nextKeyStr)) {
-            ma.tokenMap.put(nextKeyStr, ma.youtube.nextPageToken);
+        if (ma.youtube.nextPageToken != null) {
+            if (!ma.tokenMap.containsKey(nextKeyStr)) {
+                ma.tokenMap.put(nextKeyStr, ma.youtube.nextPageToken);
+            }
         }
         if (prevKey > 0) {
             if (ma.tokenMap.containsKey(prevKeyStr)) {
