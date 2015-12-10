@@ -343,18 +343,21 @@ public class UDPResponseHelper {
                         context.liveOkeUDPClient.rsvpList.clear();
                     }
                     String msgList = senderMSG.substring(8, senderMSG.length());
-                    LogHelper.v("msgList = " + msgList);
-                    StringTokenizer stok = new StringTokenizer(msgList, " ");
+                    // 12/2015
+                    // format as: Reserve:songnum.title.requester|songnum.title.requester...
+                    LogHelper.i("msgList = " + msgList);
+                    StringTokenizer stok = new StringTokenizer(msgList, "|");
 
                     while (stok.hasMoreTokens()) {
                         StringTokenizer reqTok = new StringTokenizer(stok.nextToken(), ".");
                         if (reqTok.hasMoreTokens()) {
                             final String songID = reqTok.nextToken();
+                            String title = reqTok.nextToken();
                             String requester = reqTok.nextToken().replace("_", " ");
                             try {
-                                context.db.open();
-                                final Song song = context.db.findSongByID(songID);
-                                if (song != null) {
+                                //context.db.open();
+                                //final Song song = context.db.findSongByID(songID);
+                                //if (song != null) {
                                     final User u = new User(requester);
                                     if (context.me.name.equalsIgnoreCase(requester)) {
                                         u.avatar = context.me.avatar;
@@ -374,13 +377,13 @@ public class UDPResponseHelper {
                                     if (u.avatar == null) {
                                         u.avatar = (new DrawableHelper()).buildDrawable(u.name.substring(0, 1), "round");
                                     }
-                                    final ReservedListItem rsvpItem = new ReservedListItem(u, song.title, song.icon, songID);
+                                    final ReservedListItem rsvpItem = new ReservedListItem(u, title, null, songID);
                                     context.liveOkeUDPClient.rsvpList.add(rsvpItem);
-                                }
+                                //}
                             } catch (Exception ex) {
                                 LogHelper.e(ex.getMessage(), ex);
                             } finally {
-                                context.db.close();
+                                //context.db.close();
                             }
                         }
                     }

@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
+import com.vnguyen.liveokeremote.LiveOkeRemoteApplication;
 import com.vnguyen.liveokeremote.helper.LogHelper;
 import com.vnguyen.liveokeremote.helper.UDPBroadcastHelper;
 
@@ -155,7 +157,7 @@ public class UDPListenerService extends Service {
         byte[] data = packet.getData();
         final String message = new String(data,0,data.length).trim();
 
-        //Log.v(LiveOkeRemoteApplication.TAG, "Got UDP broadcast from " + senderIP + ":" + senderPORT + ", message: " + message);
+        Log.v(LiveOkeRemoteApplication.TAG, "Got UDP broadcast from " + senderIP + ":" + senderPORT + ", message: " + message);
         broadcastIntent(senderIP, senderPORT, message);
         //socket.close();
     }

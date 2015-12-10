@@ -61,7 +61,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         // we then connect to it.
                         socket = new Socket(context.liveOkeUDPClient.liveOkeIPAddress, SERVER_TCP_PORT);
                         socket.setKeepAlive(false);
-                        LogHelper.d("Connected to LiveOke-TCP.");
+                        LogHelper.i("Connected to LiveOke-TCP.");
                         byteArrayOutputStream =
                                 new ByteArrayOutputStream(socket.getReceiveBufferSize());
                         byte[] buffer = new byte[socket.getReceiveBufferSize()];
@@ -73,7 +73,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         byteArrayOutputStream.write(buffer, 0, bytesRead);
                         byteArrayOutputStream.flush();
                         response = byteArrayOutputStream.toString("UTF-8");
-                        LogHelper.v("RESPONSE = " + response);
+                        //LogHelper.i("RESPONSE = " + response);
                         onReceived(response);
                         printStream.print("getsong");
                         printStream.flush();
@@ -84,9 +84,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         response = "";
                         // keep reading the stream until the end
                         while (true) {
-                            LogHelper.v("*** START READING ***");
+                            //LogHelper.i("*** START READING ***");
                             bytesRead = inputStream.read(buffer);
-                            LogHelper.v("*** BYTES READ = " + bytesRead);
+                            //LogHelper.i("*** BYTES READ = " + bytesRead);
                             if (bytesRead == -1) {
                                 break;
                             }
@@ -108,7 +108,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         // response string will be a string with delimiter |
                         // parse it and feed it into a processor
                         StringTokenizer stok = new StringTokenizer(response,"|");
-                        LogHelper.v("Total Tokens = " + stok.countTokens());
+                        LogHelper.i("Total Tokens = " + stok.countTokens());
                         while (stok.hasMoreTokens()) {
                             String rawSong = stok.nextToken().trim();
                             if (!rawSong.startsWith("Finish")) {
@@ -134,7 +134,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                     } finally {
                         if (socket != null) {
                             try {
-                                LogHelper.v("Closing the socket...");
+                                LogHelper.i("Closing the socket...");
                                 //socket.shutdownInput();
                                 //socket.shutdownOutput();
                                 socket.close();
@@ -174,9 +174,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 int cpus = Runtime.getRuntime().availableProcessors();
                 int maxThreads = cpus * 2;
                 maxThreads = (maxThreads > 0 ? maxThreads : 1);
-                LogHelper.v("CPUs: " + cpus);
-                LogHelper.v("Max Thread: " + maxThreads);
-                LogHelper.v("Total RAW = " + songRawDataList.size());
+                LogHelper.i("CPUs: " + cpus);
+                LogHelper.i("Max Thread: " + maxThreads);
+                LogHelper.i("Total RAW = " + songRawDataList.size());
                 executor = new ThreadPoolExecutor(
                         cpus, // core thread pool size
                         maxThreads, // maximum thread pool size
@@ -209,7 +209,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 while (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
                 }
                 if (context.liveOkeUDPClient.songs != null && !context.liveOkeUDPClient.songs.isEmpty()) {
-                    LogHelper.v("TOTAL SONG = " + context.liveOkeUDPClient.songs.size());
+                    LogHelper.i("TOTAL SONG = " + context.liveOkeUDPClient.songs.size());
                     insertDBNow(context.liveOkeUDPClient.songs);
                 }
                 executor = null;

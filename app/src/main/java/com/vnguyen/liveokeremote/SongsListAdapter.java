@@ -35,6 +35,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 public class SongsListAdapter extends BaseSwipeAdapter {
     private MainActivity context;
@@ -270,6 +271,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         } else {
             context.drawableHelper.setIconAsBackground("fa-search", R.color.white, rsvp4MeImgView, context);
             context.drawableHelper.setIconAsBackground("fa-trash", R.color.white, rsvp4FriendsImgView, context);
+            context.drawableHelper.setIconAsBackground("fa-youtube", R.color.white, add2FavImgView, context);
             add2FavImgView.setImageResource(android.R.color.transparent);
         }
 
@@ -293,8 +295,11 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                 public void onPositive(MaterialDialog materialDialog) {
                                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     if (context.liveOkeUDPClient != null) {
-                                        String cmd = "reserve," + idNumber.getText() + "," + context.me.name;
-                                        LogHelper.v("cmd = " + cmd);
+                                        String title = songTitle.getText()+"";
+                                        title = title.replace("."," ");
+                                        title.trim();
+                                        String cmd = "reserve," + idNumber.getText() + "."+ title + "," + context.me.name;
+                                        LogHelper.i("cmd = " + cmd);
                                         //context.webSocketHelper.sendMessage(cmd);
                                         context.liveOkeUDPClient.sendMessage(cmd,
                                                 context.liveOkeUDPClient.liveOkeIPAddress,
@@ -318,6 +323,13 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                                     "Ad is not ready to display, getting new Ad...");
                                             context.getNewAd();
                                         }
+                                        SnackbarManager.show(Snackbar.with(context)
+                                                .type(SnackbarType.MULTI_LINE)
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                .textColor(Color.WHITE)
+                                                .color(Color.BLACK)
+                                                .text("'" + songTitle.getText() + "' is reserved for " + context.me.name));
+
                                     } else {
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
@@ -375,7 +387,10 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                         if (context.liveOkeUDPClient != null) {
                                             //context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
-                                            context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() + "," + charSequence,
+                                            String title = songTitle.getText()+"";
+                                            title = title.replace("."," ");
+                                            title.trim();
+                                            context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() +"." + title + "," + charSequence,
                                                     context.liveOkeUDPClient.liveOkeIPAddress,
                                                     context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                             if (context.interstitialAd.isLoaded()) {
@@ -459,6 +474,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                     try {
                                         context.db.open();
                                         context.db.deleteFavorite(idNumber.getText().toString());
+                                        LogHelper.i("Delete favorite: id = " + idNumber.getText());
                                         for (Iterator<Song> it = songs.iterator();it.hasNext();) {
                                             Song song = it.next();
                                             if (song.convertedTitle.equalsIgnoreCase(idNumber.getText().toString())) {
@@ -515,7 +531,18 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         Song song = new Song();
                                         song.title = sTitle;
                                         song.convertedTitle = asciiTittle;
+
                                         context.db.open();
+                                        Song s = null;
+                                        try {
+                                            s = context.db.findSongByID(idNumber.getText() + "");
+                                        } catch (Exception x) {
+                                            if (s == null) {
+                                                // this is youtube (online) video
+                                                song.convertedTitle += "|" + idNumber.getText();
+                                            }
+                                        }
+                                        LogHelper.i("Saving to Favorite: song ID = " + idNumber.getText());
                                         context.db.save2Favorite(song);
                                         SnackbarManager.show(Snackbar.with(context)
                                                 .type(SnackbarType.MULTI_LINE)
@@ -537,6 +564,83 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                             .show();
                 } else {
                     // do nothing
+                    StringTokenizer stok = new StringTokenizer(idNumber.getText()+"","|");
+                    if (stok.countTokens() > 1) {
+                        // then it is an online youtube video, you can reserve it right here
+                        stok.nextElement();
+                        final String ytID = stok.nextToken();
+                        LogHelper.i("YouTube ID: " + ytID);
+                        new MaterialDialog.Builder(context)
+                                .title("Reserve This YouTube Song.")
+                                .content("Do you want to reserve this YouTube song for YOU?")
+                                .theme(Theme.LIGHT)  // the default is light, so you don't need this line
+                                .positiveText("OK")
+                                .negativeText("CANCEL")
+                                .callback(new MaterialDialog.ButtonCallback() {
+
+                                    @Override
+                                    public void onNegative(MaterialDialog materialDialog) {
+                                    }
+
+                                    @Override
+                                    public void onPositive(MaterialDialog materialDialog) {
+                                        //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
+                                        if (context.liveOkeUDPClient != null) {
+                                            String title = songTitle.getText()+"";
+                                            title = title.replace("."," ");
+                                            title.trim();
+                                            String cmd = "reserve," + ytID + "."+ title + "," + context.me.name;
+                                            LogHelper.i("cmd = " + cmd);
+                                            //context.webSocketHelper.sendMessage(cmd);
+                                            context.liveOkeUDPClient.sendMessage(cmd,
+                                                    context.liveOkeUDPClient.liveOkeIPAddress,
+                                                    context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
+                                            swipeLayout.toggle();
+                                            if (context.interstitialAd.isLoaded()) {
+                                                try {
+                                                    Thread.sleep(500);
+                                                } catch (InterruptedException e) {
+
+                                                }
+                                                context.interstitialAd.show();
+                                                // update the reserved count notification
+                                                //context.reservedCount++;
+                                                //context.notifCountButton.setText(String.valueOf(ma.reservedCount));
+                                            } else {
+                                                // Toast.makeText(listView.getContext(),
+                                                // "Ad not ready",
+                                                // Toast.LENGTH_SHORT).show();
+                                                LogHelper.i(
+                                                        "Ad is not ready to display, getting new Ad...");
+                                                context.getNewAd();
+                                            }
+                                            SnackbarManager.show(Snackbar.with(context)
+                                                    .type(SnackbarType.MULTI_LINE)
+                                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                    .textColor(Color.WHITE)
+                                                    .color(Color.BLACK)
+                                                    .text("'" + songTitle.getText() + "' is reserved for " + context.me.name));
+
+                                        } else {
+                                            SnackbarManager.show(Snackbar.with(context)
+                                                    .type(SnackbarType.MULTI_LINE)
+                                                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                                    .textColor(Color.WHITE)
+                                                    .color(Color.RED)
+                                                    .text("ERROR: Not Connected"));
+                                        }
+                                    }
+                                })
+                                .show();
+
+                    } else {
+                        SnackbarManager.show(Snackbar.with(context)
+                                .type(SnackbarType.MULTI_LINE)
+                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                                .textColor(Color.WHITE)
+                                .color(Color.BLACK)
+                                .text("Only YouTube video can be reserved from this screen!"));
+                    }
                 }
             }
         });

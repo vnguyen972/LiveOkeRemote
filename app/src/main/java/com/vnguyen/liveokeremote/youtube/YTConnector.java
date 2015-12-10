@@ -71,6 +71,7 @@ public class YTConnector {
                         item.setThumbnailURL(result.getSnippet().getThumbnails().getDefault().getUrl());
                     }
                     item.setId(result.getId().getVideoId());
+                    item.setChannelTitle(result.getSnippet().getChannelTitle());
                     items.add(item);
                 }
             }

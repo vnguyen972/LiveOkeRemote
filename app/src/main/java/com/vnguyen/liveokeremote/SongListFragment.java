@@ -1,5 +1,7 @@
 package com.vnguyen.liveokeremote;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.vnguyen.liveokeremote.data.Song;
 import com.vnguyen.liveokeremote.db.SongListDataSource;
 import com.vnguyen.liveokeremote.helper.DrawableHelper;
@@ -130,13 +134,25 @@ public class SongListFragment extends Fragment {
 //            LogHelper.i("k = " + k + "- v = " + val);
 //        }
         for (YTVideoItem ytVideo : ma.ytSearchResults) {
-            Song song = new Song();
+            final Song song = new Song();
             song.title = ytVideo.getTitle();
             song.id = ytVideo.getId();
-            song.icon = (new DrawableHelper()).buildDrawable(song.id.substring(0, 1), "round");
-            song.singer = "YouTube";
+            //song.icon = (new DrawableHelper()).buildDrawable(song.id.substring(0, 1), "round");
+            Ion.with(ma).load(ytVideo.getThumbnailURL())
+                    .withBitmap().asBitmap()
+                    .setCallback(new FutureCallback<Bitmap>() {
+                        @Override
+                        public void onCompleted(Exception e, Bitmap result) {
+                            if (result != null) {
+                                song.icon = new BitmapDrawable(result);
+                            } else {
+                                song.icon = (new DrawableHelper()).buildDrawable(song.id.substring(0, 1), "round");
+                            }
+                        }
+                    });
+            song.singer = ytVideo.getChannelTitle()+" (YouTube)";
             song.producer = "YouTube";
-            song.type = "online";
+            song.type = "youtube";
             ytList.add(song);
         }
         return ytList;

@@ -8,6 +8,15 @@ public class YTVideoItem {
     private String description;
     private String thumbnailURL;
     private String id;
+    private String channelTitle;
+
+    public String getChannelTitle() {
+        return channelTitle;
+    }
+
+    public void setChannelTitle(String channelTitle) {
+        this.channelTitle = channelTitle;
+    }
 
     public String getId() {
         return id;
