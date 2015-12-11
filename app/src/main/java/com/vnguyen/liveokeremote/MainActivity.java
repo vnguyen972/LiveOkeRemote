@@ -685,7 +685,9 @@ public class MainActivity extends ActionBarActivity {
                     public void run(){
                         // inititalize the 1st two pages
                         tokenMap.put("01", "");
-                        tokenMap.put("02", youtube.nextPageToken);
+                        if (youtube.nextPageToken != null) {
+                            tokenMap.put("02", youtube.nextPageToken);
+                        }
                         LogHelper.i("Youtube videos found: " + ytSearchResults.size());
                         getPagerYouTube();
                         updateMainDisplay();

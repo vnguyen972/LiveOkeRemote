@@ -130,7 +130,6 @@ public class SongResultsAdapter extends BaseAdapter {
         } else {
             holder.thumbNail.setImageDrawable(d);
         }
-
         holder.resultTitle.setText(result.Title);
         holder.resultArtist.setText(result.Artist);
         holder.resultHost.setText(result.HostName);

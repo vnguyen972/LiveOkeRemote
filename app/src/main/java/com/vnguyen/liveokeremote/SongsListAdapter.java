@@ -90,6 +90,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             view.setTag(holder);
         }
         holder.iconImgView.setImageDrawable(song.icon);
+        notifyDataSetChanged();
         holder.iconImgView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
