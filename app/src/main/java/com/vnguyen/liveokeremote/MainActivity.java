@@ -397,7 +397,7 @@ public class MainActivity extends ActionBarActivity {
                     if (liveOkeUDPClient.doneGettingSongList) {
                         toggleOff();
                         String ip = PreferencesHelper.getInstance(MainActivity.this).getPreference("ipAddress");
-                        if (liveOkeUDPClient.pingCount > 3) {
+                        if (liveOkeUDPClient.pingCount > 0) {
                             // after about 3 pings without pong, reset the address
                             // only if no ipAddress in Preference.
                             if (ip == null || ip.equals("")) {
