@@ -103,6 +103,7 @@ public class MainActivity extends ActionBarActivity {
     public ArrayList<User> friendsList;
     public ConcurrentHashMap<String, String> pagerTitles;
     public int totalSong;
+    public boolean bye = false;
 
     public Uri mImageCaptureUri;
     public AquiredPhoto aquiredPhoto;
@@ -396,11 +397,12 @@ public class MainActivity extends ActionBarActivity {
                     if (liveOkeUDPClient.doneGettingSongList) {
                         toggleOff();
                         String ip = PreferencesHelper.getInstance(MainActivity.this).getPreference("ipAddress");
-                        if (liveOkeUDPClient.pingCount > 0) {
-                            // after about 10 pings without pong, reset the address
+                        if (liveOkeUDPClient.pingCount > 3) {
+                            // after about 3 pings without pong, reset the address
                             // only if no ipAddress in Preference.
                             if (ip == null || ip.equals("")) {
                                 liveOkeUDPClient.liveOkeIPAddress = null;
+                                bye = true;
                             }
                         }
                         liveOkeUDPClient.sendMessage("Ping", liveOkeUDPClient.liveOkeIPAddress, LiveOkeUDPClient.LIVEOKE_UDP_PORT);

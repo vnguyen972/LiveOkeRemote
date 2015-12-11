@@ -246,6 +246,11 @@ public class UDPResponseHelper {
                 if (senderMSG.equalsIgnoreCase("Pong")) {
                     Log.v(LiveOkeRemoteApplication.TAG, "Received Pong.");
                     context.liveOkeUDPClient.pingCount = 0;
+                    if (context.bye) {
+                        // if got disconnected already, then init the client again
+                        context.liveOkeUDPClient.initClient();
+                        context.bye = false;
+                    }
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
