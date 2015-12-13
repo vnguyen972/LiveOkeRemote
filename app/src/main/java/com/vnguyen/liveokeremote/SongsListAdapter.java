@@ -43,6 +43,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
     private Typeface font;
     private Typeface font2;
     private SwipeLayout swipeLayout;
+    private String[] charToReplace = {";",".",","};
 
     public SongsListAdapter(Context context, ArrayList<Song> songs) {
         this.context = (MainActivity) context;
@@ -297,7 +298,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                     //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                     if (context.liveOkeUDPClient != null) {
                                         String title = songTitle.getText()+"";
-                                        title = title.replace("."," ");
+                                        title = replaceString(title);
                                         title.trim();
                                         String cmd = "reserve," + idNumber.getText() + "."+ title + "," + context.me.name;
                                         LogHelper.i("cmd = " + cmd);
@@ -389,7 +390,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         if (context.liveOkeUDPClient != null) {
                                             //context.webSocketHelper.sendMessage("reserve," + idNumber.getText() + "," + charSequence);
                                             String title = songTitle.getText()+"";
-                                            title = title.replace("."," ");
+                                            title = replaceString(title);
                                             title.trim();
                                             context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() +"." + title + "," + charSequence,
                                                     context.liveOkeUDPClient.liveOkeIPAddress,
@@ -588,7 +589,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         //if (context.webSocketHelper != null && context.webSocketHelper.isConnected()) {
                                         if (context.liveOkeUDPClient != null) {
                                             String title = songTitle.getText()+"";
-                                            title = title.replace("."," ");
+                                            title = replaceString(title);
                                             title.trim();
                                             String cmd = "reserve," + ytID + "."+ title + "," + context.me.name;
                                             LogHelper.i("cmd = " + cmd);
@@ -645,6 +646,14 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                 }
             }
         });
+    }
+
+    private String replaceString(String inStr) {
+        String outStr = inStr;
+        for (String str : charToReplace) {
+            outStr = outStr.replace(str, " ");
+        }
+        return outStr;
     }
 
         private class SongListViewHolder {
