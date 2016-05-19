@@ -103,6 +103,7 @@ public class MainActivity extends ActionBarActivity {
     public ArrayList<User> friendsList;
     public ConcurrentHashMap<String, String> pagerTitles;
     public int totalSong;
+    public int totalBytes;
     public boolean bye = false;
 
     public Uri mImageCaptureUri;

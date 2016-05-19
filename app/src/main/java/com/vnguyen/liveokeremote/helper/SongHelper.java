@@ -151,6 +151,8 @@ public class SongHelper {
         }
         String s = new String(b);
         String[] str = s.split(";");
+        //LogHelper.i("STR = " + str[0] + " - length = " + str.length);
+        //LogHelper.i("DATA = " + data);
         song.id= str[0];
         if (str[1].equals("")) {
             song.title = "?Unavailable";

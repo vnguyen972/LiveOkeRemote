@@ -68,12 +68,12 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         inputStream = socket.getInputStream();
                         OutputStream outputStream = socket.getOutputStream();
                         PrintStream printStream = new PrintStream(outputStream);
-                        // after connect, LiveOke sends "totalsongs"
+                        // after connect, LiveOke sends "totalbytes"
                         bytesRead = inputStream.read(buffer);
                         byteArrayOutputStream.write(buffer, 0, bytesRead);
                         byteArrayOutputStream.flush();
                         response = byteArrayOutputStream.toString("UTF-8");
-                        //LogHelper.i("RESPONSE = " + response);
+                        LogHelper.i("RESPONSE = " + response);
                         onReceived(response);
                         printStream.print("getsong");
                         printStream.flush();
@@ -83,32 +83,35 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         buffer = new byte[1024*1024*5];
                         response = "";
                         // keep reading the stream until the end
+                        int totalBytesReadSoFar = 0;
+                        int percentage = 0;
                         while (true) {
                             //LogHelper.i("*** START READING ***");
                             bytesRead = inputStream.read(buffer);
-                            //LogHelper.i("*** BYTES READ = " + bytesRead);
-                            if (bytesRead == -1) {
-                                break;
-                            }
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    pd.setMessage("Reading from LiveOke... " + bytesRead + " bytes.");
-                                }
-                            });
+//                            LogHelper.i("*** BYTES READ = " + bytesRead);
+                            totalBytesReadSoFar += bytesRead;
+//                            LogHelper.i("*** TOTAL BYTES READ = " + totalBytesReadSoFar);
                             byteArrayOutputStream.write(buffer, 0, bytesRead);
                             response += byteArrayOutputStream.toString("UTF-8");
-                            // clear out the outputstream array
-                            // send 'getsong' until we get everything
                             byteArrayOutputStream.reset();
-                            printStream.print("getsong");
-                            printStream.flush();
-                            pd.incrementSecondaryProgressBy(1);
+                            percentage = totalBytesReadSoFar * 100 / context.totalBytes;
+                            LogHelper.i(percentage + "% ...");
+                            pd.incrementSecondaryProgressBy(percentage);
+                            if (totalBytesReadSoFar == context.totalBytes) {
+                                break;
+                            }
                         }
                         // response string will be a string with delimiter |
                         // parse it and feed it into a processor
                         StringTokenizer stok = new StringTokenizer(response,"|");
-                        LogHelper.i("Total Tokens = " + stok.countTokens());
+                        //LogHelper.i("Total Tokens = " + stok.countTokens());
+                        context.totalSong = stok.countTokens();
+                        context.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pd.setMessage("Total song: " + context.totalSong);
+                            }
+                        });
                         while (stok.hasMoreTokens()) {
                             String rawSong = stok.nextToken().trim();
                             if (!rawSong.startsWith("Finish")) {
@@ -120,6 +123,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             @Override
                             public void run() {
                                 pd.setMessage("Processing...");
+
                             }
                         });
                         onReceived("Finish");
@@ -135,8 +139,6 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         if (socket != null) {
                             try {
                                 LogHelper.i("Closing the socket...");
-                                //socket.shutdownInput();
-                                //socket.shutdownOutput();
                                 socket.close();
                                 byteArrayOutputStream.close();
                                 inputStream.close();
@@ -160,6 +162,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
             String songData = message.substring(9, message.length());
             songRawDataList.add(songData);
         } else if (message.startsWith("totalsong:")) {
+            context.totalBytes = Integer.parseInt(message.substring(10, message.length()));
             context.totalSong = Integer.parseInt(message.substring(10, message.length()));
             songRawDataList = new ArrayList<>();
             context.liveOkeUDPClient.gotTotalSongResponse = true;

@@ -358,6 +358,8 @@ public class UDPResponseHelper {
                         if (reqTok.hasMoreTokens()) {
                             final String songID = reqTok.nextToken();
                             String title = reqTok.nextToken();
+                            reqTok.nextToken(); //skip one
+                            reqTok.nextToken(); // skip this one too (thumbnail pic)
                             String requester = reqTok.nextToken().replace("_", " ");
                             try {
                                 //context.db.open();

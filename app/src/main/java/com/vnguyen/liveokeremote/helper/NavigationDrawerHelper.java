@@ -192,7 +192,7 @@ public class NavigationDrawerHelper {
                                                             @Override
                                                             public void run() {
                                                                 pd.setMax(context.totalSong);
-                                                                pd.setTitle("Please wait while downloading " + context.totalSong + " songs...");
+                                                                pd.setTitle("Downloading " + context.totalSong + " bytes...");
 
                                                             }
                                                         });
