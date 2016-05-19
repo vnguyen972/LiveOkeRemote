@@ -151,6 +151,7 @@ public class SongListFragment extends Fragment {
                         }
                     });
             song.singer = ytVideo.getChannelTitle()+" (YouTube)";
+            song.singerIcon = ytVideo.getThumbnailURL();
             song.producer = "YouTube";
             song.type = "youtube";
             ytList.add(song);

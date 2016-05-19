@@ -355,11 +355,12 @@ public class UDPResponseHelper {
 
                     while (stok.hasMoreTokens()) {
                         StringTokenizer reqTok = new StringTokenizer(stok.nextToken(), ".");
+                        String thumbnailURL;
                         if (reqTok.hasMoreTokens()) {
                             final String songID = reqTok.nextToken();
                             String title = reqTok.nextToken();
-                            reqTok.nextToken(); //skip one
-                            reqTok.nextToken(); // skip this one too (thumbnail pic)
+                            reqTok.nextToken(); // (youtube song id)
+                            thumbnailURL = reqTok.nextToken(); //  (thumbnail pic)
                             String requester = reqTok.nextToken().replace("_", " ");
                             try {
                                 //context.db.open();

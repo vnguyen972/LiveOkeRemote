@@ -69,7 +69,7 @@ public class RsvpListAdapter extends BaseSwipeAdapter {
             holder.icon.setImageDrawable(item.requester.avatar);
             notifyDataSetChanged();
         }
-        holder.title.setText(Html.fromHtml(item.title + "<br>" + item.requester.name));
+        holder.title.setText(Html.fromHtml(item.title + "<br><b>" + item.requester.name + "</b>"));
         holder.num.setText(item.number);
     }
 

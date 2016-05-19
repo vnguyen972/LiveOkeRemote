@@ -77,6 +77,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             holder = new SongListViewHolder();
             holder.iconImgView = (ImageView) view.findViewById(R.id.songs_icon);
             holder.idTxtView = (TextView) view.findViewById(R.id.song_id);
+            holder.iconUrlView = (TextView) view.findViewById(R.id.song_icon_url);
             holder.titleTxtView = (TextView) view.findViewById(R.id.song_title);
             TextView tv = (TextView) view.findViewById(R.id.song_singer);
             if (tv != null) {
@@ -90,6 +91,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
             holder.position = position;
             view.setTag(holder);
         }
+
         holder.iconImgView.setImageDrawable(song.icon);
         notifyDataSetChanged();
         holder.iconImgView.setOnClickListener(new View.OnClickListener() {
@@ -178,6 +180,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         } else {
             holder.idTxtView.setText(song.id.trim());
         }
+        holder.iconUrlView.setText(song.singerIcon);
         holder.titleTxtView.setTypeface(font);
 //        holder.titleTxtView.setTextSize(21);
         holder.titleTxtView.setText(song.title.trim());
@@ -262,6 +265,8 @@ public class SongsListAdapter extends BaseSwipeAdapter {
 
         final TextView idNumber = (TextView) vTop.findViewById(R.id.song_id);
 
+        final TextView iconURL = (TextView) vTop.findViewById(R.id.song_icon_url);
+
         ImageView rsvp4MeImgView = (ImageView) vBottom.findViewById(R.id.reserve_for_me_id);
         ImageView rsvp4FriendsImgView = (ImageView) vBottom.findViewById(R.id.reserve_for_friends_id);
         ImageView add2FavImgView = (ImageView) vBottom.findViewById(R.id.add_to_favorites_id);
@@ -300,7 +305,9 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         String title = songTitle.getText()+"";
                                         title = replaceString(title);
                                         title.trim();
-                                        String cmd = "reserve," + idNumber.getText() + "."+ title + "," + context.me.name;
+                                        String icURL = iconURL.getText() + "";
+                                        icURL = icURL.replace(".","*");
+                                        String cmd = "reserve," + idNumber.getText() + "."+ title + "." + icURL + "," + context.me.name;
                                         LogHelper.i("cmd = " + cmd);
                                         //context.webSocketHelper.sendMessage(cmd);
                                         context.liveOkeUDPClient.sendMessage(cmd,
@@ -392,7 +399,9 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                             String title = songTitle.getText()+"";
                                             title = replaceString(title);
                                             title.trim();
-                                            context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() +"." + title + "," + charSequence,
+                                            String icURL = iconURL.getText() + "";
+                                            icURL = icURL.replace(".","*");
+                                            context.liveOkeUDPClient.sendMessage("reserve," + idNumber.getText() +"." + title + "." + icURL +  "," + charSequence,
                                                     context.liveOkeUDPClient.liveOkeIPAddress,
                                                     context.liveOkeUDPClient.LIVEOKE_UDP_PORT);
                                             if (context.interstitialAd.isLoaded()) {
@@ -541,7 +550,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                         } catch (Exception x) {
                                             if (s == null) {
                                                 // this is youtube (online) video
-                                                song.convertedTitle += "|" + idNumber.getText();
+                                                song.convertedTitle += "|" + idNumber.getText()+"|"+iconURL.getText();
                                             }
                                         }
                                         LogHelper.i("Saving to Favorite: song ID = " + idNumber.getText());
@@ -569,8 +578,10 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                     StringTokenizer stok = new StringTokenizer(idNumber.getText()+"","|");
                     if (stok.countTokens() > 1) {
                         // then it is an online youtube video, you can reserve it right here
-                        stok.nextElement();
+                        // skip the title
+                        String vs = stok.nextToken();
                         final String ytID = stok.nextToken();
+                        final String thumbURL = stok.nextToken();
                         LogHelper.i("YouTube ID: " + ytID);
                         new MaterialDialog.Builder(context)
                                 .title("Reserve This YouTube Song.")
@@ -591,7 +602,9 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                                             String title = songTitle.getText()+"";
                                             title = replaceString(title);
                                             title.trim();
-                                            String cmd = "reserve," + ytID + "."+ title + "," + context.me.name;
+                                            String icURL = iconURL.getText() + "";
+                                            icURL = icURL.replace(".","*");
+                                            String cmd = "reserve," + ytID + "."+ title + "." + thumbURL.replace(".","*") + "," + context.me.name;
                                             LogHelper.i("cmd = " + cmd);
                                             //context.webSocketHelper.sendMessage(cmd);
                                             context.liveOkeUDPClient.sendMessage(cmd,
@@ -659,6 +672,7 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         private class SongListViewHolder {
             ImageView iconImgView;
             TextView idTxtView;
+            TextView iconUrlView;
             TextView titleTxtView;
             TextView singerTxtView;
             TextView producerTxtView;
