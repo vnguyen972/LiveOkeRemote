@@ -112,6 +112,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                                 pd.setMessage("Total song: " + context.totalSong);
                             }
                         });
+                        context.liveOkeUDPClient.gotTotalSongResponse = true;
                         while (stok.hasMoreTokens()) {
                             String rawSong = stok.nextToken().trim();
                             if (!rawSong.startsWith("Finish")) {
@@ -163,9 +164,9 @@ public class SongListRetriever implements  LiveOkeTCPClient {
             songRawDataList.add(songData);
         } else if (message.startsWith("totalsong:")) {
             context.totalBytes = Integer.parseInt(message.substring(10, message.length()));
-            context.totalSong = Integer.parseInt(message.substring(10, message.length()));
+            //context.totalSong = Integer.parseInt(message.substring(10, message.length()));
             songRawDataList = new ArrayList<>();
-            context.liveOkeUDPClient.gotTotalSongResponse = true;
+            //context.liveOkeUDPClient.gotTotalSongResponse = true;
         } else if (message.startsWith("Finish")) {
             // done receiving songs list
             // now it's time to process them
@@ -227,7 +228,6 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                 LogHelper.e(ex.getMessage(), ex);
                 exception = ex;
             } finally {
-                context.liveOkeUDPClient.doneGettingSongList = true;
                 if (executor != null) {
                     executor.shutdown();
                     try {
@@ -244,6 +244,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         context.updateMainDisplay();
                     }
                 });
+                context.liveOkeUDPClient.doneGettingSongList = true;
             }
         }
     }

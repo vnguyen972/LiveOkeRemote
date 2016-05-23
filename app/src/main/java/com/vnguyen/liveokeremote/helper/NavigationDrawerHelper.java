@@ -192,7 +192,7 @@ public class NavigationDrawerHelper {
                                                             @Override
                                                             public void run() {
                                                                 pd.setMax(context.totalSong);
-                                                                pd.setTitle("Downloading " + context.totalSong + " bytes...");
+                                                                pd.setTitle("Downloading " + context.totalSong + " songs...");
 
                                                             }
                                                         });
