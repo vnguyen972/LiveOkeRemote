@@ -176,9 +176,9 @@ public class NavigationDrawerHelper {
                                                     LogHelper.v("PRE-Exec: sending 'getsonglist' command...");
                                                     while (!context.liveOkeUDPClient.gotTotalSongResponse) {
                                                         long currTime = System.currentTimeMillis();
-                                                        if (currTime - startTime > 10000) {
-                                                            break;
-                                                        }
+//                                                        if (currTime - startTime > 10000) {
+//                                                            break;
+//                                                        }
                                                         LogHelper.v("PRE-Exec: waiting for total song");
                                                         try {
                                                             Thread.sleep(1000);

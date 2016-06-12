@@ -85,6 +85,7 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                         // keep reading the stream until the end
                         int totalBytesReadSoFar = 0;
                         int percentage = 0;
+                        pd.setMax(context.totalBytes);
                         while (true) {
                             //LogHelper.i("*** START READING ***");
                             bytesRead = inputStream.read(buffer);
@@ -96,7 +97,14 @@ public class SongListRetriever implements  LiveOkeTCPClient {
                             byteArrayOutputStream.reset();
                             percentage = totalBytesReadSoFar * 100 / context.totalBytes;
                             LogHelper.i(percentage + "% ...");
-                            pd.incrementSecondaryProgressBy(percentage);
+                            final int perc = percentage;
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pd.setMessage("Receiving ... " + perc + "%");
+                                    pd.incrementSecondaryProgressBy(perc);
+                                }
+                            });
                             if (totalBytesReadSoFar == context.totalBytes) {
                                 break;
                             }
