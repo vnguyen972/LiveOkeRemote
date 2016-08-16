@@ -142,7 +142,7 @@ public class UDPListenerService extends Service {
     }
 
     private void listenAndWaitAndThrowIntent(InetAddress broadcastIP) throws Exception {
-        byte[] recvBuf = new byte[590];
+        byte[] recvBuf = new byte[8192];
         if (socket == null || socket.isClosed()) {
             socket = new DatagramSocket(BROADCAST_PORT, broadcastIP);
             socket.setBroadcast(true);
