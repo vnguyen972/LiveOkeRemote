@@ -1,5 +1,6 @@
 package com.vnguyen.liveokeremote.helper;
 
+import android.Manifest;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;

@@ -135,32 +135,32 @@ public class SongsListAdapter extends BaseSwipeAdapter {
                         @Override
                         protected void onPostExecute(Void aVoid) {
                             // @todo: research to fix this July 2015
-                            dialog = new MaterialDialog.Builder(context)
-                                    .title(Html.fromHtml("Found <font color='#009688'>" + song.title + "</font> Online: "))
-                                    .adapter(adapter, new MaterialDialog.ListCallback() {
-                                        @Override
-                                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-
-                                        }
-                                    })
-                                    .build();
-                            dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                                @Override
-                                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                                        if (adapter.myHandler != null) {
-                                            adapter.myHandler.removeCallbacks(adapter.mProgressUpdater);
-                                            context.mediaPlayer.stop();
-                                        }
-                                        dialog.dismiss();
-                                    }
-                                    // return false: telling Android that I ONLY handle the
-                                    // keys specified here, Android does the rest.
-                                    return false;
-                                }
-                            });
-                            adh.dismissProgress();
-                            dialog.show();
+//                            dialog = new MaterialDialog.Builder(context)
+//                                    .title(Html.fromHtml("Found <font color='#009688'>" + song.title + "</font> Online: "))
+//                                    .adapter(adapter, new MaterialDialog.ListCallback() {
+//                                        @Override
+//                                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+//
+//                                        }
+//                                    })
+//                                    .build();
+//                            dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+//                                @Override
+//                                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+//                                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                                        if (adapter.myHandler != null) {
+//                                            adapter.myHandler.removeCallbacks(adapter.mProgressUpdater);
+//                                            context.mediaPlayer.stop();
+//                                        }
+//                                        dialog.dismiss();
+//                                    }
+//                                    // return false: telling Android that I ONLY handle the
+//                                    // keys specified here, Android does the rest.
+//                                    return false;
+//                                }
+//                            });
+//                            adh.dismissProgress();
+//                            dialog.show();
                         }
 
                     };
@@ -180,7 +180,9 @@ public class SongsListAdapter extends BaseSwipeAdapter {
         } else {
             holder.idTxtView.setText(song.id.trim());
         }
-        holder.iconUrlView.setText(song.singerIcon);
+        if (song.singerIcon != null) {
+            holder.iconUrlView.setText(song.singerIcon);
+        }
         holder.titleTxtView.setTypeface(font);
 //        holder.titleTxtView.setTextSize(21);
         holder.titleTxtView.setText(song.title.trim());

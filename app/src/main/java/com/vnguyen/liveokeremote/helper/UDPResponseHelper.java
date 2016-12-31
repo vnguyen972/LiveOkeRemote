@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -107,7 +108,8 @@ public class UDPResponseHelper {
     public void processMessage(String senderIP, String senderMSG) {
             if (senderMSG.startsWith("{")) {
                 // Message is a JSON message
-                final LiveOkeRemoteBroadcastMsg msg = (new Gson()).fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd hh:mm a").create();
+                final LiveOkeRemoteBroadcastMsg msg = gson.fromJson(senderMSG, LiveOkeRemoteBroadcastMsg.class);
                 msg.ipAddress = senderIP;
                 LogHelper.v("msg.ip = " + msg.ipAddress);
                 if (msg.greeting.equalsIgnoreCase("my.avatar")) {

@@ -66,7 +66,7 @@ public class ChatAdapter extends BaseAdapter {
 //        } else {
 //            holder = (ChatViewHolder) convertView.getTag();
         }
-        holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + ": " + message.message + "   "));
+        holder.message.setText(Html.fromHtml(message.time + "<BR>" + message.name + ": " + message.message + "   "));
 //        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.message.getLayoutParams();
 //        RelativeLayout.LayoutParams lp2 = (RelativeLayout.LayoutParams) holder.chatterIcon.getLayoutParams();
         //holder.message.setBackground(null);
@@ -99,22 +99,22 @@ public class ChatAdapter extends BaseAdapter {
             holder.message.setBackground(null);
             //lp.gravity = Gravity.LEFT;
             holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
-            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is off-line!"));
+            holder.message.setText(Html.fromHtml(message.time + "<BR>" + message.name + " is off-line!"));
         } else if (message.greeting.equalsIgnoreCase("Hi")) {
             holder.message.setBackground(null);
             //lp.gravity = Gravity.LEFT;
             holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
-            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is on-line!"));
+            holder.message.setText(Html.fromHtml(message.time + "<BR>" + message.name + " is on-line!"));
         } else if (message.greeting.equalsIgnoreCase("Pause")) {
             holder.message.setBackground(null);
             //lp.gravity = Gravity.LEFT;
             holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
-            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is not active and will NOT receive any messages!"));
+            holder.message.setText(Html.fromHtml(message.time + "<BR>" + message.name + " is not active and will NOT receive any messages!"));
         } else if (message.greeting.equalsIgnoreCase("Resume")) {
             holder.message.setBackground(null);
             //lp.gravity = Gravity.LEFT;
             holder.message.setTextColor(context.getResources().getColor(R.color.half_black));
-            holder.message.setText(Html.fromHtml(message.getDateTime() + "<BR>" + message.name + " is now active and will receive messages!"));
+            holder.message.setText(Html.fromHtml(message.time + "<BR>" + message.name + " is now active and will receive messages!"));
         }
         //holder.message.setLayoutParams(lp);
 //        holder.message.setLayoutParams(holder.msgLayoutParams);

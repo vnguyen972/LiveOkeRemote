@@ -1,6 +1,7 @@
 package com.vnguyen.liveokeremote;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -47,7 +49,6 @@ import android.widget.ViewFlipper;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.androidquery.AQuery;
-import com.github.fernandodev.easyratingdialog.library.EasyRatingDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -154,7 +155,6 @@ public class MainActivity extends ActionBarActivity {
 
     private Handler handler = new Handler();
     private Runnable pingPong;
-    private EasyRatingDialog easyRatingDialog;
 
     public MediaPlayer mediaPlayer;
     public ChatHelper chatHelper;
@@ -170,7 +170,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        easyRatingDialog.onStart();
     }
 
     @Override
@@ -181,11 +180,24 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    protected boolean shouldAskPermissions() {
+        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
+    @TargetApi(23)
+    protected void askPermissions() {
+        String[] permissions = {
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+        };
+        int requestCode = 200;
+        requestPermissions(permissions, requestCode);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         chatHelper = new ChatHelper(this);
-        easyRatingDialog = new EasyRatingDialog(this);
         mediaPlayer = new MediaPlayer();
         youtube = new YTConnector(this);
         notificationHelper = new NotificationHelper(MainActivity.this);
@@ -414,7 +426,9 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
-
+        if (shouldAskPermissions()) {
+            askPermissions();
+        }
     }
 
     @Override
@@ -430,7 +444,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        easyRatingDialog.showIfNeeded();
         LogHelper.v("*** App RESUMING ***");
         if (liveOkeUDPClient != null) {
             liveOkeUDPClient.initClient();
@@ -464,6 +477,7 @@ public class MainActivity extends ActionBarActivity {
             }
         }
     }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
