@@ -98,7 +98,7 @@ public class UDPListenerService extends Service {
         try {
             byte[] sendData = message.getBytes();
 
-            InetAddress address = (new UDPBroadcastHelper()).getBroadcastAddress((WifiManager)getSystemService(Context.WIFI_SERVICE));
+            InetAddress address = (new UDPBroadcastHelper()).getBroadcastAddress((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE));
             LogHelper.i("** --> About to broadcast '" + message + "' to: " + address.getHostAddress() +":"+port);
             DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length,address, port);
             socket.send(sendPacket);
